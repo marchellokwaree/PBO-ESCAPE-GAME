@@ -3,7 +3,7 @@ package Entitiy;
 import java.awt.Graphics2D;
 import java.awt.Image;
 import Main.GamePanel;
-import Main.KeyHandler;
+import Main.KeyHandler; 
 
 public class Player extends Entity {
     GamePanel gp;
