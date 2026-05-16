@@ -41,7 +41,7 @@ public class GamePanel extends JPanel implements Runnable {
     Thread gameThread;
     Player player;
     
-    Image Tanah, wall, playerimg;
+    Image Tanah, wall, playerimg, ExitDoor;
     BufferedImage bufferedImage;
 
     public GamePanel() {
@@ -67,6 +67,16 @@ public class GamePanel extends JPanel implements Runnable {
                 }
             }
         }
+
+        int endX = 0, endY = 0;
+        for (int i = 0; i < maxScreenRow; i++) {
+            for (int j = 0; j < maxScreenCol; j++) {
+                if (map1[i][j] == 'N') {
+                    endX = j * tileSize;
+                    endY = i * tileSize;
+                }
+            }
+        }
         
         // Pastikan parameter Player sesuai dengan constructor baru di Player.java
         player = new Player(this, keyH, playerimg, startX, startY);
@@ -82,6 +92,7 @@ public class GamePanel extends JPanel implements Runnable {
             // Loading Tiles
             this.Tanah = loadImage("/Assets/lab_tileset_LITE/seperated/tile031.png");
             this.wall = loadImage("/Assets/lab_tileset_LITE/seperated/tile066.png");
+            this.ExitDoor = loadImage("/Assets/lab_tileset_LITE/seperated/tile067.png");
         } catch (Exception e) {
             System.err.println("Error loading assets!");
             e.printStackTrace();
@@ -130,7 +141,10 @@ public class GamePanel extends JPanel implements Runnable {
                 repaint();
                 delta--;
             }
+            checkWinCondition();
         }
+
+
     }
 
     public void update() {
@@ -148,10 +162,30 @@ public class GamePanel extends JPanel implements Runnable {
                 if (map1[i][j] == '1' && wall != null) {
                     g2.drawImage(wall, j * tileSize, i * tileSize, tileSize, tileSize, null);
                 }
+                if (map1[i][j] == 'N' && ExitDoor != null) {
+                    g2.drawImage(ExitDoor, j * tileSize, i * tileSize, tileSize, tileSize, null);
+                }
             }
         }
 
         if (player != null) player.draw(g2);
         g2.dispose();
+    }
+
+    protected void checkWinCondition() {
+        int playerTileX = player.x / tileSize;
+        int playerTileY = player.y / tileSize;
+
+        if (map1[playerTileY][playerTileX] == 'N') {
+            // Tampilkan pesan kemenangan
+            System.out.println("Congratulations! You've reached the exit!");
+            WinGame();
+        }
+    }
+
+    protected void WinGame() {
+        // Implementasi logika kemenangan, matikan game loop, dan tampilkan pesan kemenangan
+        System.out.println("Congratulations! You've reached the exit!");
+        System.exit(0); // Keluar dari game
     }
 }
