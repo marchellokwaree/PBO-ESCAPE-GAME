@@ -3,13 +3,14 @@ package Entitiy;
 import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.image.BufferedImage;
+import java.io.File;
 import java.io.IOException;
+import java.net.URL;
 
 import javax.imageio.ImageIO;
 
 import Main.GamePanel;
 import Main.KeyHandler;
-
 
 public class Player extends Entity {
     GamePanel gp;
@@ -26,17 +27,19 @@ public class Player extends Entity {
         super(x, y, 2); // speed 2
         this.gp = gp;
         this.keyH = keyH;
-        this.currentImage = playerImg; 
+        this.currentImage = playerImg;
         try {
-            this.bufferedImage = ImageIO.read(getClass().getResourceAsStream("/Assets/ASSET/AnimationSheet.png"));
+            this.bufferedImage = loadBufferedImage("/Assets/ASSET/ASSETKARAKTER/AnimationSheet.png");
             int spriteWidth = 24; // Lebar setiap sprite
             int spriteHeight = 24; // Tinggi setiap sprite
             int row2Y = (1 * spriteHeight) + 1; // Y untuk baris kedua
-            for (int i = 0; i < 8; i++) {
-                int colx = i * spriteWidth; // X untuk setiap kolom
-                walkImages[i] = bufferedImage.getSubimage(colx, row2Y, spriteWidth, spriteHeight);
+            if (this.bufferedImage != null) {
+                for (int i = 0; i < 8; i++) {
+                    int colx = i * spriteWidth; // X untuk setiap kolom
+                    walkImages[i] = bufferedImage.getSubimage(colx, row2Y, spriteWidth, spriteHeight);
+                }
             }
-        } catch (IOException e) {
+        } catch (Exception e) {
             System.out.println("Error loading animation sheet: " + e.getMessage());
             e.printStackTrace();
         }
@@ -50,10 +53,14 @@ public class Player extends Entity {
         // Cek Input dan tentukan gambar (Bisa dikembangkan per arah jika ada asetnya)
         if (keyH.upPressed || keyH.downPressed || keyH.leftPressed || keyH.rightPressed) {
             moving = true;
-            if (keyH.upPressed) nextY -= speed;
-            if (keyH.downPressed) nextY += speed;
-            if (keyH.leftPressed) nextX -= speed;
-            if (keyH.rightPressed) nextX += speed;
+            if (keyH.upPressed)
+                nextY -= speed;
+            if (keyH.downPressed)
+                nextY += speed;
+            if (keyH.leftPressed)
+                nextX -= speed;
+            if (keyH.rightPressed)
+                nextX += speed;
         }
 
         // LOGIKA ANIMASI: Berganti antara spriteNum 1 dan 2 saat bergerak
@@ -96,30 +103,40 @@ public class Player extends Entity {
         }
     }
 
+    private BufferedImage loadBufferedImage(String path) {
+        try {
+            URL url = getClass().getResource(path);
+            if (url != null) {
+                return ImageIO.read(url);
+            }
+            return ImageIO.read(new File("src" + path));
+        } catch (IOException e) {
+            System.err.println("Failed to load player buffered image: " + path + " -> " + e.getMessage());
+            return null;
+        }
+    }
+
     public void draw(Graphics2D g2) {
         int drawY = y;
         Image walkingImage = null;
-        
+
         // EFEK VISUAL JALAN:
-        // Jika sedang melangkah (spriteNum 2), gambar naik sedikit agar terlihat seperti melangkah
-        // Jika kamu sudah punya 2 gambar berbeda, kamu bisa mengganti gambarnya di sini.
+        // Jika sedang melangkah (spriteNum 2), gambar naik sedikit agar terlihat
+        // seperti melangkah
+        // Jika kamu sudah punya 2 gambar berbeda, kamu bisa mengganti gambarnya di
+        // sini.
         if (spriteNum == 2) {
-            drawY -= 4; 
-             // Ganti ke gambar berjalan
-             walkingImage = walkImages[1]; // Contoh: potongan gambar untuk langkah kedua
-        }
-        else {
+            drawY -= 4;
+            // Ganti ke gambar berjalan
+            walkingImage = walkImages[1]; // Contoh: potongan gambar untuk langkah kedua
+        } else {
             walkingImage = currentImage; // Gambar diam
         }
-
-
-
 
         java.awt.geom.AffineTransform originalTransform = g2.getTransform();
 
         int width = gp.getTileSize();
         int height = gp.getTileSize();
-
 
         // gambar menghadap ke arah kiri jika bergerak ke kiri
         if (keyH.leftPressed) {
@@ -129,9 +146,7 @@ public class Player extends Entity {
                 g2.drawImage(walkingImage, 0, 0, width, height, null);
             }
 
-            
-        }
-        else {
+        } else {
             if (walkingImage != null) {
                 g2.drawImage(walkingImage, x, drawY, gp.getTileSize(), gp.getTileSize(), null);
             }
