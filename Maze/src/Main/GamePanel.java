@@ -45,14 +45,12 @@ public class GamePanel extends JPanel implements Runnable {
     Image floorTile, wallCenter, playerimg, ExitDoor;
     BufferedImage bufferedImage;
 
-    Image wallCornerTopRight;
-    Image wallCornerBottomRight;
-    Image wallCornerTopLeft;
-    Image wallCornerBottomLeft;
-    Image wallVertical;
-    Image wallHorizontal;
+    Image wallCornerTopRight , wallCornerBottomRight ,  wallCornerTopLeft , wallCornerBottomLeft;
+    Image wallVertical , wallHorizontal;
     Image wallEndLeft, wallEndRight, wallEndTop, wallEndBottom;
     Image wallTUp, wallTDown, wallTLeft, wallTRight, wallTIntersection;
+    Image BearTrap , FireTrap , Heal , Npc , IceTrap; 
+    
 
     public GamePanel() {
         this.maxScreenCol = map1[0].length;
