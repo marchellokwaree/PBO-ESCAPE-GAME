@@ -42,16 +42,17 @@ public class GamePanel extends JPanel implements Runnable {
     Thread gameThread;
     Player player;
 
-    Image Tanah, wall, playerimg, ExitDoor;
+    Image floorTile, wallCenter, playerimg, ExitDoor;
     BufferedImage bufferedImage;
 
-    Image wallKananAtas;
-    Image wallKananBawah;
-    Image wallKiriAtas;
-    Image wallKiriBawah;
-    Image wallvertical;
-    Image wallhorizontal;
-    Image wallKiri, wallKanan, wallAtas, wallBawah;
+    Image wallCornerTopRight;
+    Image wallCornerBottomRight;
+    Image wallCornerTopLeft;
+    Image wallCornerBottomLeft;
+    Image wallVertical;
+    Image wallHorizontal;
+    Image wallEndLeft, wallEndRight, wallEndTop, wallEndBottom;
+    Image wallTUp, wallTDown, wallTLeft, wallTRight, wallTIntersection;
 
     public GamePanel() {
         this.maxScreenCol = map1[0].length;
@@ -80,7 +81,7 @@ public class GamePanel extends JPanel implements Runnable {
         int endX = 0, endY = 0;
         for (int i = 0; i < maxScreenRow; i++) {
             for (int j = 0; j < maxScreenCol; j++) {
-                if (map1[i][j] == 'N') {
+                if (map1[i][j] == 'G') {
                     endX = j * tileSize;
                     endY = i * tileSize;
                 }
@@ -100,19 +101,23 @@ public class GamePanel extends JPanel implements Runnable {
             }
 
             // Loading Tiles
-            this.Tanah = loadImage("/Assets/lab_tileset_LITE/seperated/tile031.png");
-            this.wall = loadImage("/Assets/lab_tileset_LITE/seperated/tile066.png");
+            this.floorTile = loadImage("/Assets/lab_tileset_LITE/seperated/tile031.png");
             this.ExitDoor = loadImage("/Assets/lab_tileset_LITE/seperated/tile067.png");
-            this.wallKananAtas = loadImage("/Assets/lab_tileset_LITE/seperated/tile016.png");
-            this.wallKananBawah = loadImage("/Assets/lab_tileset_LITE/seperated/tile025.png");
-            this.wallKiriAtas = loadImage("/Assets/lab_tileset_LITE/seperated/tile015.png");
-            this.wallKiriBawah = loadImage("/Assets/lab_tileset_LITE/seperated/tile024.png");
-            this.wallvertical = loadImage("/Assets/lab_tileset_LITE/seperated/tile039.png");
-            this.wallhorizontal = loadImage("/Assets/lab_tileset_LITE/seperated/tile040.png");
-            this.wallKiri = loadImage("/Assets/lab_tileset_LITE/seperated/tile055.png");
-            this.wallKanan = loadImage("/Assets/lab_tileset_LITE/seperated/tile054.png");
-            this.wallAtas = loadImage("/Assets/lab_tileset_LITE/seperated/tile068.png");
-            this.wallBawah = loadImage("/Assets/lab_tileset_LITE/seperated/tile041.png");
+            this.wallCenter = loadImage("/Assets/lab_tileset_LITE/seperated/tile066.png");
+            this.wallCornerBottomLeft = loadImage("/Assets/lab_tileset_LITE/seperated/tile067.png");
+            this.wallCornerTopLeft = loadImage("/Assets/lab_tileset_LITE/seperated/tile039.png");
+            this.wallCornerBottomRight = loadImage("/Assets/lab_tileset_LITE/seperated/tile071.png");
+            this.wallCornerTopRight = loadImage("/Assets/lab_tileset_LITE/seperated/tile043.png");
+            this.wallVertical = loadImage("/Assets/lab_tileset_LITE/seperated/tile074.png");
+            this.wallHorizontal = loadImage("/Assets/lab_tileset_LITE/seperated/tile033.png");
+            this.wallEndLeft = loadImage("/Assets/lab_tileset_LITE/seperated/tile052.png");
+            this.wallEndRight = loadImage("/Assets/lab_tileset_LITE/seperated/tile047.png");
+            this.wallEndTop = loadImage("/Assets/lab_tileset_LITE/seperated/tile058.png");
+            this.wallEndBottom = loadImage("/Assets/lab_tileset_LITE/seperated/tile066.png");
+            this.wallTUp = loadImage("/Assets/lab_tileset_LITE/seperated/tile042.png");
+            this.wallTDown = loadImage("/Assets/lab_tileset_LITE/seperated/tile041.png");
+            this.wallTLeft = loadImage("/Assets/lab_tileset_LITE/seperated/tile054.png");
+            this.wallTRight = loadImage("/Assets/lab_tileset_LITE/seperated/tile055.png");
 
         } catch (Exception e) {
             System.err.println("Error loading assets!");
@@ -206,32 +211,174 @@ public class GamePanel extends JPanel implements Runnable {
         boolean left = hasWallAt(row, col - 1);
         boolean right = hasWallAt(row, col + 1);
 
-        if (top && right && !bottom && !left)
-            return wallKananAtas;
-        if (top && left && !bottom && !right)
-            return wallKiriAtas;
-        if (bottom && right && !top && !left)
-            return wallKananBawah;
-        if (bottom && left && !top && !right)
-            return wallKiriBawah;
-        if (top && bottom && !left && !right)
-            return wallvertical;
-        if (left && right && !top && !bottom)
-            return wallhorizontal;
-        if (top && !bottom && !left && !right)
-            return wallAtas;
-        if (bottom && !top && !left && !right)
-            return wallBawah;
-        if (left && !right && !top && !bottom)
-            return wallKiri;
-        if (right && !left && !top && !bottom)
-            return wallKanan;
-        if ((top && left && right) || (bottom && left && right))
-            return wallhorizontal;
-        if ((left && top && bottom) || (right && top && bottom))
-            return wallvertical;
+        // Intersection 4-arah
+        if (top && bottom && left && right) {
+            if (wallTIntersection != null) {
+                return wallTIntersection;
+            } else if (wallVertical != null) {
+                return wallVertical;
+            } else {
+                return wallCenter;
+            }
+        }
 
-        return wall != null ? wall : wallhorizontal;
+        // Pertigaan terbuka ke ATAS ┴ (bawah + kiri + kanan)
+        if (bottom && left && right && !top) {
+            if (wallTUp != null) {
+                return wallTUp;
+            } else {
+                return wallHorizontal;
+            }
+        }
+
+        // Pertigaan terbuka ke BAWAH ┬ (atas + kiri + kanan)
+        if (top && left && right && !bottom) {
+            if (wallTDown != null) {
+                return wallTDown;
+            } else {
+                return wallHorizontal;
+            }
+        }
+
+        // Pertigaan terbuka ke KIRI ┤ (atas + bawah + kanan)
+        if (top && bottom && right && !left) {
+            if (wallTLeft != null) {
+                return wallTLeft;
+            } else {
+                return wallVertical;
+            }
+        }
+
+        // Pertigaan terbuka ke KANAN ├ (atas + bawah + kiri)
+        if (top && bottom && left && !right) {
+            if (wallTRight != null) {
+                return wallTRight;
+            } else {
+                return wallVertical;
+            }
+        }
+
+        // --- Straight walls --- (Tidak berubah, sudah benar)
+        if (top && bottom && !left && !right) {
+            if (wallVertical != null) {
+                return wallVertical;
+            } else {
+                return wallCenter;
+            }
+        }
+        if (left && right && !top && !bottom) {
+            if (wallHorizontal != null) {
+                return wallHorizontal;
+            } else {
+                return wallCenter;
+            }
+        }
+
+        // --- Corners --- (DITUKAR untuk visual yang benar)
+        // Jika ada tembok di ATAS dan KANAN, kita butuh pojokan yang visualnya
+        // menghadap ke bawah-kiri.
+        if (top && right && !bottom && !left) {
+            if (wallCornerBottomLeft != null) {
+                return wallCornerBottomLeft;
+            } else {
+                return wallCenter;
+            }
+        }
+        // Jika ada tembok di KANAN dan BAWAH, kita butuh pojokan yang visualnya
+        // menghadap ke atas-kiri.
+        if (right && bottom && !top && !left) {
+            if (wallCornerTopLeft != null) {
+                return wallCornerTopLeft;
+            } else {
+                return wallCenter;
+            }
+        }
+        // Jika ada tembok di BAWAH dan KIRI, kita butuh pojokan yang visualnya
+        // menghadap ke atas-kanan.
+        if (bottom && left && !top && !right) {
+            if (wallCornerTopRight != null) {
+                return wallCornerTopRight;
+            } else {
+                return wallCenter;
+            }
+        }
+        // Jika ada tembok di KIRI dan ATAS, kita butuh pojokan yang visualnya menghadap
+        // ke bawah-kanan.
+        if (left && top && !bottom && !right) {
+            if (wallCornerBottomRight != null) {
+                return wallCornerBottomRight;
+            } else {
+                return wallCenter;
+            }
+        }
+
+        // --- End pieces --- (DITUKAR untuk visual yang benar)
+        // Ujung yang menyambung ke ATAS, butuh gambar ujung yang TERTUTUP (misal:
+        // wallEndBottom)
+        if (top && !bottom && !left && !right) {
+            if (wallEndBottom != null) {
+                return wallEndBottom;
+            } else {
+                return wallCenter;
+            }
+        }
+        // Ujung yang menyambung ke BAWAH, butuh gambar ujung yang TERTUTUP (misal:
+        // wallEndTop)
+        if (bottom && !top && !left && !right) {
+            if (wallEndTop != null) {
+                return wallEndTop;
+            } else {
+                return wallCenter;
+            }
+        }
+        // Ujung yang menyambung ke KIRI, butuh gambar ujung yang TERTUTUP (misal:
+        // wallEndRight)
+        if (left && !right && !top && !bottom) {
+            if (wallEndRight != null) {
+                return wallEndRight;
+            } else {
+                return wallCenter;
+            }
+        }
+        // Ujung yang menyambung ke KANAN, butuh gambar ujung yang TERTUTUP (misal:
+        // wallEndLeft)
+        if (right && !left && !top && !bottom) {
+            if (wallEndLeft != null) {
+                return wallEndLeft;
+            } else {
+                return wallCenter;
+            }
+        }
+
+        // --- Fallback cases --- (Juga disesuaikan agar pojokan tertutup lebih rapi)
+        if ((top && left && right) || (bottom && left && right)) {
+            if (wallHorizontal != null) {
+                return wallHorizontal;
+            } else {
+                return wallCenter;
+            }
+        }
+        if ((left && top && bottom) || (right && top && bottom)) {
+            if (wallVertical != null) {
+                return wallVertical;
+            } else {
+                return wallCenter;
+            }
+        }
+        if (top || bottom || left || right) {
+            if (wallCenter != null) {
+                return wallCenter;
+            } else {
+                return wallHorizontal;
+            }
+        }
+
+        // --- Default Fallback ---
+        if (wallCenter != null) {
+            return wallCenter;
+        } else {
+            return wallHorizontal;
+        }
     }
 
     @Override
@@ -241,8 +388,8 @@ public class GamePanel extends JPanel implements Runnable {
 
         for (int i = 0; i < maxScreenRow; i++) {
             for (int j = 0; j < maxScreenCol; j++) {
-                if (Tanah != null) {
-                    g2.drawImage(Tanah, j * tileSize, i * tileSize, tileSize, tileSize, null);
+                if (floorTile != null) {
+                    g2.drawImage(floorTile, j * tileSize, i * tileSize, tileSize, tileSize, null);
                 }
 
                 if (map1[i][j] == 'G' && ExitDoor != null) {
@@ -265,9 +412,7 @@ public class GamePanel extends JPanel implements Runnable {
         int playerTileX = player.x / tileSize;
         int playerTileY = player.y / tileSize;
 
-        if (map1[playerTileY][playerTileX] == 'N') {
-            // Tampilkan pesan kemenangan
-            System.out.println("Congratulations! You've reached the exit!");
+        if (map1[playerTileY][playerTileX] == 'G') {
             WinGame();
         }
     }
