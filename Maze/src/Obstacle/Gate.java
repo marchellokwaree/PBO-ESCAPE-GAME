@@ -16,6 +16,7 @@ public class Gate extends Obstacle {
     private int animationCounter = 0;
     private final int animationDelay = 6;
     public boolean active = false;
+    private PressurePlate requiredPressurePlate = null; // Trapdoor requirement
 
     public Gate(int x, int y, int width, int height, boolean right) {
         super(x, y, width, height);
@@ -43,9 +44,26 @@ public class Gate extends Obstacle {
         }
     }
 
+    public void setRequiredPressurePlate(PressurePlate plate) {
+        this.requiredPressurePlate = plate;
+    }
+
+    public boolean canOpen() {
+        // Jika ada trapdoor yang diperlukan, cek apakah sudah diinjak
+        if (requiredPressurePlate != null) {
+            return requiredPressurePlate.activated;
+        }
+        // Jika tidak ada trapdoor yang diperlukan, gate bisa dibuka
+        return true;
+    }
+
     public void openGate() {
         if (alrOpen) {
             return; // Jika sudah terbuka, tidak perlu membuka lagi
+        }
+        // Hanya buka jika persyaratan trapdoor terpenuhi
+        if (!canOpen()) {
+            return; // Tidak bisa membuka jika trapdoor belum diinjak
         }
         open = true;
         this.currentFrame = 0;

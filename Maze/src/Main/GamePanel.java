@@ -89,6 +89,11 @@ public class GamePanel extends JPanel implements Runnable {
                 }
             }
         }
+        
+        // Simpan referensi untuk linking gates dengan pressure plates
+        ArrayList<PressurePlate> pressurePlates = new ArrayList<>();
+        ArrayList<Gate> gates = new ArrayList<>();
+        
         for (int i = 0; i < maxScreenRow; i++) {
             for (int j = 0; j < maxScreenCol; j++) {
                 if (map1[i][j] == 'F') {
@@ -98,17 +103,29 @@ public class GamePanel extends JPanel implements Runnable {
                     obstacles.add(new IceTrap(j * tileSize, i * tileSize, tileSize, tileSize));
                 }
                 if (map1[i][j] == 'P') {
-                    obstacles.add(new PressurePlate(j * tileSize, i * tileSize, tileSize, tileSize));
+                    PressurePlate plate = new PressurePlate(j * tileSize, i * tileSize, tileSize, tileSize);
+                    obstacles.add(plate);
+                    pressurePlates.add(plate);
                 }
                 if (map1[i][j] == 'D') {
+                    Gate gate;
                     if (map1[i - 1][j] == '1') {
-                        obstacles.add(new Gate(j * tileSize, i * tileSize, tileSize, tileSize, false));
-                    } else if (map1[i][j + 1] == '1') {
-                        obstacles.add(new Gate(j * tileSize, i * tileSize, tileSize, tileSize, true));
+                        gate = new Gate(j * tileSize, i * tileSize, tileSize, tileSize, false);
+                    } else {
+                        gate = new Gate(j * tileSize, i * tileSize, tileSize, tileSize, true);
                     }
+                    obstacles.add(gate);
+                    gates.add(gate);
                 }
             }
         }
+        
+        // CONTOH: Link gate ke pressure plate
+        // Uncomment dan sesuaikan index untuk mengatur gate mana yang memerlukan trapdoor
+        // Jika ada pressure plate di index 0 dan gate di index 0:
+        // if (pressurePlates.size() > 0 && gates.size() > 0) {
+        //     gates.get(0).setRequiredPressurePlate(pressurePlates.get(0));
+        // }
 
         // Pastikan parameter Player sesuai dengan constructor baru di Player.java
         player = new Player(this, keyH, playerimg, startX, startY);
@@ -218,6 +235,20 @@ public class GamePanel extends JPanel implements Runnable {
             return true;
         return map1[top][left] == '1' || map1[top][right] == '1' ||
                 map1[bottom][left] == '1' || map1[bottom][right] == '1';
+    }
+
+    public boolean collidesWithClosedGate(int nextX, int nextY) {
+        // Periksa apakah player akan menabrak gate yang tertutup
+        for (Obstacle obstacle : obstacles) {
+            if (obstacle instanceof Gate) {
+                Gate gate = (Gate) obstacle;
+                // Jika gate tertutup (tidak buka) dan player menubruk, return true
+                if (!gate.open && gate.collidesWith(nextX, nextY, tileSize)) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     public void startGameThread() {
@@ -532,10 +563,13 @@ public class GamePanel extends JPanel implements Runnable {
                 PressurePlate pressurePlate = (PressurePlate) obstacle;
                 if (pressurePlate.collidesWith(player.x, player.y, tileSize)) {
                     pressurePlate.activate();
+                    // Buka gate yang tidak memiliki persyaratan trapdoor
+                    // atau gate yang memiliki trapdoor terpenuhi
                     for (Obstacle other : obstacles) {
                         if (other instanceof Gate) {
-                            ((Gate) other).openGate();
-                            ((Gate) other).alrOpen = true;
+                            Gate gate = (Gate) other;
+                            gate.openGate();
+                            gate.alrOpen = true;
                         }
                     }
                 } else {

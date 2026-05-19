@@ -97,10 +97,10 @@ public class Player extends Entity {
         }
 
         // Collision Check
-        if (!gp.collidesWithWall(nextX, y)) {
+        if (!gp.collidesWithWall(nextX, y) && !gp.collidesWithClosedGate(nextX, y)) {
             x = nextX;
         }
-        if (!gp.collidesWithWall(x, nextY)) {
+        if (!gp.collidesWithWall(x, nextY) && !gp.collidesWithClosedGate(x, nextY)) {
             y = nextY;
         }
     }
