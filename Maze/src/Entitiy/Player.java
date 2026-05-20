@@ -22,6 +22,9 @@ public class Player extends Entity {
     int spriteCounter = 0;
     int spriteNum = 1;
     public int HP = 100;
+    public int normalSpeed = 2;
+    public int slowSpeed = 1;
+    public int slowEffectCounter = 0; // Counter untuk efek slow
     BufferedImage[] walkImages = new BufferedImage[8]; // Array untuk menyimpan gambar berjalan
 
     // Constructor disesuaikan dengan GamePanel kamu (5 parameter)
@@ -48,6 +51,7 @@ public class Player extends Entity {
     }
 
     public void update() {
+        updateEffects();
         int nextX = x;
         int nextY = y;
         boolean moving = false;
@@ -103,6 +107,20 @@ public class Player extends Entity {
         if (!gp.collidesWithWall(x, nextY) && !gp.collidesWithClosedGate(x, nextY)) {
             y = nextY;
         }
+    }
+
+    public void updateEffects() {
+        if (slowEffectCounter > 0) {
+            slowEffectCounter--;
+            if (slowEffectCounter == 0) {
+                speed = normalSpeed;
+            }
+        }
+    }
+
+    public void applySlow(int durationFrames) {
+        slowEffectCounter = durationFrames;
+        speed = slowSpeed;
     }
 
     private BufferedImage loadBufferedImage(String path) {

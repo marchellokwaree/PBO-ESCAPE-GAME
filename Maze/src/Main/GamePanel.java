@@ -274,6 +274,8 @@ public class GamePanel extends JPanel implements Runnable {
             }
             checkWinCondition();
             checkDamage();
+
+            
         }
 
     }
@@ -574,6 +576,12 @@ public class GamePanel extends JPanel implements Runnable {
                     }
                 } else {
                     pressurePlate.deactivate();
+                }
+            }
+            if (obstacle instanceof IceTrap) {
+                IceTrap iceTrap = (IceTrap) obstacle;
+                if (iceTrap.active && iceTrap.collidesWith(player.x, player.y, tileSize)) {
+                    player.applySlow(120); // Contoh: efek es berlangsung selama 2 detik (120 frame)
                 }
             }
         }
