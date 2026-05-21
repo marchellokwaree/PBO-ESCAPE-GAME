@@ -2,6 +2,7 @@ package Entitiy;
 
 import java.awt.Graphics2D;
 import java.awt.Image;
+import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -27,6 +28,7 @@ public class Player extends Entity {
     public int slowSpeed = 1;
     public int slowEffectCounter = 0; // Counter untuk efek slow
     BufferedImage[] walkImages = new BufferedImage[8]; // Array untuk menyimpan gambar berjalan
+    Rectangle hitbox;
 
     // Constructor disesuaikan dengan GamePanel kamu (5 parameter)
     public Player(GamePanel gp, KeyHandler keyH, Image playerImg, int x, int y) {
@@ -49,6 +51,15 @@ public class Player extends Entity {
             System.out.println("Error loading animation sheet: " + e.getMessage());
             e.printStackTrace();
         }
+
+        // Contoh: Ukuran sprite player adalah 48x48 (tileSize = 48)
+        // Kita ingin hitboxnya lebih kecil di tengah (lebar 32, tinggi 32)
+        // Maka kita beri offset x = 8 dan y = 16 agar presisi di kaki/badan
+        hitbox = new Rectangle();
+        hitbox.x = 8;       // jarak dari kiri sprite ke awal hitbox
+        hitbox.y = 16;      // jarak dari atas sprite ke awal hitbox
+        hitbox.width = 32;  // lebar hitbox
+        hitbox.height = 32; // tinggi hitbox
     }
 
     public void update() {
@@ -102,10 +113,10 @@ public class Player extends Entity {
         }
 
         // Collision Check
-        if (!gp.collidesWithWall(nextX, y) && !gp.collidesWithClosedGate(nextX, y)) {
+        if (!gp.collidesWithWall(nextX, y , this.hitbox) && !gp.collidesWithClosedGate(nextX, y , this.hitbox)) {
             x = nextX;
         }
-        if (!gp.collidesWithWall(x, nextY) && !gp.collidesWithClosedGate(x, nextY)) {
+        if (!gp.collidesWithWall(x, nextY , this.hitbox) && !gp.collidesWithClosedGate(x, nextY , this.hitbox)) {
             y = nextY;
         }
     }
