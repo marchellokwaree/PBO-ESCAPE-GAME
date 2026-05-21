@@ -22,6 +22,7 @@ public class Player extends Entity {
     int spriteCounter = 0;
     int spriteNum = 1;
     public int HP = 100;
+    public int damageCooldown = 0;
     public int normalSpeed = 2;
     public int slowSpeed = 1;
     public int slowEffectCounter = 0; // Counter untuk efek slow
@@ -115,6 +116,9 @@ public class Player extends Entity {
             if (slowEffectCounter == 0) {
                 speed = normalSpeed;
             }
+        }
+        if (damageCooldown > 0) {
+            damageCooldown--;
         }
     }
 

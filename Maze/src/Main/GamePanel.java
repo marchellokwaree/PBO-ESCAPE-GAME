@@ -22,9 +22,10 @@ public class GamePanel extends JPanel implements Runnable {
     // Map data
     char map1[][] = {
         { '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1' },
-        { '1', '0', '0', '0', '1', '0', '1', '0', '0', '0', '0', '0', '0', '0', '0', '0', '1', '0', '0', 'S', '0', '0', '0', '0', '0', '0', '1', '0', '1', '0', '0', '0', '0', '0', '1', '0', '0', '0', '1' },
-        { '1', '1', '1', '0', '1', '0', '1', '0', '1', '1', '1', '0', '1', '1', '1', '0', '1', '0', '1', '1', '1', '0', '1', '1', '1', '0', '1', '0', '1', '0', '1', '1', '1', '0', '1', '0', '1', '0', '1' },
-        { '1', '0', '0', '0', '1', '0', '0', '0', '1', '0', '0', '0', '1', '0', '1', '0', '0', '0', '0', '0', '0', '0', '1', '0', '1', '0', '1', '0', '0', '0', '0', '0', '1', '0', '0', '0', '1', '0', '1' },
+        { '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1' },
+        { '1', '0', '0', '0', '1', '0', '1', '0', '0', '0', 'F', '0', 'F', '0', '0', '0', '1', '0', 'P', 'S', '0', '0', '0', '0', 'F', '0', '1', '0', '1', '0', '0', '0', '0', '0', '1', '0', '0', '0', '1' },
+        { '1', '1', '1', '0', '1', '0', '1', '0', '1', '1', '1', '0', '1', '1', '1', '0', '1', 'D', '1', '1', '1', '0', '1', '1', '1', '0', '1', '0', '1', '0', '1', '1', '1', '0', '1', '0', '1', '0', '1' },
+        { '1', '0', '0', '0', '1', '0', '0', '0', '1', '0', '0', '0', '1', '0', '1', 'D', '0', '0', 'F', '0', '0', '0', '1', '0', '1', '0', '1', '0', '0', '0', '0', '0', '1', '0', '0', '0', '1', '0', '1' },
         { '1', '0', '1', '1', '1', '0', '1', '1', '1', '0', '1', '1', '1', '0', '1', '1', '1', '1', '1', '1', '1', '1', '1', '0', '1', '0', '1', '1', '1', '1', '1', '1', '1', '1', '1', '0', '1', '0', '1' },
         { '1', '0', '0', '0', '1', '0', '1', '0', '0', '0', '1', '0', '0', '0', '1', '0', '0', '0', '0', '0', '0', '0', '0', '0', '1', '0', '0', '0', '1', '0', '0', '0', '0', '0', '1', '0', '1', '0', '1' },
         { '1', '1', '1', '0', '1', '1', '1', '0', '1', '1', '1', '0', '1', '0', '1', '0', '1', '1', '1', '1', '1', '0', '1', '0', '1', '1', '1', '0', '1', '0', '1', '1', '1', '0', '1', '1', '1', '0', '1' },
@@ -67,6 +68,7 @@ public class GamePanel extends JPanel implements Runnable {
     KeyHandler keyH = new KeyHandler();
     Thread gameThread;
     Player player;
+    Darah darah;
     ArrayList<Obstacle> obstacles = new ArrayList<>();
     Image floorTile, wallCenter, playerimg, ExitDoor;
     BufferedImage bufferedImage;
@@ -150,6 +152,7 @@ public class GamePanel extends JPanel implements Runnable {
 
         // Pastikan parameter Player sesuai dengan constructor baru di Player.java
         player = new Player(this, keyH, playerimg, startX, startY);
+        darah = new Darah();
     }
 
     public void loadAssets() {
@@ -548,6 +551,12 @@ public class GamePanel extends JPanel implements Runnable {
 
         if (player != null)
             player.draw(g2);
+
+        if (darah != null && player != null) {
+            darah.update(player.HP);
+            darah.draw(g2);
+        }
+
         g2.dispose();
     }
 
@@ -572,8 +581,12 @@ public class GamePanel extends JPanel implements Runnable {
         for (Obstacle obstacle : obstacles) {
             if (obstacle instanceof FireTrap) {
                 FireTrap fireTrap = (FireTrap) obstacle;
-                if (fireTrap.active && fireTrap.collidesWith(player.x, player.y, tileSize)) {
-                    player.HP--;
+                if (fireTrap.active && fireTrap.collidesWith(player.x, player.y, tileSize) && player.damageCooldown == 0) {
+                    player.HP -= 30;
+                    if (player.HP < 0) {
+                        player.HP = 0;
+                    }
+                    player.damageCooldown = 60; // Jangan terkena damage lagi selama sekitar 1 detik
 
                     System.out.println("Player hit by fire trap! HP: " + player.HP);
                     if (player.HP <= 0) {
