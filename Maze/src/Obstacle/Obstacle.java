@@ -9,6 +9,8 @@ import java.net.URL;
 
 import javax.imageio.ImageIO;
 
+import Main.GamePanel;
+
 public class Obstacle {
     public int x, y, width, height;
     boolean active = false;
@@ -41,7 +43,22 @@ public class Obstacle {
         }
     }
 
-    
+    public void drawCamera(Graphics2D g2, GamePanel gp, BufferedImage img) {
+        if (img != null && gp.getPlayer() != null) {
+            // Rumus posisi layar = Posisi dunia - Posisi Player + Titik tengah layar
+            int screenX = x - gp.getPlayer().x + gp.getPlayer().screenX;
+            int screenY = y - gp.getPlayer().y + gp.getPlayer().screenY;
+
+            // Optimasi: Hanya gambar jika jebakan masuk dalam area layar
+            if (x + width > gp.getPlayer().x - gp.getPlayer().screenX &&
+                x - width < gp.getPlayer().x + gp.getPlayer().screenX &&
+                y + height > gp.getPlayer().y - gp.getPlayer().screenY &&
+                y - height < gp.getPlayer().y + gp.getPlayer().screenY) {
+                
+                g2.drawImage(img, screenX, screenY, width, height, null);
+            }
+        }
+    }
 
 
 }

@@ -23,10 +23,13 @@ public class Player extends Entity {
     int spriteCounter = 0;
     int spriteNum = 1;
     public int HP = 100;
+    public int maxHP = 100;
     public int damageCooldown = 0;
     public int normalSpeed = 2;
     public int slowSpeed = 1;
     public int slowEffectCounter = 0; // Counter untuk efek slow
+    public final int screenX;
+    public final int screenY;
     BufferedImage[] walkImages = new BufferedImage[8]; // Array untuk menyimpan gambar berjalan
     Rectangle hitbox;
 
@@ -52,14 +55,15 @@ public class Player extends Entity {
             e.printStackTrace();
         }
 
-        // Contoh: Ukuran sprite player adalah 48x48 (tileSize = 48)
-        // Kita ingin hitboxnya lebih kecil di tengah (lebar 32, tinggi 32)
-        // Maka kita beri offset x = 8 dan y = 16 agar presisi di kaki/badan
+        // Sesuaikan hitbox dengan ukuran tile 24x24.
+        // Hitbox lebih kecil agar tidak menabrak dinding di bawah/sekitar sprite.
         hitbox = new Rectangle();
-        hitbox.x = 8;       // jarak dari kiri sprite ke awal hitbox
-        hitbox.y = 16;      // jarak dari atas sprite ke awal hitbox
-        hitbox.width = 32;  // lebar hitbox
-        hitbox.height = 32; // tinggi hitbox
+        hitbox.x = 4;       // offset dari kiri sprite
+        hitbox.y = 4;       // offset dari atas sprite
+        hitbox.width = gp.getTileSize() - 8;  // lebar hitbox
+        hitbox.height = gp.getTileSize() - 4; // tinggi hitbox
+        this.screenX = (gp.screenWidth / 2) - (gp.getTileSize() / 2);
+        this.screenY = (gp.screenHeight / 2) - (gp.getTileSize() / 2);
     }
 
     public void update() {
@@ -174,7 +178,7 @@ public class Player extends Entity {
     }
 
     public void draw(Graphics2D g2) {
-        int drawY = y;
+        int drawY = screenY;
         Image walkingImage = null;
 
         // EFEK VISUAL JALAN:
@@ -190,6 +194,8 @@ public class Player extends Entity {
             walkingImage = currentImage; // Gambar diam
         }
 
+
+
         java.awt.geom.AffineTransform originalTransform = g2.getTransform();
 
         int width = gp.getTileSize();
@@ -197,7 +203,7 @@ public class Player extends Entity {
 
         // gambar menghadap ke arah kiri jika bergerak ke kiri
         if (keyH.leftPressed) {
-            g2.translate(x + width, drawY); // Sesuaikan posisi setelah flip
+            g2.translate(screenX + width, drawY); // Sesuaikan posisi setelah flip
             g2.scale(-1, 1); // Flip horizontal
             if (walkingImage != null) {
                 g2.drawImage(walkingImage, 0, 0, width, height, null);
@@ -205,7 +211,7 @@ public class Player extends Entity {
 
         } else {
             if (walkingImage != null) {
-                g2.drawImage(walkingImage, x, drawY, gp.getTileSize(), gp.getTileSize(), null);
+                g2.drawImage(walkingImage, screenX, drawY, gp.getTileSize(), gp.getTileSize(), null);
             }
 
         }

@@ -7,6 +7,8 @@ import java.io.IOException;
 import java.net.URL;
 
 import javax.imageio.ImageIO;
+
+import Main.GamePanel;
 public class PressurePlate extends Obstacle {
     public boolean activated = false;
     private BufferedImage spriteSheet;
@@ -60,11 +62,9 @@ public class PressurePlate extends Obstacle {
         }
     }
 
-    public void draw(Graphics2D g2) {
+    public void draw(Graphics2D g2, GamePanel gp) {
         BufferedImage frame = getCurrentFrame();
-        if (frame != null) {
-            g2.drawImage(frame, x, y, width, height, null);
-        }
+        super.drawCamera(g2, gp , frame);
     }
 
 }

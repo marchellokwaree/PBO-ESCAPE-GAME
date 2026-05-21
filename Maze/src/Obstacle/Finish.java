@@ -1,50 +1,31 @@
 package Obstacle;
-import java.awt.Graphics2D;
+
 import java.awt.image.BufferedImage;
-import java.io.IOException;
-import java.net.URL;
-
-import javax.imageio.ImageIO;
-
+import java.awt.Graphics2D;
 import Main.GamePanel;
-public class IceTrap extends Obstacle{
+
+public class Finish extends Obstacle {
     private BufferedImage spriteSheet;
-    private BufferedImage[] animationFrames = new BufferedImage[4];
+    private BufferedImage[] animationFrames = new BufferedImage[8];
     private int currentFrame = 0;
     private int animationCounter = 0;
-    private final int animationDelay = 100;
-    public boolean active = true;
-
-    public IceTrap(int x, int y, int width, int height) {
+    private final int animationDelay = 6;
+    public Finish(int x, int y, int width, int height) {
         super(x, y, width, height);
 
         try {
-            this.spriteSheet = loadBufferedImage("/Assets/ASSET/Traps/Ice_Trap_2.jpeg");
-            int frameWidth = 120;
-            int frameHeight = 120;
-            int xstart = 67+270;
-            int ystart = 605;
+            this.spriteSheet = loadBufferedImage("/Assets/ASSET/Traps/Portal-Blue-Sheet.png");
+            int frameWidth = 64;
+            int frameHeight = 64;
             for (int i = 0; i < animationFrames.length; i++) {
-                int colx = xstart + (i * frameWidth);
-                if (i == 1) {
-                    colx = 67+135; // Tambahkan 1 pixel untuk frame kedua
-                }
-                if (i == 2) {
-                    colx = 67+270; // Tambahkan 1 pixel untuk frame kedua
-                }
-                if (i == 3) {
-                    colx = 67+405; // Tambahkan 1 pixel untuk frame kedua
-                }
-                animationFrames[i] = spriteSheet.getSubimage(colx, ystart, frameWidth, frameHeight);
+                int colx = i * frameWidth;
+                animationFrames[i] = spriteSheet.getSubimage(colx, 0, frameWidth, frameHeight);
             }
-            System.out.println("berhasil memuat 4 item");
         } catch (Exception e) {
-            System.out.println("Error loading ice trap image: " + e.getMessage());
+            System.out.println("Error loading finish image: " + e.getMessage());
             e.printStackTrace();
         }
     }
-
-    
 
     public void update() {
         animationCounter++;
@@ -78,4 +59,6 @@ public class IceTrap extends Obstacle{
         BufferedImage frame = getCurrentFrame();
         super.drawCamera(g2, gp , frame);
     }
+
+    
 }

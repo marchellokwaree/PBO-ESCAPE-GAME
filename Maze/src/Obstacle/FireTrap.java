@@ -2,10 +2,7 @@ package Obstacle;
 
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
-import java.io.IOException;
-import java.net.URL;
-
-import javax.imageio.ImageIO;
+import Main.GamePanel;
 
 public class FireTrap extends Obstacle {
     private BufferedImage spriteSheet;
@@ -65,11 +62,9 @@ public class FireTrap extends Obstacle {
         return spriteSheet;
     }
 
-    public void draw(Graphics2D g2) {
+    public void draw(Graphics2D g2, GamePanel gp) {
         BufferedImage frame = getCurrentFrame();
-        if (frame != null) {
-            g2.drawImage(frame, x, y, width, height, null);
-        }
+        super.drawCamera(g2, gp , frame);
     }
 
 

@@ -22,68 +22,111 @@ import java.awt.Rectangle;
 public class GamePanel extends JPanel implements Runnable {
     // Map data
     char map1[][] = {
-        { '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1' },
-        { '1', 'P', '0', '0', '1', '0', '1', '0', '0', '0', '0', '0', '0', '0', '0', '0', '1', 'I', 'I', 'S', 'I', 'I', '0', '0', '0', '0', '1', 'P', '1', '0', '0', '0', '0', '0', '1', '0', '0', '0', '1' },
-        { '1', '1', '1', '0', '1', '0', '1', '0', '1', '1', '1', '0', '1', '1', '1', '0', '1', 'I', '1', '1', '1', 'I', '1', '1', '1', '0', '1', '0', '1', '0', '1', '1', '1', '0', '1', '0', '1', '0', '1' },
-        { '1', '0', 'F', '0', '1', '0', '0', '0', '1', 'F', 'F', '0', '1', '0', '1', '0', '0', 'I', 'I', 'I', 'I', 'I', '1', '0', '1', '0', '1', '0', '0', '0', '0', '0', '1', '0', '0', '0', '1', '0', '1' },
-        { '1', '0', 'F', '0', '1', '0', '0', '0', '1', '0', '0', '0', '1', '0', '1', '0', '0', 'I', 'I', 'I', 'I', 'I', '1', '0', '1', '0', '1', '0', '0', '0', '0', '0', '1', '0', '0', '0', '1', '0', '1' },
-        { '1', '0', '1', '1', '1', '0', '1', '1', '1', '0', '1', '1', '1', '0', '1', '1', '1', '1', '1', '1', '1', '1', '1', '0', '1', '0', '1', '1', '1', '1', '1', '1', '1', '1', '1', '0', '1', '0', '1' },
-        { '1', '0', '0', '0', '1', '0', '1', '0', '0', '0', '1', '0', '0', '0', '1', '0', '0', '0', '0', '0', '0', '0', '0', '0', '1', '0', '0', '0', '1', '0', '0', '0', '0', '0', '1', '0', '1', '0', '1' },
-        { '1', '0', '1', '0', '1', '1', '1', '0', '1', '1', '1', '0', '1', '0', '1', '0', '1', '1', '1', '1', '1', '0', '1', '0', '1', '1', '1', '0', '1', '0', '1', '1', '1', '0', '1', '1', '1', '0', '1' },
-        { '1', '0', '1', '0', '0', '0', '0', '0', '1', '0', '1', '0', '1', '0', '0', '0', '1', '0', '1', '0', '0', '0', '1', '0', '1', '0', '1', '0', '0', '0', '1', '0', '1', '0', '0', '0', '0', '0', '1' },
-        { '1', '0', '1', '1', '1', '1', '1', '1', '1', '0', '1', '0', '1', '1', '1', '1', '1', '0', '1', '0', '1', '1', '1', '0', '1', '0', '1', '1', '1', '1', '1', '0', '1', '1', '1', '1', '1', '0', '1' },
-        { '1', '0', '0', '0', '0', '0', '1', '0', '0', '0', '1', '0', '0', '0', '0', '0', '0', '0', '1', '0', '1', '0', '0', '0', '1', '0', '0', '0', '0', '0', '0', '0', '1', '0', '0', '0', '0', '0', '1' },
-        { '1', '0', '1', '1', '1', '1', '1', '0', '1', '0', '1', '0', '1', '1', '1', '1', '1', '0', '1', '0', '1', '1', '1', '0', '1', '0', '1', '0', '1', '1', '1', '1', '1', '0', '1', '1', '1', '1', '1' },
-        { '1', '0', '0', '0', '0', '0', '0', '0', '1', '0', '0', '0', '1', '0', '0', '0', '1', '0', '1', '0', '0', '0', '1', '0', '1', '0', '1', '0', '0', '0', '1', '0', '0', '0', '1', '0', '0', '0', '1' },
-        { '1', '0', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '0', '1', '0', '1', '1', '1', '1', '1', '0', '1', '0', '1', '1', '1', '1', '1', '0', '1', '0', '1', '1', '1', '0', '1', '1', '1' },
-        { '1', '0', '0', '0', '0', '0', '1', '0', '0', '0', '1', '0', '0', '0', '1', '0', '1', '0', '0', '0', '0', '0', '1', '0', '0', '0', '0', '0', '0', '0', '1', '0', '0', '0', '1', '0', '0', '0', '1' },
-        { '1', '1', '1', '1', '1', '0', '1', '0', '1', '0', '1', '0', '1', '1', '1', '0', '1', '0', '1', '1', '1', '1', '1', '0', '1', '1', '1', '1', '1', '1', '1', '1', '1', '0', '1', '1', '1', '0', '1' },
-        { '1', '0', '0', '0', '1', '0', '0', '0', '1', '0', '1', '0', '1', '0', '1', '0', '0', '0', '1', '0', '0', '0', '0', '0', '1', '0', '0', '0', '0', '0', '0', '0', '1', '0', '0', '0', '0', '0', '1' },
-        { '1', '0', '1', '0', '1', '1', '1', '1', '1', '0', '1', '0', '1', '0', '1', '1', '1', '1', '1', '0', '1', '1', '1', '1', '1', '0', '1', '1', '1', '0', '1', '1', '1', '1', '1', '1', '1', '0', '1' },
-        { '1', '0', '1', '0', '0', '0', '0', '0', '0', '0', '1', '0', '1', '0', '0', '0', '0', '0', '1', '0', '0', '0', '1', '0', '0', '0', '0', '0', '1', '0', '1', '0', '0', '0', '0', '0', '0', '0', '1' },
-        { '1', '0', '1', '1', '1', '1', '1', '1', '1', '1', '1', '0', '1', '0', '1', '1', '1', '1', '1', '1', '1', '0', '1', '0', '1', '1', '1', '1', '1', '0', '1', '0', '1', '1', '1', '1', '1', '1', '1' },
-        { '1', '0', '0', '0', '1', '0', '0', '0', '1', '0', '0', '0', '1', '0', '1', '0', '0', '0', '0', '0', '0', '0', '1', '0', '0', '0', '1', '0', '0', '0', '1', '0', '1', '0', '0', '0', '0', '0', '1' },
-        { '1', '1', '1', '0', '1', '1', '1', '0', '1', '0', '1', '1', '1', '0', '1', '0', '1', '1', '1', '1', '1', '1', '1', '1', '1', '0', '1', '0', '1', '1', '1', '0', '1', '0', '1', '1', '1', '0', '1' },
-        { '1', '0', '1', '0', '0', '0', 'D', '0', '1', '0', '0', '0', '1', '0', '0', '0', '0', '0', '0', '0', '0', '0', '1', 'P', '1', '0', '1', '0', '0', '0', '0', '0', '1', '0', '0', 'P', '1', '0', '1' },
-        { '1', '0', '1', '1', '1', '1', '1', '0', '1', '1', '1', '0', '1', '1', '1', '1', '1', '1', '1', '1', '1', '0', '1', '0', '1', '0', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '0', '1' },
-        { '1', '0', '0', '0', '1', '0', '0', '0', '1', '0', '1', '0', '0', '0', '0', '0', '1', '0', '0', '0', '1', '0', '0', '0', '1', '0', '1', '0', '0', '0', '0', '0', '1', '0', '0', '0', '0', '0', '1' },
-        { '1', '0', '1', '0', '1', '0', '1', '1', '1', '0', '1', '1', '1', '1', '1', '0', '1', '0', '1', '0', '1', '1', '1', '1', '1', '0', '1', '0', '1', '1', '1', '0', '1', '0', '1', '1', '1', '0', '1' },
-        { '1', '0', '1', '0', '1', '0', '0', '0', '0', '0', '1', '0', '0', '0', 'D', '0', '0', '0', '1', '0', '0', '0', '0', '0', '0', '0', '1', '0', '1', '0', '1', '0', '0', '0', '1', '0', '1', '0', '1' },
-        { '1', '0', '1', '0', '1', '1', '1', '1', '1', '0', '1', '0', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '0', '1', '0', '1', '1', '1', '1', '1', '0', '1', '0', '1' },
-        { '1', '0', '1', '0', '0', '0', '0', '0', '1', '0', '1', '0', '0', '0', '0', '0', '0', '0', '1', '0', '0', '0', '0', '0', '0', '0', '0', '0', '1', '0', '0', '0', '0', '0', '0', '0', '1', '0', '1' },
-        { '1', '0', '1', '0', '1', '1', '1', '1', '1', '0', '1', '0', '1', '1', '1', '0', '1', '1', '1', '0', '1', '1', '1', '1', '1', '0', '1', '1', '1', '0', '1', '1', '1', '1', '1', '0', '1', '0', '1' },
-        { '1', '0', '1', '0', '1', '0', '0', '0', '1', '0', '1', '0', '0', '0', '1', '0', '1', '0', '0', '0', '1', '0', '0', '0', '1', '0', '1', '0', '0', '0', '0', '0', '0', '0', '1', '0', '1', '0', '1' },
-        { '1', '0', '1', '0', '1', '0', '1', '0', '1', '0', '1', '1', '1', '0', '1', '0', '1', '0', '1', '1', '1', '0', '1', '0', '1', '0', '1', '1', '1', '1', '1', '1', '1', '0', '1', '0', '1', '0', '1' },
-        { '1', '0', '1', '0', '0', '0', '1', '0', '1', '0', '1', '0', '1', '0', '1', '0', '0', '0', '1', '0', '1', '0', '1', '0', '0', '0', '1', '0', '0', '0', '0', '0', '1', '0', '1', '0', '1', '0', '1' },
-        { '1', '0', '1', '1', '1', '1', '1', '0', '1', '0', '1', '0', '1', '0', '1', '1', '1', '1', '1', '0', '1', '0', '1', '1', '1', '1', '1', '0', '1', '1', '1', '0', '1', '1', '1', '0', '1', '0', '1' },
-        { '1', '0', '0', '0', '0', '0', '1', '0', '0', '0', '1', '0', '0', '0', '0', '0', '0', '0', '0', '0', '1', '0', '1', '0', '0', '0', '0', '0', '0', '0', '1', '0', '0', '0', '0', '0', '1', '0', '1' },
-        { '1', '1', '1', '1', '1', '0', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '0', '1', '0', '1', '1', '1', '1', '1', '0', '1', '1', '1', '1', '1', '1', '1', '0', '1' },
-        { '1', '0', '1', '0', '0', '0', '1', '0', '0', '0', '0', '0', '1', '0', '0', '0', '0', '0', '0', '0', '0', '0', '1', '0', '0', '0', '1', '0', '1', '0', '0', '0', '0', '0', '0', '0', '0', '0', '1' },
-        { '1', '0', '1', '0', '1', '1', '1', '0', '1', '1', '1', '0', '1', '0', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '0', '1', '0', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1' },
-        { '1', '0', '0', '0', '0', '0', '0', '0', '1', '0', '0', '0', '0', '0', '1', '0', '0', '0', '0', '0', '0', '0', '0', '0', 'D', '0', 'F', 'F', 'F', 'F', 'F', 'F', 'F', 'F', 'F', 'F', 'F', 'P', '1' },
-        { '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1' }, };
+            { '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1',
+                    '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1' },
+            { '1', 'P', '0', '0', '1', '0', '1', '0', '0', '0', '0', '0', '0', '0', '0', '0', '1', 'I', 'I', 'S', 'H',
+                    'G', '0', '0', '0', '0', '1', 'P', '1', '0', '0', '0', '0', '0', '1', '0', '0', '0', '1' },
+            { '1', '1', '1', '0', '1', '0', '1', '0', '1', '1', '1', '0', '1', '1', '1', '0', '1', 'I', '1', '1', '1',
+                    'I', '1', '1', '1', '0', '1', '0', '1', '0', '1', '1', '1', '0', '1', '0', '1', '0', '1' },
+            { '1', '0', 'F', '0', '1', '0', '0', '0', '1', 'F', 'F', '0', '1', '0', '1', '0', '0', 'I', 'I', 'I', 'I',
+                    'I', '1', '0', '1', '0', '1', '0', '0', '0', '0', '0', '1', '0', '0', '0', '1', '0', '1' },
+            { '1', '0', 'F', '0', '1', '0', '0', '0', '1', '0', '0', '0', '1', '0', '1', '0', '0', 'I', 'I', 'I', 'I',
+                    'I', '1', '0', '1', '0', '1', '0', '0', '0', '0', '0', '1', '0', '0', '0', '1', '0', '1' },
+            { '1', '0', '1', '1', '1', '0', '1', '1', '1', '0', '1', '1', '1', '0', '1', '1', '1', '1', '1', '1', '1',
+                    '1', '1', '0', '1', '0', '1', '1', '1', '1', '1', '1', '1', '1', '1', '0', '1', '0', '1' },
+            { '1', '0', '0', '0', '1', '0', '1', '0', '0', '0', '1', '0', '0', '0', '1', '0', '0', '0', '0', '0', '0',
+                    '0', '0', '0', '1', '0', '0', '0', '1', '0', '0', '0', '0', '0', '1', '0', '1', '0', '1' },
+            { '1', '0', '1', '0', '1', '1', '1', '0', '1', '1', '1', '0', '1', '0', '1', '0', '1', '1', '1', '1', '1',
+                    '0', '1', '0', '1', '1', '1', '0', '1', '0', '1', '1', '1', '0', '1', '1', '1', '0', '1' },
+            { '1', '0', '1', '0', '0', '0', '0', '0', '1', '0', '1', '0', '1', '0', '0', '0', '1', '0', '1', '0', '0',
+                    '0', '1', '0', '1', '0', '1', '0', '0', '0', '1', '0', '1', '0', '0', '0', '0', '0', '1' },
+            { '1', '0', '1', '1', '1', '1', '1', '1', '1', '0', '1', '0', '1', '1', '1', '1', '1', '0', '1', '0', '1',
+                    '1', '1', '0', '1', '0', '1', '1', '1', '1', '1', '0', '1', '1', '1', '1', '1', '0', '1' },
+            { '1', '0', '0', '0', '0', '0', '1', '0', '0', '0', '1', '0', '0', '0', '0', '0', '0', '0', '1', '0', '1',
+                    '0', '0', '0', '1', '0', '0', '0', '0', '0', '0', '0', '1', '0', '0', '0', '0', '0', '1' },
+            { '1', '0', '1', '1', '1', '1', '1', '0', '1', '0', '1', '0', '1', '1', '1', '1', '1', '0', '1', '0', '1',
+                    '1', '1', '0', '1', '0', '1', '0', '1', '1', '1', '1', '1', '0', '1', '1', '1', '1', '1' },
+            { '1', '0', '0', '0', '0', '0', '0', '0', '1', '0', '0', '0', '1', '0', '0', '0', '1', '0', '1', '0', '0',
+                    '0', '1', '0', '1', '0', '1', '0', '0', '0', '1', '0', '0', '0', '1', '0', '0', '0', '1' },
+            { '1', '0', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '0', '1', '0', '1', '1', '1', '1', '1',
+                    '0', '1', '0', '1', '1', '1', '1', '1', '0', '1', '0', '1', '1', '1', '0', '1', '1', '1' },
+            { '1', '0', '0', '0', '0', '0', '1', '0', '0', '0', '1', '0', '0', '0', '1', '0', '1', '0', '0', '0', '0',
+                    '0', '1', '0', '0', '0', '0', '0', '0', '0', '1', '0', '0', '0', '1', '0', '0', '0', '1' },
+            { '1', '1', '1', '1', '1', '0', '1', '0', '1', '0', '1', '0', '1', '1', '1', '0', '1', '0', '1', '1', '1',
+                    '1', '1', '0', '1', '1', '1', '1', '1', '1', '1', '1', '1', '0', '1', '1', '1', '0', '1' },
+            { '1', '0', '0', '0', '1', '0', '0', '0', '1', '0', '1', '0', '1', '0', '1', '0', '0', '0', '1', '0', '0',
+                    '0', '0', '0', '1', '0', '0', '0', '0', '0', '0', '0', '1', '0', '0', '0', '0', '0', '1' },
+            { '1', '0', '1', '0', '1', '1', '1', '1', '1', '0', '1', '0', '1', '0', '1', '1', '1', '1', '1', '0', '1',
+                    '1', '1', '1', '1', '0', '1', '1', '1', '0', '1', '1', '1', '1', '1', '1', '1', '0', '1' },
+            { '1', '0', '1', '0', '0', '0', '0', '0', '0', '0', '1', '0', '1', '0', '0', '0', '0', '0', '1', '0', '0',
+                    '0', '1', '0', '0', '0', '0', '0', '1', '0', '1', '0', '0', '0', '0', '0', '0', '0', '1' },
+            { '1', '0', '1', '1', '1', '1', '1', '1', '1', '1', '1', '0', '1', '0', '1', '1', '1', '1', '1', '1', '1',
+                    '0', '1', '0', '1', '1', '1', '1', '1', '0', '1', '0', '1', '1', '1', '1', '1', '1', '1' },
+            { '1', '0', '0', '0', '1', '0', '0', '0', '1', '0', '0', '0', '1', '0', '1', '0', '0', '0', '0', '0', '0',
+                    '0', '1', '0', '0', '0', '1', '0', '0', '0', '1', '0', '1', '0', '0', '0', '0', '0', '1' },
+            { '1', '1', '1', '0', '1', '1', '1', '0', '1', '0', '1', '1', '1', '0', '1', '0', '1', '1', '1', '1', '1',
+                    '1', '1', '1', '1', '0', '1', '0', '1', '1', '1', '0', '1', '0', '1', '1', '1', '0', '1' },
+            { '1', '0', '1', '0', '0', '0', 'D', '0', '1', '0', '0', '0', '1', '0', '0', '0', '0', '0', '0', '0', '0',
+                    '0', '1', 'P', '1', '0', '1', '0', '0', '0', '0', '0', '1', '0', '0', 'P', '1', '0', '1' },
+            { '1', '0', '1', '1', '1', '1', '1', '0', '1', '1', '1', '0', '1', '1', '1', '1', '1', '1', '1', '1', '1',
+                    '0', '1', '0', '1', '0', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '0', '1' },
+            { '1', '0', '0', '0', '1', '0', '0', '0', '1', '0', '1', '0', '0', '0', '0', '0', '1', '0', '0', '0', '1',
+                    '0', '0', '0', '1', '0', '1', '0', '0', '0', '0', '0', '1', '0', '0', '0', '0', '0', '1' },
+            { '1', '0', '1', '0', '1', '0', '1', '1', '1', '0', '1', '1', '1', '1', '1', '0', '1', '0', '1', '0', '1',
+                    '1', '1', '1', '1', '0', '1', '0', '1', '1', '1', '0', '1', '0', '1', '1', '1', '0', '1' },
+            { '1', '0', '1', '0', '1', '0', '0', '0', '0', '0', '1', '0', '0', '0', 'D', '0', '0', '0', '1', '0', '0',
+                    '0', '0', '0', '0', '0', '1', '0', '1', '0', '1', '0', '0', '0', '1', '0', '1', '0', '1' },
+            { '1', '0', '1', '0', '1', '1', '1', '1', '1', '0', '1', '0', '1', '1', '1', '1', '1', '1', '1', '1', '1',
+                    '1', '1', '1', '1', '1', '1', '0', '1', '0', '1', '1', '1', '1', '1', '0', '1', '0', '1' },
+            { '1', '0', '1', '0', '0', '0', '0', '0', '1', '0', '1', '0', '0', '0', '0', '0', '0', '0', '1', '0', '0',
+                    '0', '0', '0', '0', '0', '0', '0', '1', '0', '0', '0', '0', '0', '0', '0', '1', '0', '1' },
+            { '1', '0', '1', '0', '1', '1', '1', '1', '1', '0', '1', '0', '1', '1', '1', '0', '1', '1', '1', '0', '1',
+                    '1', '1', '1', '1', '0', '1', '1', '1', '0', '1', '1', '1', '1', '1', '0', '1', '0', '1' },
+            { '1', '0', '1', '0', '1', '0', '0', '0', '1', '0', '1', '0', '0', '0', '1', '0', '1', '0', '0', '0', '1',
+                    '0', '0', '0', '1', '0', '1', '0', '0', '0', '0', '0', '0', '0', '1', '0', '1', '0', '1' },
+            { '1', '0', '1', '0', '1', '0', '1', '0', '1', '0', '1', '1', '1', '0', '1', '0', '1', '0', '1', '1', '1',
+                    '0', '1', '0', '1', '0', '1', '1', '1', '1', '1', '1', '1', '0', '1', '0', '1', '0', '1' },
+            { '1', '0', '1', '0', '0', '0', '1', '0', '1', '0', '1', '0', '1', '0', '1', '0', '0', '0', '1', '0', '1',
+                    '0', '1', '0', '0', '0', '1', '0', '0', '0', '0', '0', '1', '0', '1', '0', '1', '0', '1' },
+            { '1', '0', '1', '1', '1', '1', '1', '0', '1', '0', '1', '0', '1', '0', '1', '1', '1', '1', '1', '0', '1',
+                    '0', '1', '1', '1', '1', '1', '0', '1', '1', '1', '0', '1', '1', '1', '0', '1', '0', '1' },
+            { '1', '0', '0', '0', '0', '0', '1', '0', '0', '0', '1', '0', '0', '0', '0', '0', '0', '0', '0', '0', '1',
+                    '0', '1', '0', '0', '0', '0', '0', '0', '0', '1', '0', '0', '0', '0', '0', '1', '0', '1' },
+            { '1', '1', '1', '1', '1', '0', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1',
+                    '0', '1', '0', '1', '1', '1', '1', '1', '0', '1', '1', '1', '1', '1', '1', '1', '0', '1' },
+            { '1', '0', '1', '0', '0', '0', '1', '0', '0', '0', '0', '0', '1', '0', '0', '0', '0', '0', '0', '0', '0',
+                    '0', '1', '0', '0', '0', '1', '0', '1', '0', '0', '0', '0', '0', '0', '0', '0', '0', '1' },
+            { '1', '0', '1', '0', '1', '1', '1', '0', '1', '1', '1', '0', '1', '0', '1', '1', '1', '1', '1', '1', '1',
+                    '1', '1', '1', '1', '0', '1', '0', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1' },
+            { '1', '0', '0', '0', '0', '0', '0', '0', '1', '0', '0', '0', '0', '0', '1', '0', '0', '0', '0', '0', '0',
+                    '0', '0', '0', 'D', '0', 'F', 'F', 'F', 'F', 'F', 'F', 'F', 'F', 'F', 'F', 'F', 'G', '1' },
+            { '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1',
+                    '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1' }, };
 
-    final int tileSize = 24;
-    int maxScreenCol, maxScreenRow, screenWidth, screenHeight;
+    final int tileSize = 32;
+    public final int maxScreenCol = 24;
+    public final int maxScreenRow = 18;
+    public final int screenWidth = tileSize * maxScreenCol;
+    public final int screenHeight = tileSize * maxScreenRow;
 
-    KeyHandler keyH = new KeyHandler();
-    Thread gameThread;
-    Player player;
-    ArrayList<Obstacle> obstacles = new ArrayList<>();
-    Image floorTile, wallCenter, playerimg, ExitDoor;
-    BufferedImage bufferedImage;
+    public final int maxWorldCol = map1[0].length;
+    public final int maxWorldRow = map1.length;
+    public final int worldWidth = tileSize * maxWorldCol;
+    public final int worldHeight = tileSize * maxWorldRow;
+
+    public KeyHandler keyH = new KeyHandler();
+    public Thread gameThread;
+    public Player player;
+    public ArrayList<Obstacle> obstacles = new ArrayList<>();
+    public Image floorTile, wallCenter, playerimg, ExitDoor;
+    public BufferedImage bufferedImage;
 
     Image wallCornerTopRight, wallCornerBottomRight, wallCornerTopLeft, wallCornerBottomLeft;
     Image wallVertical, wallHorizontal;
     Image wallEndLeft, wallEndRight, wallEndTop, wallEndBottom;
     Image wallTUp, wallTDown, wallTLeft, wallTRight, wallTIntersection;
-    Image BearTrap, FireTrap, Heal, Npc, IceTrap;
 
     public GamePanel() {
-        this.maxScreenCol = map1[0].length;
-        this.maxScreenRow = map1.length;
-        this.screenWidth = tileSize * maxScreenCol;
-        this.screenHeight = tileSize * maxScreenRow;
 
         this.addKeyListener(keyH);
         this.setFocusable(true);
@@ -94,8 +137,8 @@ public class GamePanel extends JPanel implements Runnable {
         loadAssets();
 
         int startX = 0, startY = 0;
-        for (int i = 0; i < maxScreenRow; i++) {
-            for (int j = 0; j < maxScreenCol; j++) {
+        for (int i = 0; i < maxWorldRow; i++) {
+            for (int j = 0; j < maxWorldCol; j++) {
                 if (map1[i][j] == 'S') {
                     startX = j * tileSize;
                     startY = i * tileSize;
@@ -104,21 +147,13 @@ public class GamePanel extends JPanel implements Runnable {
         }
 
         int endX = 0, endY = 0;
-        for (int i = 0; i < maxScreenRow; i++) {
-            for (int j = 0; j < maxScreenCol; j++) {
-                if (map1[i][j] == 'G') {
-                    endX = j * tileSize;
-                    endY = i * tileSize;
-                }
-            }
-        }
-        
+
         // Simpan referensi untuk linking gates dengan pressure plates
         ArrayList<PressurePlate> pressurePlates = new ArrayList<>();
         ArrayList<Gate> gates = new ArrayList<>();
-        
-        for (int i = 0; i < maxScreenRow; i++) {
-            for (int j = 0; j < maxScreenCol; j++) {
+
+        for (int i = 0; i < maxWorldRow; i++) {
+            for (int j = 0; j < maxWorldCol; j++) {
                 if (map1[i][j] == 'F') {
                     obstacles.add(new FireTrap(j * tileSize, i * tileSize, tileSize, tileSize));
                 }
@@ -140,14 +175,21 @@ public class GamePanel extends JPanel implements Runnable {
                     obstacles.add(gate);
                     gates.add(gate);
                 }
+                if (map1[i][j] == 'G') {
+                    obstacles.add(new Finish(j * tileSize, i * tileSize, tileSize, tileSize));
+                }
+                if (map1[i][j] == 'H') {
+                    obstacles.add(new HealPotion(j * tileSize, i * tileSize, tileSize, tileSize));
+                }
             }
         }
-        
+
         // CONTOH: Link gate ke pressure plate
-        // Uncomment dan sesuaikan index untuk mengatur gate mana yang memerlukan trapdoor
+        // Uncomment dan sesuaikan index untuk mengatur gate mana yang memerlukan
+        // trapdoor
         // Jika ada pressure plate di index 0 dan gate di index 0:
         // if (pressurePlates.size() > 0 && gates.size() > 0) {
-        //     gates.get(0).setRequiredPressurePlate(pressurePlates.get(0));
+        // gates.get(0).setRequiredPressurePlate(pressurePlates.get(0));
         // }
 
         // Pastikan parameter Player sesuai dengan constructor baru di Player.java
@@ -165,18 +207,10 @@ public class GamePanel extends JPanel implements Runnable {
             if (this.bufferedImage != null) {
                 this.playerimg = bufferedImage.getSubimage(0, 0, 25, 25);
             }
-            this.bufferedImage = loadBufferedImage("/Assets/ASSET/Traps/Fire_Trap.png");
-            if (this.bufferedImage != null) {
-                this.FireTrap = bufferedImage.getSubimage(0, 9, 32, 32);
-            }
-            this.bufferedImage = loadBufferedImage("/Assets/ASSET/Traps/Ice_Trap.png");
-            if (this.bufferedImage != null) {
-                this.IceTrap = bufferedImage.getSubimage(32, 150, 32, 32);
-            }
 
             // Loading Tiles
             this.floorTile = loadImage("/Assets/lab_tileset_LITE/seperated/tile031.png");
-            this.ExitDoor = loadImage("/Assets/lab_tileset_LITE/seperated/tile067.png");
+
             this.wallCenter = loadImage("/Assets/lab_tileset_LITE/seperated/tile066.png");
             this.wallCornerBottomLeft = loadImage("/Assets/lab_tileset_LITE/seperated/tile067.png");
             this.wallCornerTopLeft = loadImage("/Assets/lab_tileset_LITE/seperated/tile039.png");
@@ -252,47 +286,47 @@ public class GamePanel extends JPanel implements Runnable {
         return tileSize;
     }
 
-
     public boolean collidesWithWall(int nextX, int nextY, Rectangle hitbox) {
-            // Hitung posisi absolut hitbox di koordinat world untuk posisi selanjutnya
-        int hitboxLeftX   = nextX + hitbox.x;
-        int hitboxRightX  = nextX + hitbox.x + hitbox.width - 1;
-        int hitboxTopY    = nextY + hitbox.y;
+        // Hitung posisi absolut hitbox di koordinat world untuk posisi selanjutnya
+        int hitboxLeftX = nextX + hitbox.x;
+        int hitboxRightX = nextX + hitbox.x + hitbox.width - 1;
+        int hitboxTopY = nextY + hitbox.y;
         int hitboxBottomY = nextY + hitbox.y + hitbox.height - 1;
-         // Konversi koordinat pixel absolut ke indeks baris/kolom matriks map
-        int left   = hitboxLeftX / tileSize;
-        int right  = hitboxRightX / tileSize;
-        int top    = hitboxTopY / tileSize;           
+        // Konversi koordinat pixel absolut ke indeks baris/kolom matriks map
+        int left = hitboxLeftX / tileSize;
+        int right = hitboxRightX / tileSize;
+        int top = hitboxTopY / tileSize;
         int bottom = hitboxBottomY / tileSize;
-        
-            // Batasan luar map (Out of Bounds)
-        if (left < 0 || right >= maxScreenCol || top < 0 || bottom >= maxScreenRow) {
-                return true;
+
+        // Batasan luar map (Out of Bounds)
+        if (left < 0 || right >= maxWorldCol || top < 0 || bottom >= maxWorldRow) {
+            return true;
         }
 
-         // Cek apakah 4 sudut hitbox menubruk tembok ('1')
-        return map1[top][left] == '1' || map1[top][right] == '1' ||   map1[bottom][left] == '1' || map1[bottom][right] == '1';
+        // Cek apakah 4 sudut hitbox menubruk tembok ('1')
+        return map1[top][left] == '1' || map1[top][right] == '1' || map1[bottom][left] == '1'
+                || map1[bottom][right] == '1';
     }
 
     public boolean collidesWithClosedGate(int nextX, int nextY, Rectangle hitbox) {
         // 1. Buat objek Rectangle bayangan untuk posisi player selanjutnya
         Rectangle playerFutureBounds = new Rectangle(
-            nextX + hitbox.x, 
-            nextY + hitbox.y, 
-            hitbox.width, 
-            hitbox.height
-        );
+                nextX + hitbox.x,
+                nextY + hitbox.y,
+                hitbox.width,
+                hitbox.height);
 
         for (Obstacle obstacle : obstacles) {
             if (obstacle instanceof Gate) {
                 Gate gate = (Gate) obstacle;
-                
+
                 // 2. Jika gate tertutup, cek tabrakan menggunakan .intersects()
                 if (!gate.open) {
                     // Asumsi: Class Gate memiliki koordinat x, y, dan ukuran sendiri.
-                    // Jika Gate Anda sudah punya objek Rectangle sendiri, gunakan itu (misal: gate.hitbox).
+                    // Jika Gate Anda sudah punya objek Rectangle sendiri, gunakan itu (misal:
+                    // gate.hitbox).
                     Rectangle gateBounds = new Rectangle(gate.x, gate.y, tileSize, tileSize);
-                    
+
                     if (playerFutureBounds.intersects(gateBounds)) {
                         return true;
                     }
@@ -323,10 +357,9 @@ public class GamePanel extends JPanel implements Runnable {
                 repaint();
                 delta--;
             }
-            checkWinCondition();
+
             checkDamage();
 
-            
         }
 
     }
@@ -349,14 +382,20 @@ public class GamePanel extends JPanel implements Runnable {
                 ((Gate) obstacle).update();
             }
             if (obstacle instanceof PressurePlate) {
-                
+
                 ((PressurePlate) obstacle).update();
+            }
+            if (obstacle instanceof Finish) {
+                ((Finish) obstacle).update();
+            }
+            if (obstacle instanceof HealPotion) {
+                ((HealPotion) obstacle).update();
             }
         }
     }
 
     private boolean hasWallAt(int row, int col) {
-        if (row < 0 || row >= maxScreenRow || col < 0 || col >= maxScreenCol) {
+        if (row < 0 || row >= maxWorldRow || col < 0 || col >= maxWorldCol) {
             return false;
         }
         return map1[row][col] == '1';
@@ -543,18 +582,32 @@ public class GamePanel extends JPanel implements Runnable {
         super.paintComponent(g);
         Graphics2D g2 = (Graphics2D) g;
 
-        for (int i = 0; i < maxScreenRow; i++) {
-            for (int j = 0; j < maxScreenCol; j++) {
-                if (floorTile != null) {
-                    g2.drawImage(floorTile, j * tileSize, i * tileSize, tileSize, tileSize, null);
-                }
+        for (int i = 0; i < maxWorldRow; i++) {
+            for (int j = 0; j < maxWorldCol; j++) {
 
-                if (map1[i][j] == 'G' && ExitDoor != null) {
-                    g2.drawImage(ExitDoor, j * tileSize, i * tileSize, tileSize, tileSize, null);
-                } else if (map1[i][j] == '1') {
-                    Image wallImage = getWallImageForTile(i, j);
-                    if (wallImage != null) {
-                        g2.drawImage(wallImage, j * tileSize, i * tileSize, tileSize, tileSize, null);
+                int worldX = j * tileSize;
+                int worldY = i * tileSize;
+
+                // RUMUS KAMERA: Posisi di layar = Posisi Dunia - Posisi Player + Titik Tengah
+                // Layar
+                int screenX = worldX - player.x + player.screenX;
+                int screenY = worldY - player.y + player.screenY;
+
+                // Hanya gambar tile jika masuk ke dalam pandangan layar monitor
+                if (worldX + tileSize > player.x - player.screenX &&
+                        worldX - tileSize < player.x + player.screenX &&
+                        worldY + tileSize > player.y - player.screenY &&
+                        worldY - tileSize < player.y + player.screenY) {
+
+                    if (floorTile != null) {
+                        g2.drawImage(floorTile, screenX, screenY, tileSize, tileSize, null);
+                    }
+
+                    if (map1[i][j] == '1') {
+                        Image wallImage = getWallImageForTile(i, j);
+                        if (wallImage != null) {
+                            g2.drawImage(wallImage, screenX, screenY, tileSize, tileSize, null);
+                        }
                     }
                 }
             }
@@ -563,36 +616,26 @@ public class GamePanel extends JPanel implements Runnable {
         // Gambar semua obstacles, termasuk fire trap animasi
         for (Obstacle obstacle : obstacles) {
             if (obstacle instanceof FireTrap) {
-                ((FireTrap) obstacle).draw(g2);
+                ((FireTrap) obstacle).draw(g2, this);
             }
             if (obstacle instanceof IceTrap) {
-                ((IceTrap) obstacle).draw(g2);
+                ((IceTrap) obstacle).draw(g2, this);
             }
             if (obstacle instanceof PressurePlate) {
-                ((PressurePlate) obstacle).draw(g2);
+                ((PressurePlate) obstacle).draw(g2, this);
             }
             if (obstacle instanceof Gate) {
-                ((Gate) obstacle).draw(g2);
+                ((Gate) obstacle).draw(g2, this);
+            }
+            if (obstacle instanceof Finish) {
+                ((Finish) obstacle).draw(g2, this);
             }
         }
 
         if (player != null)
             player.draw(g2);
 
-        
-        
-
         g2.dispose();
-    }
-
-    protected void checkWinCondition() {
-        int playerTileX = player.x / tileSize;
-        int playerTileY = player.y / tileSize;
-
-        if (map1[playerTileY][playerTileX] == 'G') {
-            WinGame();
-        }
-
     }
 
     protected void WinGame() {
@@ -603,10 +646,19 @@ public class GamePanel extends JPanel implements Runnable {
     }
 
     protected void checkDamage() {
-        for (Obstacle obstacle : obstacles) {
+        java.util.Iterator<Obstacle> it = obstacles.iterator();
+        while (it.hasNext()) {
+            Obstacle obstacle = it.next();
+            if (obstacle instanceof Finish) {
+                Finish finish = (Finish) obstacle;
+                if (finish.collidesWith(player.x, player.y, tileSize)) {
+                    WinGame();
+                }
+            }
             if (obstacle instanceof FireTrap) {
                 FireTrap fireTrap = (FireTrap) obstacle;
-                if (fireTrap.active && fireTrap.collidesWith(player.x, player.y, tileSize) && player.damageCooldown == 0) {
+                if (fireTrap.active && fireTrap.collidesWith(player.x, player.y, tileSize)
+                        && player.damageCooldown == 0) {
                     player.HP -= 30;
                     if (player.HP < 0) {
                         player.HP = 0;
@@ -641,6 +693,17 @@ public class GamePanel extends JPanel implements Runnable {
                 IceTrap iceTrap = (IceTrap) obstacle;
                 if (iceTrap.active && iceTrap.collidesWith(player.x, player.y, tileSize)) {
                     player.applySlow(120); // Contoh: efek es berlangsung selama 2 detik (120 frame)
+                }
+            }
+            if (obstacle instanceof HealPotion) {
+                HealPotion healPotion = (HealPotion) obstacle;
+                if (healPotion.collidesWith(player.x, player.y, tileSize)) {
+                    player.HP += 50; // Contoh: menyembuhkan 50 HP
+                    if (player.HP > 100) {
+                        player.HP = 100; // Batas maksimal HP
+                    }
+                    it.remove(); // Hapus potion setelah digunakan dengan aman
+                    System.out.println("Player consumed a heal potion! HP: " + player.HP);
                 }
             }
         }

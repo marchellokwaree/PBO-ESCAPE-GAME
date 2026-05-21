@@ -7,6 +7,8 @@ import java.net.URL;
 
 import javax.imageio.ImageIO;
 
+import Main.GamePanel;
+
 public class Gate extends Obstacle {
     public boolean open = false;
     public boolean alrOpen = false;
@@ -92,10 +94,8 @@ public class Gate extends Obstacle {
         }
     }
 
-    public void draw(Graphics2D g2) {
+    public void draw(Graphics2D g2, GamePanel gp) {
         BufferedImage frame = getCurrentFrame();
-        if (frame != null) {
-            g2.drawImage(frame, x, y, width, height, null);
-        }
+        super.drawCamera(g2, gp , frame);
     }
 }
