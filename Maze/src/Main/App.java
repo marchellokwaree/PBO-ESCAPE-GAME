@@ -10,7 +10,7 @@ public class App {
         // frame.setResizable(false);
         GamePanel gamePanel = new GamePanel();
         frame.add(gamePanel);
-        frame.pack(); 
+        frame.pack();
         frame.setLocationRelativeTo(null);
         frame.setVisible(true);
         gamePanel.startGameThread();
