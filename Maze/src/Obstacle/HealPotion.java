@@ -8,7 +8,7 @@ import java.io.IOException;
 import Main.GamePanel;
 public class HealPotion extends Obstacle {
     private BufferedImage spriteSheet;
-    private BufferedImage[] animationFrames = new BufferedImage[3];
+    private BufferedImage[] animationFrames = new BufferedImage[8];
     private int currentFrame = 0;
     private int animationCounter = 0;
     private final int animationDelay = 6;
@@ -18,9 +18,13 @@ public class HealPotion extends Obstacle {
             this.spriteSheet = loadBufferedImage("/Assets/ASSET/Traps/heal_potion.png");
             int frameWidth = 16;
             int frameHeight = 16;
-            for (int i = 0; i < animationFrames.length; i++) {
-                int colx = i * frameWidth;
-                animationFrames[i] = spriteSheet.getSubimage(colx, 0, frameWidth, frameHeight);
+            if (this.spriteSheet != null) {
+                int index = 0;
+                for (int row = 0; row < 3 && index < animationFrames.length; row++) {
+                    for (int col = 0; col < 3 && index < animationFrames.length; col++) {
+                        animationFrames[index++] = spriteSheet.getSubimage(col * frameWidth, row * frameHeight, frameWidth, frameHeight);
+                    }
+                }
             }
         } catch (Exception e) {
             System.out.println("Error loading heal potion image: " + e.getMessage());
