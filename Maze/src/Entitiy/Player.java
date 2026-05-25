@@ -35,7 +35,7 @@ public class Player extends Entity {
 
     // Constructor disesuaikan dengan GamePanel kamu (5 parameter)
     public Player(GamePanel gp, KeyHandler keyH, Image playerImg, int x, int y) {
-        super(x, y, 2); // speed 2
+        super(x, y, 3); // speed 2
         this.gp = gp;
         this.keyH = keyH;
         this.currentImage = playerImg;
