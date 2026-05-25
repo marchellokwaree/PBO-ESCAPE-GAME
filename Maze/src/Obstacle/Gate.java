@@ -16,12 +16,14 @@ public class Gate extends Obstacle {
     private BufferedImage[] animationFrames = new BufferedImage[6];
     private int currentFrame = 0;
     private int animationCounter = 0;
-    private final int animationDelay = 6;
+    private final int animationDelay = 20;
     public boolean active = false;
     private PressurePlate requiredPressurePlate = null; // Trapdoor requirement
+    public String ID;
 
-    public Gate(int x, int y, int width, int height, boolean right) {
+    public Gate(int x, int y, int width, int height, boolean right, String ID) {
         super(x, y, width, height);
+        this.ID = ID;
         try {
             if (!right) {
                 this.spriteSheet = loadBufferedImage("/Assets/ASSET/Traps/Push_Trap_Front.png");

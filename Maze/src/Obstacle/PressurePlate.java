@@ -15,8 +15,10 @@ public class PressurePlate extends Obstacle {
     private BufferedImage[] animationFrames = new BufferedImage[2];
     private int currentFrame = 0;
     private int animationCounter = 0;
-    public PressurePlate(int x, int y, int width, int height) {
+    public String ID;
+    public PressurePlate(int x, int y, int width, int height, String ID) {
         super(x, y, width, height);
+        this.ID = ID;
         try {
             this.spriteSheet = loadBufferedImage("/Assets/ASSET/free-pixel-art-dungeon-objects-asset-pack/PNG/Pedestals.png");
             int frameWidth = 48;
