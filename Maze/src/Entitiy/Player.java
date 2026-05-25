@@ -33,6 +33,8 @@ public class Player extends Entity {
     BufferedImage[] walkImages = new BufferedImage[8]; // Array untuk menyimpan gambar berjalan
     Rectangle hitbox;
 
+
+
     // Constructor disesuaikan dengan GamePanel kamu (5 parameter)
     public Player(GamePanel gp, KeyHandler keyH, Image playerImg, int x, int y) {
         super(x, y, 3); // speed 2
@@ -64,6 +66,11 @@ public class Player extends Entity {
         hitbox.height = gp.getTileSize() - 4; // tinggi hitbox
         this.screenX = (gp.screenWidth / 2) - (gp.getTileSize() / 2);
         this.screenY = (gp.screenHeight / 2) - (gp.getTileSize() / 2);
+    }
+
+    
+    public Rectangle getHitbox() {
+        return new Rectangle(x + hitbox.x, y + hitbox.y, hitbox.width, hitbox.height);
     }
 
     public void update() {

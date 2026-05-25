@@ -631,8 +631,11 @@ public class GamePanel extends JPanel implements Runnable {
                 }
             }
             if (obstacle instanceof FireTrap) {
+
                 FireTrap fireTrap = (FireTrap) obstacle;
-                if (fireTrap.active && fireTrap.collidesWith(player.x, player.y, tileSize)
+                Rectangle fireHitbox = new Rectangle(fireTrap.x, fireTrap.y, 30, 30);
+
+                if (fireTrap.active && fireHitbox.intersects(player.getHitbox())
                         && player.damageCooldown == 0) {
                     player.HP -= 30;
                     if (player.HP < 0) {
@@ -649,7 +652,8 @@ public class GamePanel extends JPanel implements Runnable {
             }
             if (obstacle instanceof PressurePlate) {
                 PressurePlate pressurePlate = (PressurePlate) obstacle;
-                if (pressurePlate.collidesWith(player.x, player.y, tileSize)) {
+                Rectangle pressureHitbox = new Rectangle(pressurePlate.x, pressurePlate.y, tileSize, tileSize);
+                if (pressureHitbox.intersects(player.getHitbox())) {
                     pressurePlate.activate();
                     for (Obstacle o : obstacles) {
                         if (o instanceof Gate) {
@@ -667,13 +671,15 @@ public class GamePanel extends JPanel implements Runnable {
             }
             if (obstacle instanceof IceTrap) {
                 IceTrap iceTrap = (IceTrap) obstacle;
-                if (iceTrap.active && iceTrap.collidesWith(player.x, player.y, tileSize)) {
+                Rectangle iceHitbox = new Rectangle(iceTrap.x, iceTrap.y, tileSize, tileSize);
+                if (iceTrap.active && iceHitbox.intersects(player.getHitbox())) {
                     player.applySlow(5); // Contoh: efek es berlangsung selama 2 detik (120 frame)
                 }
             }
             if (obstacle instanceof HealPotion) {
                 HealPotion healPotion = (HealPotion) obstacle;
-                if (healPotion.collidesWith(player.x, player.y, tileSize)) {
+                Rectangle healHitbox = new Rectangle(healPotion.x, healPotion.y, tileSize, tileSize);
+                if (healHitbox.intersects(player.getHitbox())) {
                     player.HP += 50; // Contoh: menyembuhkan 50 HP
                     if (player.HP > 100) {
                         player.HP = 100; // Batas maksimal HP

@@ -22,7 +22,7 @@ public class HealPotion extends Obstacle {
                 int index = 0;
                 for (int row = 0; row < 3 && index < animationFrames.length; row++) {
                     for (int col = 0; col < 3 && index < animationFrames.length; col++) {
-                        animationFrames[index++] = spriteSheet.getSubimage(col * frameWidth, row * frameHeight, frameWidth, frameHeight);
+                        animationFrames[index++] = spriteSheet.getSubimage(col * frameWidth, row * frameHeight, 16, 16);
                     }
                 }
             }
@@ -60,9 +60,27 @@ public class HealPotion extends Obstacle {
         return spriteSheet;
     }
 
+    @Override
+    public void drawCamera(Graphics2D g2, GamePanel gp, BufferedImage img) {
+        if (img != null && gp.getPlayer() != null) {
+            // Rumus posisi layar = Posisi dunia - Posisi Player + Titik tengah layar
+            int screenY = y - gp.getPlayer().y + gp.getPlayer().screenY + 6;
+            int screenX = x - gp.getPlayer().x + gp.getPlayer().screenX + 6;
+
+            // Optimasi: Hanya gambar jika jebakan masuk dalam area layar
+            if (x + width > gp.getPlayer().x - gp.getPlayer().screenX &&
+                x - width < gp.getPlayer().x + gp.getPlayer().screenX &&
+                y + height > gp.getPlayer().y - gp.getPlayer().screenY &&
+                y - height < gp.getPlayer().y + gp.getPlayer().screenY) {
+                
+                g2.drawImage(img, screenX, screenY, 20, 20, null);
+            }
+        }
+    }
+
     public void draw(Graphics2D g2, GamePanel gp) {
         BufferedImage frame = getCurrentFrame();
-        super.drawCamera(g2, gp , frame);
+        drawCamera(g2, gp , frame);
     }
 
      
