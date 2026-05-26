@@ -1,6 +1,5 @@
 package Main;
 
-import Entitiy.Player;
 import Obstacle.*;
 import Entitiy.*;
 import java.awt.Color;
@@ -25,7 +24,7 @@ public class GamePanel extends JPanel implements Runnable {
             { "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1",
                     "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1" },
             { "1", "P1", "0", "0", "1", "0", "1", "0", "0", "0", "0", "0", "0", "0", "0", "0", "1", "D2", "P2", "S",
-                    "H", "0", "0", "0", "0", "0", "1", "P1", "1", "0", "0", "0", "0", "0", "1", "0", "0", "0", "1" },
+                    "H", "G", "0", "0", "0", "0", "1", "P1", "1", "0", "0", "0", "0", "0", "1", "0", "0", "0", "1" },
             { "1", "1", "1", "0", "1", "G1", "1", "0", "1", "1", "1", "0", "1", "1", "1", "0", "1", "N", "1", "1", "1",
                     "I", "1", "1", "1", "0", "1", "0", "1", "0", "1", "1", "1", "0", "1", "0", "1", "0", "1" },
             { "1", "0", "F", "0", "1", "0", "0", "0", "1", "F", "F", "0", "1", "0", "1", "0", "0", "I", "I", "I", "I",
@@ -99,7 +98,7 @@ public class GamePanel extends JPanel implements Runnable {
             { "1", "0", "1", "0", "1", "1", "1", "0", "1", "1", "1", "0", "1", "0", "1", "1", "1", "1", "1", "1", "1",
                     "1", "1", "1", "1", "0", "1", "0", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1" },
             { "1", "0", "0", "0", "0", "0", "0", "0", "1", "0", "0", "0", "0", "0", "1", "0", "0", "0", "0", "0", "0",
-                    "0", "0", "0", "D1", "0", "F", "F", "F", "F", "F", "F", "F", "F", "F", "F", "F", "G1", "1" },
+                    "0", "0", "0", "D1", "0", "F", "F", "F", "F", "F", "F", "F", "F", "F", "F", "F", "G", "1" },
             { "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1",
                     "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1" }, };
 
@@ -619,9 +618,9 @@ public class GamePanel extends JPanel implements Runnable {
 
                 // Hanya gambar tile jika masuk ke dalam pandangan layar monitor
                 if (worldX + tileSize > player.x - player.screenX &&
-                        worldX - tileSize < player.x + player.screenX &&
-                        worldY + tileSize > player.y - player.screenY &&
-                        worldY - tileSize < player.y + player.screenY) {
+                 worldX - tileSize < player.x - player.screenX + screenWidth &&
+                 worldY + tileSize > player.y - player.screenY &&
+                 worldY - tileSize < player.y - player.screenY + screenHeight) {
 
                     if (floorTile != null) {
                         g2.drawImage(floorTile, screenX, screenY, tileSize, tileSize, null);

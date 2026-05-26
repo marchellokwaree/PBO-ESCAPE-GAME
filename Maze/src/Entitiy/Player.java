@@ -28,8 +28,10 @@ public class Player extends Entity {
     public int normalSpeed = 2;
     public int slowSpeed = 1;
     public int slowEffectCounter = 0; // Counter untuk efek slow
-    public final int screenX;
-    public final int screenY;
+    public int screenX;
+    public int screenY;
+    public final int defaultScreenX;
+    public final int defaultScreenY;
     BufferedImage[] walkImages = new BufferedImage[8]; // Array untuk menyimpan gambar berjalan
     Rectangle hitbox;
 
@@ -64,8 +66,13 @@ public class Player extends Entity {
         hitbox.y = 4;       // offset dari atas sprite
         hitbox.width = gp.getTileSize() - 8;  // lebar hitbox
         hitbox.height = gp.getTileSize() - 4; // tinggi hitbox
-        this.screenX = (gp.screenWidth / 2) - (gp.getTileSize() / 2);
-        this.screenY = (gp.screenHeight / 2) - (gp.getTileSize() / 2);
+        // Mengunci posisi default pemain tepat di tengah jendela game
+        this.defaultScreenX = (gp.screenWidth / 2) - (gp.getTileSize() / 2);
+        this.defaultScreenY = (gp.screenHeight / 2) - (gp.getTileSize() / 2);
+
+        // Posisi layar saat ini
+        this.screenX = defaultScreenX;
+        this.screenY = defaultScreenY;
     }
 
     
@@ -77,6 +84,27 @@ public class Player extends Entity {
         updateEffects();
         int nextX = x;
         int nextY = y;
+           // --- KAMERA CLAMPING (Mencegah kamera keluar map) ---
+        screenX = defaultScreenX;
+        screenY = defaultScreenY;
+
+        // Batas Kiri
+        if (x < defaultScreenX) {
+            screenX = x;
+        }
+        // Batas Kanan
+        else if (x > gp.worldWidth - (gp.screenWidth - defaultScreenX)) {
+            screenX = gp.screenWidth - (gp.worldWidth - x);
+        }
+
+            // Batas Atas
+        if (y < defaultScreenY) {
+            screenY = y;
+        }
+        // Batas Bawah
+        else if (y > gp.worldHeight - (gp.screenHeight - defaultScreenY)) {
+            screenY = gp.screenHeight - (gp.worldHeight - y);
+        }
         boolean moving = false;
 
         // Cek Input dan tentukan gambar (Bisa dikembangkan per arah jika ada asetnya)

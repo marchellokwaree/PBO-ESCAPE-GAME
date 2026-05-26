@@ -78,9 +78,9 @@ public class Obstacle {
 
             // Optimasi: Hanya gambar jika jebakan masuk dalam area layar
             if (x + width > gp.getPlayer().x - gp.getPlayer().screenX &&
-                x - width < gp.getPlayer().x + gp.getPlayer().screenX &&
+                x - width < gp.getPlayer().x - gp.getPlayer().screenX + gp.screenWidth &&
                 y + height > gp.getPlayer().y - gp.getPlayer().screenY &&
-                y - height < gp.getPlayer().y + gp.getPlayer().screenY) {
+                y - height < gp.getPlayer().y - gp.getPlayer().screenY + gp.screenHeight) {
                 
                 g2.drawImage(img, screenX, screenY, width, height, null);
             }
