@@ -62,9 +62,9 @@ public class Player extends Entity {
         // Sesuaikan hitbox dengan ukuran tile 24x24.
         // Hitbox lebih kecil agar tidak menabrak dinding di bawah/sekitar sprite.
         hitbox = new Rectangle();
-        hitbox.x = 4;       // offset dari kiri sprite
+        hitbox.x = 8;       // offset dari kiri sprite
         hitbox.y = 4;       // offset dari atas sprite
-        hitbox.width = gp.getTileSize() - 8;  // lebar hitbox
+        hitbox.width = gp.getTileSize() - 16;  // lebar hitbox
         hitbox.height = gp.getTileSize() - 4; // tinggi hitbox
         // Mengunci posisi default pemain tepat di tengah jendela game
         this.defaultScreenX = (gp.screenWidth / 2) - (gp.getTileSize() / 2);

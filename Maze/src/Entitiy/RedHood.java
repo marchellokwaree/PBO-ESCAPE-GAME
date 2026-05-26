@@ -54,8 +54,8 @@ public class RedHood extends Entity {
         hitbox = new Rectangle();
         hitbox.x = 4; // offset dari kiri sprite
         hitbox.y = 4; // offset dari atas sprite
-        hitbox.width = gp.getTileSize() * 2; // lebar hitbox
-        hitbox.height = gp.getTileSize() * 2; // tinggi hitbox
+        hitbox.width = gp.getTileSize() -16; // lebar hitbox
+        hitbox.height = gp.getTileSize() - 8; // tinggi hitbox
     }
 
     public void startDisappear() {
