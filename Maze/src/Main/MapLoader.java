@@ -21,9 +21,24 @@ public class MapLoader {
             e.printStackTrace();
         }
 
-        String[][] mapArray = new String[rowList.size()][];
+        int maxCols = 0;
+        for (String[] row : rowList) {
+            if (row.length > maxCols) {
+                maxCols = row.length;
+            }
+        }
+
+        String[][] mapArray = new String[rowList.size()][maxCols];
         for (int i = 0; i < rowList.size(); i++) {
-            mapArray[i] = rowList.get(i);
+            String[] row = rowList.get(i);
+            System.arraycopy(row, 0, mapArray[i], 0, row.length);
+            for (int j = row.length; j < maxCols; j++) {
+                mapArray[i][j] = "0"; // Pad missing columns with empty floor tiles.
+            }
+            if (row.length != maxCols) {
+                System.err.println("Warning: map row " + i + " has " + row.length + " columns but expected " + maxCols
+                        + ". Padding with 0s.");
+            }
         }
 
         return mapArray;
