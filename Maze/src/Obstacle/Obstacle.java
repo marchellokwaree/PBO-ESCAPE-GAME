@@ -72,16 +72,17 @@ public class Obstacle {
 
     public void drawCamera(Graphics2D g2, GamePanel gp, BufferedImage img) {
         if (img != null && gp.getPlayer() != null) {
-            // Rumus posisi layar = Posisi dunia - Posisi Player + Titik tengah layar
-            int screenX = x - gp.getPlayer().x + gp.getPlayer().screenX;
-            int screenY = y - gp.getPlayer().y + gp.getPlayer().screenY;
+            int camX = gp.getCameraXInt();
+            int camY = gp.getCameraYInt();
+            int screenX = x - camX;
+            int screenY = y - camY;
 
-            // Optimasi: Hanya gambar jika jebakan masuk dalam area layar
-            if (x + width > gp.getPlayer().x - gp.getPlayer().screenX &&
-                x - width < gp.getPlayer().x - gp.getPlayer().screenX + gp.screenWidth &&
-                y + height > gp.getPlayer().y - gp.getPlayer().screenY &&
-                y - height < gp.getPlayer().y - gp.getPlayer().screenY + gp.screenHeight) {
-                
+            // Optimasi: Hanya gambar jika objek masuk dalam area layar
+            if (x + width > camX &&
+                x - width < camX + gp.screenWidth &&
+                y + height > camY &&
+                y - height < camY + gp.screenHeight) {
+
                 g2.drawImage(img, screenX, screenY, width, height, null);
             }
         }

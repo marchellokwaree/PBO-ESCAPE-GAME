@@ -182,7 +182,9 @@ public class Player extends Entity {
     
 
     public void draw(Graphics2D g2) {
-        int drawY = screenY;
+        int camX = gp.getCameraXInt();
+        int camY = gp.getCameraYInt();
+        int drawY = y - camY;
         Image walkingImage = null;
 
         // EFEK VISUAL JALAN:
@@ -204,10 +206,11 @@ public class Player extends Entity {
 
         int width = gp.getTileSize();
         int height = gp.getTileSize();
+        int drawX = x - camX;
 
         // gambar menghadap ke arah kiri jika bergerak ke kiri
         if (keyH.leftPressed) {
-            g2.translate(screenX + width, drawY); // Sesuaikan posisi setelah flip
+            g2.translate(drawX + width, drawY); // Sesuaikan posisi setelah flip
             g2.scale(-1, 1); // Flip horizontal
             if (walkingImage != null) {
                 g2.drawImage(walkingImage, 0, 0, width, height, null);
@@ -215,7 +218,7 @@ public class Player extends Entity {
 
         } else {
             if (walkingImage != null) {
-                g2.drawImage(walkingImage, screenX, drawY, gp.getTileSize(), gp.getTileSize(), null);
+                g2.drawImage(walkingImage, drawX, drawY, gp.getTileSize(), gp.getTileSize(), null);
             }
 
         }

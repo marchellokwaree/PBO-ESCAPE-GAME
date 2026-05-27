@@ -42,6 +42,10 @@ public class GamePanel extends JPanel implements Runnable {
     public Image floorTile, wallCenter, playerimg, ExitDoor;
     public BufferedImage bufferedImage;
 
+    // Smooth camera position (world coordinates of top-left of screen)
+    private double cameraX = 0.0;
+    private double cameraY = 0.0;
+    private final double cameraSmoothFactor = 0.15; // between 0 (no move) and 1 (instant)
     Image wallCornerTopRight, wallCornerBottomRight, wallCornerTopLeft, wallCornerBottomLeft;
     Image wallVertical, wallHorizontal;
     Image wallEndLeft, wallEndRight, wallEndTop, wallEndBottom;
@@ -136,6 +140,11 @@ public class GamePanel extends JPanel implements Runnable {
 
         // Pastikan parameter Player sesuai dengan constructor baru di Player.java
         player = new Player(this, keyH, playerimg, startX, startY);
+
+        // Initialize camera at player-centered position (clamped)
+        cameraX = player.x - player.screenX;
+        cameraY = player.y - player.screenY;
+        clampCamera();
     }
 
     public Player getPlayer() {
@@ -359,6 +368,38 @@ public class GamePanel extends JPanel implements Runnable {
                 ((HealPotion) obstacle).update();
             }
         }
+        // Update smooth camera after updating entities
+        updateCamera();
+    }
+
+    private void updateCamera() {
+        if (player == null) return;
+
+        double targetX = player.x - player.screenX;
+        double targetY = player.y - player.screenY;
+
+        cameraX += (targetX - cameraX) * cameraSmoothFactor;
+        cameraY += (targetY - cameraY) * cameraSmoothFactor;
+
+        clampCamera();
+    }
+
+    private void clampCamera() {
+        if (cameraX < 0) cameraX = 0;
+        double maxCamX = Math.max(0, worldWidth - screenWidth);
+        if (cameraX > maxCamX) cameraX = maxCamX;
+
+        if (cameraY < 0) cameraY = 0;
+        double maxCamY = Math.max(0, worldHeight - screenHeight);
+        if (cameraY > maxCamY) cameraY = maxCamY;
+    }
+
+    public int getCameraXInt() {
+        return (int) Math.round(cameraX);
+    }
+
+    public int getCameraYInt() {
+        return (int) Math.round(cameraY);
     }
 
     private boolean hasWallAt(int row, int col) {
@@ -548,6 +589,8 @@ public class GamePanel extends JPanel implements Runnable {
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
         Graphics2D g2 = (Graphics2D) g;
+        int camX = getCameraXInt();
+        int camY = getCameraYInt();
 
         for (int i = 0; i < maxWorldRow; i++) {
             for (int j = 0; j < maxWorldCol; j++) {
@@ -555,16 +598,14 @@ public class GamePanel extends JPanel implements Runnable {
                 int worldX = j * tileSize;
                 int worldY = i * tileSize;
 
-                // RUMUS KAMERA: Posisi di layar = Posisi Dunia - Posisi Player + Titik Tengah
-                // Layar
-                int screenX = worldX - player.x + player.screenX;
-                int screenY = worldY - player.y + player.screenY;
+                int screenX = worldX - camX;
+                int screenY = worldY - camY;
 
                 // Hanya gambar tile jika masuk ke dalam pandangan layar monitor
-                if (worldX + tileSize > player.x - player.screenX &&
-                        worldX - tileSize < player.x - player.screenX + screenWidth &&
-                        worldY + tileSize > player.y - player.screenY &&
-                        worldY - tileSize < player.y - player.screenY + screenHeight) {
+                if (worldX + tileSize > camX &&
+                        worldX - tileSize < camX + screenWidth &&
+                        worldY + tileSize > camY &&
+                        worldY - tileSize < camY + screenHeight) {
 
                     if (floorTile != null) {
                         g2.drawImage(floorTile, screenX, screenY, tileSize, tileSize, null);

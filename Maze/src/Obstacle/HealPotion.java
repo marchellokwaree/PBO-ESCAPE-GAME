@@ -63,16 +63,17 @@ public class HealPotion extends Obstacle {
     @Override
     public void drawCamera(Graphics2D g2, GamePanel gp, BufferedImage img) {
         if (img != null && gp.getPlayer() != null) {
-            // Rumus posisi layar = Posisi dunia - Posisi Player + Titik tengah layar
-            int screenY = y - gp.getPlayer().y + gp.getPlayer().screenY + 6;
-            int screenX = x - gp.getPlayer().x + gp.getPlayer().screenX + 6;
+            int camX = gp.getCameraXInt();
+            int camY = gp.getCameraYInt();
+            int screenX = x - camX + 6;
+            int screenY = y - camY + 6;
 
-            // Optimasi: Hanya gambar jika jebakan masuk dalam area layar
-            if (x + width > gp.getPlayer().x - gp.getPlayer().screenX &&
-                x - width < gp.getPlayer().x - gp.getPlayer().screenX + gp.screenWidth &&
-                y + height > gp.getPlayer().y - gp.getPlayer().screenY &&
-                y - height < gp.getPlayer().y - gp.getPlayer().screenY + gp.screenHeight) {
-                
+            // Optimasi: Hanya gambar jika objek masuk dalam area layar
+            if (x + width > camX &&
+                x - width < camX + gp.screenWidth &&
+                y + height > camY &&
+                y - height < camY + gp.screenHeight) {
+
                 g2.drawImage(img, screenX, screenY, 20, 20, null);
             }
         }
