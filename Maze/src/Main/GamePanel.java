@@ -334,7 +334,14 @@ public class GamePanel extends JPanel implements Runnable {
 
             checkDamage();
 
+            try {
+                Thread.sleep(1000 / 60); // Tidur sebentar untuk mengurangi beban CPU, target sekitar 60 FPS
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
         }
+
+
 
     }
 
