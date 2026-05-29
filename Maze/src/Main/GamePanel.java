@@ -15,7 +15,9 @@ import java.util.ArrayList;
 
 import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.SwingUtilities;
 import java.awt.Rectangle;
 
 public class GamePanel extends JPanel implements Runnable {
@@ -46,6 +48,7 @@ public class GamePanel extends JPanel implements Runnable {
     private double cameraX = 0.0;
     private double cameraY = 0.0;
     private final double cameraSmoothFactor = 0.15; // between 0 (no move) and 1 (instant)
+    private boolean gameEnded = false;
     Image wallCornerTopRight, wallCornerBottomRight, wallCornerTopLeft, wallCornerBottomLeft;
     Image wallVertical, wallHorizontal;
     Image wallEndLeft, wallEndRight, wallEndTop, wallEndBottom;
@@ -664,10 +667,15 @@ public class GamePanel extends JPanel implements Runnable {
     }
 
     protected void WinGame() {
-        // Implementasi logika kemenangan, matikan game loop, dan tampilkan pesan
-        // kemenangan
-        System.out.println("Congratulations! You've reached the exit!");
-        System.exit(0); // Keluar dari game
+        if (gameEnded) {
+            return;
+        }
+        gameEnded = true;
+        SwingUtilities.invokeLater(() -> {
+            JOptionPane.showMessageDialog(this, "kamu menang anjay");
+            System.exit(0);
+        });
+        gameThread = null;
     }
 
     protected void checkDamage() {
@@ -700,8 +708,15 @@ public class GamePanel extends JPanel implements Runnable {
 
                     System.out.println("Player hit by fire trap! HP: " + player.darah.getCurrentHP());
                     if (player.darah.getCurrentHP() <= 0) {
+                        if (!gameEnded) {
+                            gameEnded = true;
+                            SwingUtilities.invokeLater(() -> {
+                                JOptionPane.showMessageDialog(this, "Kamu Mati, dasar cupu");
+                                System.exit(0);
+                            });
+                        }
                         System.out.println("Game Over! Player has been defeated.");
-                        System.exit(0);
+                        gameThread = null;
                     }
                 }
             }
