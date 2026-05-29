@@ -8,7 +8,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
-
+import Main.Darah;
 import javax.imageio.ImageIO;
 
 import Main.GamePanel;
@@ -19,9 +19,11 @@ public class Player extends Entity {
     KeyHandler keyH;
     Image currentImage;
     BufferedImage bufferedImage;
+    public Darah darah;
     // Variabel Animasi
     int spriteCounter = 0;
     int spriteNum = 1;
+    boolean hadapKiri = false;
     public int HP = 100;
     public int maxHP = 100;
     public int damageCooldown = 0;
@@ -73,6 +75,8 @@ public class Player extends Entity {
         // Posisi layar saat ini
         this.screenX = defaultScreenX;
         this.screenY = defaultScreenY;
+
+        this.darah = new Darah();
     }
 
     
@@ -114,10 +118,18 @@ public class Player extends Entity {
                 nextY -= speed;
             if (keyH.downPressed)
                 nextY += speed;
-            if (keyH.leftPressed)
+            if (keyH.leftPressed) {
+
                 nextX -= speed;
-            if (keyH.rightPressed)
+                hadapKiri = true;
+            }
+            if (keyH.rightPressed) {
                 nextX += speed;
+                hadapKiri = false;
+            }
+                
+
+                
         }
 
         // LOGIKA ANIMASI: Berganti antara spriteNum 1 dan 2 saat bergerak
@@ -208,15 +220,15 @@ public class Player extends Entity {
         int height = gp.getTileSize();
         int drawX = x - camX;
 
-        // gambar menghadap ke arah kiri jika bergerak ke kiri
-        if (keyH.leftPressed) {
+        // gambar menghadap ke arah kiri
+        if (hadapKiri) {
             g2.translate(drawX + width, drawY); // Sesuaikan posisi setelah flip
             g2.scale(-1, 1); // Flip horizontal
             if (walkingImage != null) {
                 g2.drawImage(walkingImage, 0, 0, width, height, null);
             }
 
-        } else {
+        } if (!hadapKiri) {
             if (walkingImage != null) {
                 g2.drawImage(walkingImage, drawX, drawY, gp.getTileSize(), gp.getTileSize(), null);
             }

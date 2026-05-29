@@ -4,9 +4,11 @@ import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics2D;
 
+import java.util.Random;
 public class Darah {
     private int currentHP;
     private final int maxHP;
+    
 
     public Darah() {
         this.maxHP = 100;
@@ -23,11 +25,13 @@ public class Darah {
         this.currentHP = hp;
     }
 
+    
+
     public void draw(Graphics2D g2) {
-        int x = 14;
-        int y = 10;
+        int x = 14 ; // Posisi X dengan offset getaran
+        int y = 10 ; // Posisi Y dengan offset getaran
         int width = 212;
-        int height = 28;
+        int height = 28;    
         int radius = 12;
 
         // Background panel with transparansi agar tidak terlalu menutupi
@@ -49,7 +53,7 @@ public class Darah {
 
         // Health fill
         int barWidth = (int) ((currentHP / (double) maxHP) * innerWidth);
-        Color hpColor = currentHP > 50 ? new Color(220, 40, 40) : currentHP > 20 ? new Color(235, 150, 40) : new Color(200, 60, 60);
+        Color hpColor = currentHP > 70 ? new Color(0, 191, 0) : currentHP > 50 ? new Color(235, 150, 40) : currentHP > 20 ? new Color(200, 60, 60) : new Color(150, 0, 0);
         g2.setColor(hpColor);
         g2.fillRoundRect(innerX, innerY, Math.max(barWidth, 2), innerHeight, radius, radius);
 
@@ -62,5 +66,17 @@ public class Darah {
         g2.setColor(Color.WHITE);
         g2.drawString("HP", innerX + 8, innerY + innerHeight - 6);
         g2.drawString(currentHP + " / " + maxHP, innerX + innerWidth - 60, innerY + innerHeight - 6);
+    }
+
+    public int getCurrentHP() {
+        return currentHP;
+    }
+
+    public void heal(int amount) {
+        update(currentHP + amount);
+    }
+
+    public void takeDamage(int amount) {
+        update(currentHP - amount);
     }
 }

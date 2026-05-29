@@ -658,6 +658,7 @@ public class GamePanel extends JPanel implements Runnable {
 
         if (player != null)
             player.draw(g2);
+            player.darah.draw(g2);
 
         g2.dispose();
     }
@@ -690,14 +691,15 @@ public class GamePanel extends JPanel implements Runnable {
 
                 if (fireTrap.active && fireHitbox.intersects(player.getHitbox())
                         && player.damageCooldown == 0) {
-                    player.HP -= 30;
-                    if (player.HP < 0) {
-                        player.HP = 0;
+                    player.darah.takeDamage(30);
+                    
+                    if (player.darah.getCurrentHP() < 0) {
+                        player.darah.update(0);
                     }
                     player.damageCooldown = 60; // Jangan terkena damage lagi selama sekitar 1 detik
 
-                    System.out.println("Player hit by fire trap! HP: " + player.HP);
-                    if (player.HP <= 0) {
+                    System.out.println("Player hit by fire trap! HP: " + player.darah.getCurrentHP());
+                    if (player.darah.getCurrentHP() <= 0) {
                         System.out.println("Game Over! Player has been defeated.");
                         System.exit(0);
                     }
@@ -735,12 +737,12 @@ public class GamePanel extends JPanel implements Runnable {
                 HealPotion healPotion = (HealPotion) obstacle;
                 Rectangle healHitbox = new Rectangle(healPotion.x, healPotion.y, tileSize, tileSize);
                 if (healHitbox.intersects(player.getHitbox())) {
-                    player.HP += 50; // Contoh: menyembuhkan 50 HP
-                    if (player.HP > 100) {
-                        player.HP = 100; // Batas maksimal HP
+                    player.darah.heal(50); // Contoh: menyembuhkan 50 HP
+                    if (player.darah.getCurrentHP() > 100) {
+                        player.darah.update(100); // Batas maksimal HP
                     }
                     it.remove(); // Hapus potion setelah digunakan dengan aman
-                    System.out.println("Player consumed a heal potion! HP: " + player.HP);
+                    System.out.println("Player consumed a heal potion! HP: " + player.darah.getCurrentHP());
                 }
             }
         }
@@ -761,10 +763,7 @@ public class GamePanel extends JPanel implements Runnable {
                     redHood.startDisappear();
                     System.out.println("you got a key ");
                     Key--;
-                    if (player.HP <= 0) {
-                        System.out.println("Game Over! Player has been defeated.");
-                        System.exit(0);
-                    }
+                    
                 }
             }
         }
