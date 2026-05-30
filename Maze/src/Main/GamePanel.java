@@ -666,54 +666,15 @@ public class GamePanel extends JPanel implements Runnable {
         g2.dispose();
     }
 
-    private void showEndGameScreen(String titleText, String messageText, String hintText, Color titleColor, Color backgroundColor) {
-        if (gameEnded) {
-            return;
-        }
-        gameEnded = true;
-
-        SwingUtilities.invokeLater(() -> {
-            javax.swing.JPanel panel = new javax.swing.JPanel(new java.awt.BorderLayout(10, 10));
-            panel.setBackground(backgroundColor);
-            panel.setBorder(javax.swing.BorderFactory.createCompoundBorder(
-                    javax.swing.BorderFactory.createLineBorder(titleColor, 4),
-                    javax.swing.BorderFactory.createEmptyBorder(24, 24, 24, 24)));
-
-            javax.swing.JLabel titleLabel = new javax.swing.JLabel(titleText, javax.swing.SwingConstants.CENTER);
-            titleLabel.setForeground(titleColor);
-            titleLabel.setFont(new java.awt.Font("Arial", java.awt.Font.BOLD, 42));
-            titleLabel.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 0, 12, 0));
-
-            javax.swing.JLabel messageLabel = new javax.swing.JLabel(
-                    "<html><div style='text-align:center; font-size:16pt; color:#f4f4f8;'>" + messageText + "</div></html>",
-                    javax.swing.SwingConstants.CENTER);
-            messageLabel.setFont(new java.awt.Font("Segoe UI", java.awt.Font.BOLD, 18));
-            messageLabel.setForeground(Color.WHITE);
-
-            javax.swing.JLabel hintLabel = new javax.swing.JLabel(hintText, javax.swing.SwingConstants.CENTER);
-            hintLabel.setFont(new java.awt.Font("Segoe UI", java.awt.Font.PLAIN, 12));
-            hintLabel.setForeground(new Color(190, 210, 255));
-            hintLabel.setBorder(javax.swing.BorderFactory.createEmptyBorder(12, 0, 0, 0));
-
-            panel.add(titleLabel, java.awt.BorderLayout.NORTH);
-            panel.add(messageLabel, java.awt.BorderLayout.CENTER);
-            panel.add(hintLabel, java.awt.BorderLayout.SOUTH);
-
-            JOptionPane.showMessageDialog(this, panel, "Maze Laboratory", JOptionPane.PLAIN_MESSAGE);
-            System.exit(0);
-        });
-    }
-
     protected void WinGame() {
         if (gameEnded) {
             return;
         }
-        showEndGameScreen(
-                "YOU WON",
-                "TELEPORT SUCCESSFUL! LAB ESCAPE COMPLETE.",
-                "Press OK to finish your session.",
-                new Color(102, 255, 178),
-                new Color(10, 18, 30));
+        gameEnded = true;
+        SwingUtilities.invokeLater(() -> {
+            JOptionPane.showMessageDialog(this, "kamu menang anjay");
+            System.exit(0);
+        });
         gameThread = null;
     }
 
@@ -739,7 +700,7 @@ public class GamePanel extends JPanel implements Runnable {
                 if (fireTrap.active && fireHitbox.intersects(player.getHitbox())
                         && player.damageCooldown == 0) {
                     player.darah.takeDamage(30);
-
+                    
                     if (player.darah.getCurrentHP() < 0) {
                         player.darah.update(0);
                     }
@@ -747,12 +708,13 @@ public class GamePanel extends JPanel implements Runnable {
 
                     System.out.println("Player hit by fire trap! HP: " + player.darah.getCurrentHP());
                     if (player.darah.getCurrentHP() <= 0) {
-                        showEndGameScreen(
-                                "YOU LOSE!",
-                            "YOU DONT HAVE ANY HP LEFT! THE LAB OVERWHELMS YOU.",
-                                "Press OK to close the experiment.",
-                                new Color(255, 95, 95),
-                                new Color(18, 8, 14));
+                        if (!gameEnded) {
+                            gameEnded = true;
+                            SwingUtilities.invokeLater(() -> {
+                                JOptionPane.showMessageDialog(this, "Kamu Mati, dasar cupu");
+                                System.exit(0);
+                            });
+                        }
                         System.out.println("Game Over! Player has been defeated.");
                         gameThread = null;
                     }
@@ -816,9 +778,10 @@ public class GamePanel extends JPanel implements Runnable {
                     redHood.startDisappear();
                     System.out.println("you got a key ");
                     Key--;
-
+                    
                 }
             }
         }
     }
+
 }
