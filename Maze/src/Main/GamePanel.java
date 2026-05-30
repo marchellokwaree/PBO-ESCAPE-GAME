@@ -48,7 +48,6 @@ public class GamePanel extends JPanel implements Runnable {
     private double cameraX = 0.0;
     private double cameraY = 0.0;
     private final double cameraSmoothFactor = 0.15; // between 0 (no move) and 1 (instant)
-    private boolean gameEnded = false;
     Image wallCornerTopRight, wallCornerBottomRight, wallCornerTopLeft, wallCornerBottomLeft;
     Image wallVertical, wallHorizontal;
     Image wallEndLeft, wallEndRight, wallEndTop, wallEndBottom;
@@ -88,23 +87,7 @@ public class GamePanel extends JPanel implements Runnable {
                 if ("I".equals(map1[i][j])) {
                     obstacles.add(new IceTrap(j * tileSize, i * tileSize, tileSize, tileSize));
                 }
-                // if ("P".equals(map1[i][j])) {
-                // PressurePlate plate = new PressurePlate(j * tileSize, i * tileSize, tileSize,
-                // tileSize);
-                // obstacles.add(plate);
-                // pressurePlates.add(plate);
-                // }
-                // if ("D".equals(map1[i][j])) {
-                // Gate gate;
-                // boolean aboveIsWall = (i - 1 >= 0 && "1".equals(map1[i - 1][j]));
-                // if (aboveIsWall) {
-                // gate = new Gate(j * tileSize, i * tileSize, tileSize, tileSize, false);
-                // } else {
-                // gate = new Gate(j * tileSize, i * tileSize, tileSize, tileSize, true);
-                // }
-                // obstacles.add(gate);
-                // gates.add(gate);
-                // }
+            
                 if ("G".equals(map1[i][j])) {
                     obstacles.add(new Finish(j * tileSize, i * tileSize, tileSize, tileSize));
                 }
@@ -667,15 +650,8 @@ public class GamePanel extends JPanel implements Runnable {
     }
 
     protected void WinGame() {
-        if (gameEnded) {
-            return;
-        }
-        gameEnded = true;
-        SwingUtilities.invokeLater(() -> {
-            JOptionPane.showMessageDialog(this, "kamu menang anjay");
-            System.exit(0);
-        });
-        gameThread = null;
+        System.out.println("Congratulations! You've reached the exit!");
+        System.exit(0); // Keluar dari game
     }
 
     protected void checkDamage() {
@@ -708,15 +684,8 @@ public class GamePanel extends JPanel implements Runnable {
 
                     System.out.println("Player hit by fire trap! HP: " + player.darah.getCurrentHP());
                     if (player.darah.getCurrentHP() <= 0) {
-                        if (!gameEnded) {
-                            gameEnded = true;
-                            SwingUtilities.invokeLater(() -> {
-                                JOptionPane.showMessageDialog(this, "Kamu Mati, dasar cupu");
-                                System.exit(0);
-                            });
-                        }
                         System.out.println("Game Over! Player has been defeated.");
-                        gameThread = null;
+                        System.exit(0);
                     }
                 }
             }
