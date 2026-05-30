@@ -6,9 +6,7 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
-import java.awt.Graphics;
 import java.awt.Image;
-import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.InputStream;
@@ -17,12 +15,9 @@ import java.util.ArrayList;
 
 import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
-import javax.swing.JDialog;
-import javax.swing.JButton;
-import javax.swing.JRootPane;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
-import java.awt.FlowLayout;
 import java.awt.Rectangle;
 
 public class GamePanel extends JPanel implements Runnable {
@@ -678,22 +673,11 @@ public class GamePanel extends JPanel implements Runnable {
         gameEnded = true;
 
         SwingUtilities.invokeLater(() -> {
-            JDialog dialog = new JDialog(SwingUtilities.getWindowAncestor(this), JDialog.ModalityType.APPLICATION_MODAL);
-            dialog.setUndecorated(true);
-            dialog.setBackground(new Color(0, 0, 0, 0));
-
-            JPanel panel = new JPanel(new java.awt.BorderLayout(10, 10)) {
-                @Override
-                protected void paintComponent(Graphics g) {
-                    Graphics2D g2 = (Graphics2D) g;
-                    g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-                    g2.setColor(backgroundColor);
-                    g2.fillRoundRect(0, 0, getWidth(), getHeight(), 28, 28);
-                    super.paintComponent(g);
-                }
-            };
-            panel.setOpaque(false);
-            panel.setBorder(javax.swing.BorderFactory.createEmptyBorder(24, 24, 24, 24));
+            javax.swing.JPanel panel = new javax.swing.JPanel(new java.awt.BorderLayout(10, 10));
+            panel.setBackground(backgroundColor);
+            panel.setBorder(javax.swing.BorderFactory.createCompoundBorder(
+                    javax.swing.BorderFactory.createLineBorder(titleColor, 4),
+                    javax.swing.BorderFactory.createEmptyBorder(24, 24, 24, 24)));
 
             javax.swing.JLabel titleLabel = new javax.swing.JLabel(titleText, javax.swing.SwingConstants.CENTER);
             titleLabel.setForeground(titleColor);
@@ -711,30 +695,12 @@ public class GamePanel extends JPanel implements Runnable {
             hintLabel.setForeground(new Color(190, 210, 255));
             hintLabel.setBorder(javax.swing.BorderFactory.createEmptyBorder(12, 0, 0, 0));
 
-            JButton okButton = new JButton("OK");
-            okButton.setFont(new java.awt.Font("Segoe UI", java.awt.Font.BOLD, 14));
-            okButton.setForeground(Color.WHITE);
-            okButton.setBackground(titleColor);
-            okButton.setFocusPainted(false);
-            okButton.setBorder(javax.swing.BorderFactory.createEmptyBorder(10, 24, 10, 24));
-            okButton.addActionListener(e -> {
-                dialog.dispose();
-                System.exit(0);
-            });
-
-            JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 0, 0));
-            buttonPanel.setOpaque(false);
-            buttonPanel.add(okButton);
-
             panel.add(titleLabel, java.awt.BorderLayout.NORTH);
             panel.add(messageLabel, java.awt.BorderLayout.CENTER);
             panel.add(hintLabel, java.awt.BorderLayout.SOUTH);
-            panel.add(buttonPanel, java.awt.BorderLayout.PAGE_END);
 
-            dialog.setContentPane(panel);
-            dialog.pack();
-            dialog.setLocationRelativeTo(this);
-            dialog.setVisible(true);
+            JOptionPane.showMessageDialog(this, panel, "Maze Laboratory", JOptionPane.PLAIN_MESSAGE);
+            System.exit(0);
         });
     }
 
