@@ -26,6 +26,7 @@ import javax.swing.JPanel;
 import javax.swing.JFrame;
 import javax.swing.SwingConstants;
 
+
 /**
  * Custom JButton dengan rounded corners untuk tampilan yang lebih modern.
  */
@@ -63,6 +64,7 @@ class RoundedButton extends JButton {
 				repaint();
 			}
 		});
+
 	}
 
 	@Override
@@ -105,6 +107,8 @@ public class HUDPanel extends JPanel {
 	// Background image
 	private BufferedImage backgroundImage;
 
+	private Font customFont; // custom font untuk tombol dan teks lainnya
+
 	/**
 	 * Konstruktor HUDPanel.
 	 * 
@@ -115,6 +119,19 @@ public class HUDPanel extends JPanel {
 		setPreferredSize(new Dimension(900, 700));
 		setOpaque(false);
 		setLayout(new BorderLayout(0, 0));
+		
+		try {
+			// Ganti path ini sesuai dengan lokasi file .ttf Anda!
+			InputStream is = getClass().getResourceAsStream("/Assets/Pixuf.ttf"); 
+			
+			// Buat font dari file, lalu atur ukurannya (misal: ukuran 16)
+			customFont = Font.createFont(Font.TRUETYPE_FONT, is).deriveFont(16f); 
+			setFont(customFont);
+		} catch (Exception e) {
+			System.out.println("Gagal load font untuk button, kembali ke Arial biasa.");
+			e.printStackTrace();
+			setFont(new Font("Arial", Font.BOLD, 16)); // Font cadangan jika error
+		}
 
 		// Load background image
 		loadBackgroundImage();
@@ -130,6 +147,8 @@ public class HUDPanel extends JPanel {
 		// Menambahkan teks footer sebagai instruksi tambahan.
 		JLabel footerLabel = createFooterLabel();
 		add(footerLabel, BorderLayout.SOUTH);
+
+		
 	}
 
 	/**
@@ -178,7 +197,7 @@ public class HUDPanel extends JPanel {
 	 */
 	private JLabel createTitleLabel() {
 		JLabel titleLabel = new JLabel("");
-		titleLabel.setFont(new Font("Arial", Font.BOLD, 48));
+		titleLabel.setFont(customFont.deriveFont(48f)); // Ukuran font lebih besar untuk judul
 		titleLabel.setForeground(new Color(255, 100, 100));
 		titleLabel.setHorizontalAlignment(JLabel.CENTER);
 		titleLabel.setBorder(BorderFactory.createEmptyBorder(40, 0, 30, 0));
@@ -194,20 +213,20 @@ public class HUDPanel extends JPanel {
 		centerPanel.setLayout(new BoxLayout(centerPanel, BoxLayout.Y_AXIS));
 
 		JLabel instructionLabel = new JLabel("Pilih Level / Difficulty");
-		instructionLabel.setFont(new Font("Arial", Font.BOLD, 20));
+		instructionLabel.setFont(customFont.deriveFont(20f));
 		instructionLabel.setForeground(new Color(173, 216, 230));
 		instructionLabel.setAlignmentX(CENTER_ALIGNMENT);
 		instructionLabel.setBorder(BorderFactory.createEmptyBorder(0, 0, 15, 0));
 
 		difficultyCombo = new JComboBox<>(new String[] { "Easy", "Medium", "Hard", "Extreme" });
-		difficultyCombo.setFont(new Font("Arial", Font.PLAIN, 16));
+		difficultyCombo.setFont(customFont.deriveFont(16f));
 		difficultyCombo.setMaximumSize(new Dimension(300, 45));
 		difficultyCombo.setAlignmentX(CENTER_ALIGNMENT);
 		difficultyCombo.setBackground(new Color(30, 40, 60));
 		difficultyCombo.setForeground(new Color(173, 216, 230));
 
 		RoundedButton startButton = new RoundedButton("PLAY", new Color(100, 200, 100), new Color(150, 255, 150));
-		startButton.setFont(new Font("Arial", Font.BOLD, 22));
+		startButton.setFont(customFont.deriveFont(22f));
 		startButton.setAlignmentX(CENTER_ALIGNMENT);
 		startButton.setMaximumSize(new Dimension(300, 50));
 		startButton.setForeground(Color.WHITE);
@@ -219,7 +238,7 @@ public class HUDPanel extends JPanel {
 		});
 
 		RoundedButton exitButton = new RoundedButton("EXIT", new Color(220, 80, 80), new Color(255, 150, 150));
-		exitButton.setFont(new Font("Arial", Font.BOLD, 22));
+		exitButton.setFont(customFont.deriveFont(22f));
 		exitButton.setAlignmentX(CENTER_ALIGNMENT);
 		exitButton.setMaximumSize(new Dimension(300, 50));
 		exitButton.setForeground(Color.WHITE);
@@ -247,7 +266,7 @@ public class HUDPanel extends JPanel {
 	 */
 	private JLabel createFooterLabel() {
 		JLabel footerLabel = new JLabel("Gunakan WASD untuk bergerak - Hindari jebakan - Selamatkan semua Red Hood!");
-		footerLabel.setFont(new Font("Arial", Font.PLAIN, 13));
+		footerLabel.setFont(customFont.deriveFont(13f));
 		footerLabel.setForeground(new Color(180, 180, 200));
 		footerLabel.setHorizontalAlignment(JLabel.CENTER);
 		footerLabel.setBorder(BorderFactory.createEmptyBorder(20, 0, 20, 0));

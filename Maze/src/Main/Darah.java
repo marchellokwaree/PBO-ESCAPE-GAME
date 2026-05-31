@@ -3,16 +3,28 @@ package Main;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics2D;
-
+import java.io.InputStream;
 import java.util.Random;
 public class Darah {
     private int currentHP;
     private final int maxHP;
-    
+    private Font customFont;
 
     public Darah() {
         this.maxHP = 100;
         this.currentHP = maxHP;
+
+        try {
+            // Ganti path ini sesuai dengan lokasi file .ttf Anda!
+            InputStream is = getClass().getResourceAsStream("/Assets/Pixuf.ttf"); 
+            
+            // Buat font dari file, lalu atur ukurannya (misal: ukuran 14)
+            customFont = Font.createFont(Font.TRUETYPE_FONT, is).deriveFont(14f); 
+        } catch (Exception e) {
+            System.out.println("Gagal load font, kembali ke Arial biasa.");
+            e.printStackTrace();
+            customFont = new Font("Arial", Font.BOLD, 14); // Font cadangan jika error
+        }
     }
 
     public void update(int hp) {
@@ -62,7 +74,7 @@ public class Darah {
         g2.drawRoundRect(innerX, innerY, innerWidth, innerHeight, radius, radius);
 
         // Text dan ikon
-        g2.setFont(new Font("Arial", Font.BOLD, 14));
+        g2.setFont(customFont);
         g2.setColor(Color.WHITE);
         g2.drawString("HP", innerX + 8, innerY + innerHeight - 6);
         g2.drawString(currentHP + " / " + maxHP, innerX + innerWidth - 60, innerY + innerHeight - 6);

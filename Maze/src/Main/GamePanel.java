@@ -39,6 +39,7 @@ public class GamePanel extends JPanel implements Runnable {
     public KeyHandler keyH = new KeyHandler();
     public Thread gameThread;
     public Player player;
+    public Timer timer;
     public ArrayList<Obstacle> obstacles = new ArrayList<>();
     public ArrayList<Entity> entities = new ArrayList<>();
     public Image floorTile, wallCenter, playerimg, ExitDoor;
@@ -73,8 +74,8 @@ public class GamePanel extends JPanel implements Runnable {
             }
         }
 
-        int endX = 0, endY = 0;
-
+        
+        this.timer = new Timer(100000); // Timer 100 detik (100.000 ms)
         // Simpan referensi untuk linking gates dengan pressure plates
         ArrayList<PressurePlate> pressurePlates = new ArrayList<>();
         ArrayList<Gate> gates = new ArrayList<>();
@@ -134,7 +135,7 @@ public class GamePanel extends JPanel implements Runnable {
     }
 
     public Player getPlayer() {
-        return player;
+        return player; // agar player bisa di akses di obstacle
     }
 
     public void loadAssets() {
@@ -299,6 +300,7 @@ public class GamePanel extends JPanel implements Runnable {
     public void startGameThread() {
         gameThread = new Thread(this);
         gameThread.start();
+        timer.start(); // Mulai timer saat game thread dimulai
     }
 
     @Override
@@ -319,7 +321,15 @@ public class GamePanel extends JPanel implements Runnable {
             }
 
             checkDamage();
-
+            if (timer.isTimeUp()) {
+                // Tampilkan pesan "Game Over" menggunakan JOptionPane
+                gameThread = null; // Hentikan game loop
+                SwingUtilities.invokeLater(() -> {
+                    JOptionPane.showMessageDialog(this, "Time's Up! Game Over!", "Game Over",
+                            JOptionPane.INFORMATION_MESSAGE);
+                    System.exit(0); // Keluar dari aplikasi setelah menutup dialog
+                });
+            }
             try {
                 Thread.sleep(1000 / 60); // Tidur sebentar untuk mengurangi beban CPU, target sekitar 60 FPS
             } catch (InterruptedException e) {
@@ -339,6 +349,10 @@ public class GamePanel extends JPanel implements Runnable {
             if (entity instanceof RedHood) {
                 ((RedHood) entity).update();
             }
+        }
+
+        if  (timer != null) {
+            timer.update();
         }
         for (Obstacle obstacle : obstacles) {
             if (obstacle instanceof FireTrap) {
@@ -642,9 +656,15 @@ public class GamePanel extends JPanel implements Runnable {
             }
         }
 
-        if (player != null)
-            player.draw(g2);
-            player.darah.draw(g2);
+        if (player != null){
+                player.draw(g2);
+                player.darah.draw(g2);
+
+        }
+
+        if (timer != null) {
+            timer.draw(g2, this);
+        }
 
         g2.dispose();
     }
