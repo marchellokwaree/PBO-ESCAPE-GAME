@@ -22,7 +22,7 @@ import java.awt.Rectangle;
 
 public class GamePanel extends JPanel implements Runnable {
 
-    String map1[][] = loadMapFromFileOrDefault();
+    private String map1[][] = loadMapFromFileOrDefault();
     private static final String MAP_FILE_PATH = "src/Assets/MAP/Maze1.txt";
 
     final int tileSize = 32;
@@ -44,6 +44,7 @@ public class GamePanel extends JPanel implements Runnable {
     public ArrayList<Entity> entities = new ArrayList<>();
     public Image floorTile, wallCenter, playerimg, ExitDoor;
     public BufferedImage bufferedImage;
+    public ArrayList<Entity> monsters = new ArrayList<>();
 
     // Smooth camera position (world coordinates of top-left of screen)
     private double cameraX = 0.0;
@@ -53,6 +54,8 @@ public class GamePanel extends JPanel implements Runnable {
     Image wallVertical, wallHorizontal;
     Image wallEndLeft, wallEndRight, wallEndTop, wallEndBottom;
     Image wallTUp, wallTDown, wallTLeft, wallTRight, wallTIntersection;
+
+    public MonsterSpawner spawner;
 
     public GamePanel() {
 
@@ -132,8 +135,13 @@ public class GamePanel extends JPanel implements Runnable {
         cameraX = player.x - player.screenX;
         cameraY = player.y - player.screenY;
         clampCamera();
+
+        spawner = new MonsterSpawner(this);
     }
 
+    public String[][] getMap() {
+        return map1;
+    }
     public Player getPlayer() {
         return player; // agar player bisa di akses di obstacle
     }
@@ -246,7 +254,12 @@ public class GamePanel extends JPanel implements Runnable {
     public int getTileSize() {
         return tileSize;
     }
-
+    public int getMaxWorldCol() {
+        return maxWorldCol;
+    }
+    public int getMaxWorldRow() {
+        return maxWorldRow;
+    }
     public boolean collidesWithWall(int nextX, int nextY, Rectangle hitbox) {
         // Hitung posisi absolut hitbox di koordinat world untuk posisi selanjutnya
         int hitboxLeftX = nextX + hitbox.x;
@@ -301,6 +314,9 @@ public class GamePanel extends JPanel implements Runnable {
         gameThread = new Thread(this);
         gameThread.start();
         timer.start(); // Mulai timer saat game thread dimulai
+        if (spawner != null) {
+            spawner.SpawnMonsters(5); 
+        }
     }
 
     @Override
@@ -377,6 +393,16 @@ public class GamePanel extends JPanel implements Runnable {
         }
         // Update smooth camera after updating entities
         updateCamera();
+
+        if (spawner != null) {
+            spawner.update();
+        }
+
+        for (Entity monster : monsters) {
+            if (monster instanceof FireSlime) {
+                ((FireSlime) monster).update();
+            }
+        }
     }
 
     private void updateCamera() {
@@ -666,6 +692,14 @@ public class GamePanel extends JPanel implements Runnable {
             timer.draw(g2, this);
         }
 
+        
+        for (Entity monster : monsters) {
+            if (monster instanceof FireSlime) {
+                ((FireSlime) monster).draw(g2);
+            }
+        }
+
+        
         g2.dispose();
     }
 

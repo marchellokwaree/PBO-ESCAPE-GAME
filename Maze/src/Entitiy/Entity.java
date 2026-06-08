@@ -10,10 +10,20 @@ import javax.imageio.ImageIO;
 public class Entity {
     public int x, y;
     public int speed;
+    public int HP;
+    public int maxHP;
     public Entity(int x, int y, int speed) {
         this.x = x;
         this.y = y;
         this.speed = speed;
+    }
+
+    public Entity(int x, int y, int speed, int HP) {
+        this.x = x;
+        this.y = y;
+        this.speed = speed;
+        this.HP = HP;
+        this.maxHP = HP;
     }
 
     protected BufferedImage loadBufferedImage(String path) {

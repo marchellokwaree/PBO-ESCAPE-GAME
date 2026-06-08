@@ -24,8 +24,6 @@ public class Player extends Entity {
     int spriteCounter = 0;
     int spriteNum = 1;
     boolean hadapKiri = false;
-    public int HP = 100;
-    public int maxHP = 100;
     public int damageCooldown = 0;
     public int normalSpeed = 2;
     public int slowSpeed = 1;
