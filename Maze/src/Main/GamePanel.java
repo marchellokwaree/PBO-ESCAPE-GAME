@@ -682,6 +682,14 @@ public class GamePanel extends JPanel implements Runnable {
             }
         }
 
+        
+        
+        for (Entity monster : monsters) {
+            if (monster instanceof FireSlime) {
+                ((FireSlime) monster).draw(g2);
+            }
+        }
+        
         if (player != null){
                 player.draw(g2);
                 player.darah.draw(g2);
@@ -692,14 +700,6 @@ public class GamePanel extends JPanel implements Runnable {
             timer.draw(g2, this);
         }
 
-        
-        for (Entity monster : monsters) {
-            if (monster instanceof FireSlime) {
-                ((FireSlime) monster).draw(g2);
-            }
-        }
-
-        
         g2.dispose();
     }
 

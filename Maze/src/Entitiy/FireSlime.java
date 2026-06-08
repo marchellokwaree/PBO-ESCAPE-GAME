@@ -16,9 +16,9 @@ public class FireSlime extends Entity {
     private int animationCounter = 0; // untuk animasi jalan dan idle
     private int disapearCounter = 0; // untuk animasi mati
     private int attackCounter = 0; // untuk animasi serangan
-    private final int animationDelay = 20;
-    private final int disapearDelay = 10;
-    private final int attackDelay = 15;
+    private final int animationDelay = 10; // delay untuk animasi jalan dan idle
+    private final int disapearDelay = 10; // delay untuk animasi mati
+    private final int attackDelay = 15; // delay untuk animasi serangan
     private int width = 32;
     private int height = 32;
     GamePanel gp;
