@@ -654,7 +654,7 @@ public class GamePanel extends JPanel implements Runnable {
             }
         }
 
-        // Gambar semua obstacles, termasuk fire trap animasi
+        // Gambar semua obstacles
         for (Obstacle obstacle : obstacles) {
             if (obstacle instanceof FireTrap) {
                 ((FireTrap) obstacle).draw(g2, this);
@@ -675,7 +675,7 @@ public class GamePanel extends JPanel implements Runnable {
                 ((HealPotion) obstacle).draw(g2, this);
             }
         }
-
+        // Gambar semua Red Hood
         for (Entity entity : entities) {
             if (entity instanceof RedHood) {
                 ((RedHood) entity).draw(g2, this);
@@ -683,7 +683,7 @@ public class GamePanel extends JPanel implements Runnable {
         }
 
         
-        
+        // Gambar semua monster
         for (Entity monster : monsters) {
             if (monster instanceof FireSlime) {
                 ((FireSlime) monster).draw(g2);
