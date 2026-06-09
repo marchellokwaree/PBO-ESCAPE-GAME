@@ -12,6 +12,7 @@ import java.io.File;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Iterator;
 
 import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
@@ -60,6 +61,7 @@ public class GamePanel extends JPanel implements Runnable {
     public GamePanel() {
 
         this.addKeyListener(keyH);
+        this.addMouseListener(keyH);
         this.setFocusable(true);
         this.setPreferredSize(new Dimension(screenWidth, screenHeight));
         this.setBackground(Color.BLACK);
@@ -398,9 +400,49 @@ public class GamePanel extends JPanel implements Runnable {
             spawner.update();
         }
 
+        // Gunakan Iterator untuk iterasi dan menghapus dengan aman
+        Iterator<Entity> iterator = monsters.iterator();
+        while (iterator.hasNext()) {
+            Entity monster = iterator.next();
+            
+            if (monster != null) {
+                monster.update(); 
+                
+                if (monster instanceof FireSlime) {
+                    FireSlime slime = (FireSlime) monster;
+                    slime.checkPlayerCollision(player); 
+                    
+                    // Jika slime sudah mati dan animasi matinya sudah selesai
+                    if (slime.readyToRemove) {
+                        iterator.remove(); // Menghapus slime dari ArrayList dengan aman
+                        System.out.println("FireSlime berhasil dihapus dari Map!");
+                    }
+                }
+            }
+        }
+
+        // Contoh di dalam GamePanel.java
+        // Di dalam method update() GamePanel
+        if (keyH.leftMousePressed) {
+
+            // Panggil method attack milik player, masukkan list/array monster-nya
+            player.attackEnemies(monsters); 
+
+            // Reset status klik agar tidak menyerang berkali-kali dalam 1 detik
+            keyH.leftMousePressed = false; 
+        }
+
+        // Contoh di dalam method update() GamePanel.java
         for (Entity monster : monsters) {
-            if (monster instanceof FireSlime) {
-                ((FireSlime) monster).update();
+            if (monster != null) {
+
+                // Cek apakah entity ini adalah FireSlime sebelum memanggil update
+                if (monster instanceof FireSlime) {
+                    FireSlime slime = (FireSlime) monster;
+                    slime.update(); // Sekarang tidak akan error
+                    slime.checkPlayerCollision(player); 
+                }
+
             }
         }
     }

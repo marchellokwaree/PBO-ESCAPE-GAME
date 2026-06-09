@@ -1,5 +1,4 @@
 package Entitiy;
-
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -58,5 +57,11 @@ public class Entity {
             return candidate;
         }
         return new File(userDir + File.separator + "src" + normalizedPath);
+    }
+
+    public void update() {
+        // Biarkan kosong.
+        // Ini hanya sebagai "syarat" agar Java tahu method ini ada.
+        // Nanti isinya akan otomatis ditimpa oleh update() yang ada di FireSlime dan Player.
     }
 }

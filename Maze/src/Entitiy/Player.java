@@ -8,6 +8,8 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.util.ArrayList;
+
 import Main.Darah;
 import javax.imageio.ImageIO;
 
@@ -24,6 +26,8 @@ public class Player extends Entity {
     int spriteCounter = 0;
     int spriteNum = 1;
     boolean hadapKiri = false;
+    public String direction = "DOWN"; // Default menghadap bawah
+    public int damage = 10;
     public int damageCooldown = 0;
     public int normalSpeed = 2;
     public int slowSpeed = 1;
@@ -35,6 +39,8 @@ public class Player extends Entity {
     BufferedImage[] walkImages = new BufferedImage[8]; // Array untuk menyimpan gambar berjalan
     Rectangle hitbox;
 
+    public boolean isAttacking = false;
+    public int attackCooldown = 0; // Cooldown antar serangan
 
 
     // Constructor disesuaikan dengan GamePanel kamu (5 parameter)
@@ -110,26 +116,28 @@ public class Player extends Entity {
         boolean moving = false;
 
         // Cek Input dan tentukan gambar (Bisa dikembangkan per arah jika ada asetnya)
+        // Cek Input dan tentukan gambar
         if (keyH.upPressed || keyH.downPressed || keyH.leftPressed || keyH.rightPressed) {
             moving = true;
-            if (keyH.upPressed)
+            if (keyH.upPressed) {
                 nextY -= speed;
-            if (keyH.downPressed)
+                direction = "UP"; // Simpan arah Atas
+            }
+            if (keyH.downPressed) {
                 nextY += speed;
+                direction = "DOWN"; // Simpan arah Bawah
+            }
             if (keyH.leftPressed) {
-
                 nextX -= speed;
-                hadapKiri = true;
+                hadapKiri = true; // (Biarkan ini, untuk membalik gambar sprite)
+                direction = "LEFT"; // Simpan arah Kiri
             }
             if (keyH.rightPressed) {
                 nextX += speed;
-                hadapKiri = false;
+                hadapKiri = false; // (Biarkan ini, untuk membalik gambar sprite)
+                direction = "RIGHT"; // Simpan arah Kanan
             }
-                
-
-                
         }
-
         // LOGIKA ANIMASI: Berganti antara spriteNum 1 dan 2 saat bergerak
         if (moving) {
             spriteCounter++;
@@ -180,6 +188,12 @@ public class Player extends Entity {
         if (damageCooldown > 0) {
             damageCooldown--;
         }
+        // Tambahan logika attack cooldown:
+        if (attackCooldown > 0) {
+            attackCooldown--;
+        } else {
+            isAttacking = false;
+        }
     }
 
     public void applySlow(int durationFrames) {
@@ -210,6 +224,29 @@ public class Player extends Entity {
             walkingImage = currentImage; // Gambar diam
         }
 
+        // --- DEBUG: GAMBAR KOTAK PUKULAN ---
+        // --- DEBUG: GAMBAR KOTAK PUKULAN (Letakkan di akhir method draw) ---
+        g2.setColor(new java.awt.Color(0, 0, 255, 150)); // Warna Biru Transparan
+        
+        int attackDrawX = x - camX;
+        int attackDrawY = y - camY;
+
+        switch (direction) {
+            case "UP":
+                attackDrawY -= gp.getTileSize() - 8;
+                break;
+            case "DOWN":
+                attackDrawY += gp.getTileSize() - 8;
+                break;
+            case "LEFT":
+                attackDrawX -= gp.getTileSize() - 8;
+                break;
+            case "RIGHT":
+                attackDrawX += gp.getTileSize() - 8;
+                break;
+        }
+        
+        g2.fillRect(attackDrawX, attackDrawY, gp.getTileSize(), gp.getTileSize());
 
 
         java.awt.geom.AffineTransform originalTransform = g2.getTransform();
@@ -233,5 +270,56 @@ public class Player extends Entity {
 
         }
         g2.setTransform(originalTransform);
+    }
+
+    /**
+     * Fungsi untuk menyerang musuh.
+     * Panggil fungsi ini dari GamePanel saat pemain menekan tombol serang (misal: SPASI).
+     */
+    public void attackEnemies(java.util.ArrayList<Entity> monsters) {
+        // Cek apakah serangan masih dalam masa cooldown
+        if (attackCooldown > 0) {
+            return; // Hentikan eksekusi, player belum boleh menyerang
+        }
+
+        // Jika berhasil menyerang, reset cooldown menjadi 60 frame (1 detik)
+        attackCooldown = 60;
+
+        // 1. Buat ukuran kotak pukulan (besarnya 1 tile)
+        Rectangle attackArea = new Rectangle();
+        attackArea.width = gp.getTileSize() - 8;
+        attackArea.height = gp.getTileSize() - 8;
+        
+        // 2. Tentukan posisi Kotak berdasarkan Arah
+        switch (direction) {
+            case "UP":
+                attackArea.x = this.x;
+                attackArea.y = this.y - attackArea.height; // Muncul di atas pemain
+                break;
+            case "DOWN":
+                attackArea.x = this.x;
+                attackArea.y = this.y + gp.getTileSize(); // Muncul di bawah pemain
+                break;
+            case "LEFT":
+                attackArea.x = this.x - attackArea.width; // Muncul di kiri pemain
+                attackArea.y = this.y;
+                break;
+            case "RIGHT":
+                attackArea.x = this.x + gp.getTileSize(); // Muncul di kanan pemain
+                attackArea.y = this.y;
+                break;
+        }
+
+        // 3. Cek apakah ada monster yang terkena kotak pukulan ini
+        for (Entity monster : monsters) {
+            if (monster instanceof FireSlime) {
+                FireSlime slime = (FireSlime) monster;
+                
+                if (attackArea.intersects(slime.getHitboxArea())) {
+                    slime.takeDamage(damage);
+                    System.out.println("Berhasil memukul FireSlime dari arah: " + direction);
+                }
+            }
+        }
     }
 }

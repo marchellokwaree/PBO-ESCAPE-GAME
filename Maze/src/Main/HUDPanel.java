@@ -121,16 +121,24 @@ public class HUDPanel extends JPanel {
 		setLayout(new BorderLayout(0, 0));
 		
 		try {
-			// Ganti path ini sesuai dengan lokasi file .ttf Anda!
-			InputStream is = getClass().getResourceAsStream("/Assets/Pixuf.ttf"); 
-			
-			// Buat font dari file, lalu atur ukurannya (misal: ukuran 16)
-			customFont = Font.createFont(Font.TRUETYPE_FONT, is).deriveFont(16f); 
-			setFont(customFont);
+		    // Gunakan method bantuanmu! (Gunakan slash di awal agar sesuai dengan logic method)
+		    File fontFile = resolveFile("/Assets/Pixuf.ttf");
+				
+		    if (fontFile.exists()) {
+		        // Buat font dari file, lalu atur ukurannya
+		        customFont = Font.createFont(Font.TRUETYPE_FONT, fontFile).deriveFont(16f);
+		        setFont(customFont);
+		    } else {
+		        System.out.println("Path yang dicoba: " + fontFile.getAbsolutePath());
+		        throw new Exception("Font file benar-benar tidak ditemukan oleh resolveFile.");
+		    }
+		
 		} catch (Exception e) {
-			System.out.println("Gagal load font untuk button, kembali ke Arial biasa.");
-			e.printStackTrace();
-			setFont(new Font("Arial", Font.BOLD, 16)); // Font cadangan jika error
+		    System.out.println("Gagal load font: " + e.getMessage());
+		
+		    // Fallback WAJIB agar tidak NullPointerException saat createTitleLabel
+		    customFont = new Font("Arial", Font.BOLD, 16); 
+		    setFont(customFont); 
 		}
 
 		// Load background image
@@ -294,6 +302,32 @@ public class HUDPanel extends JPanel {
 	 */
 	private void onExitPressed() {
 		System.exit(0);
+	}
+
+	private File resolveFile(String path) {
+	    String normalizedPath = path.replace('/', File.separatorChar);
+	    String userDir = System.getProperty("user.dir");
+		
+	    // Coba path 1: di dalam src
+	    File candidate = new File(userDir + File.separator + "src" + normalizedPath);
+	    if (candidate.exists()) {
+	        return candidate;
+	    }
+	
+	    // Coba path 2: langsung di root
+	    candidate = new File(userDir + normalizedPath);
+	    if (candidate.exists()) {
+	        return candidate;
+	    }
+	
+	    // Coba path 3: kalau project ada di dalam folder Maze
+	    candidate = new File(userDir + File.separator + "Maze" + File.separator + "src" + normalizedPath);
+	    if (candidate.exists()) {
+	        return candidate;
+	    }
+	
+	    // Default fallback
+	    return new File(userDir + File.separator + "src" + normalizedPath);
 	}
 
 }
