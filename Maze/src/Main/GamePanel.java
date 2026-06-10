@@ -450,19 +450,6 @@ public class GamePanel extends JPanel implements Runnable {
             keyH.leftMousePressed = false; 
         }
 
-        // Contoh di dalam method update() GamePanel.java
-        for (Entity monster : monsters) {
-            if (monster != null) {
-
-                // Cek apakah entity ini adalah FireSlime sebelum memanggil update
-                if (monster instanceof FireSlime) {
-                    FireSlime slime = (FireSlime) monster;
-                    slime.update(); // Sekarang tidak akan error
-                    slime.checkPlayerCollision(player); 
-                }
-
-            }
-        }
     }
 
     private void updateCamera() {

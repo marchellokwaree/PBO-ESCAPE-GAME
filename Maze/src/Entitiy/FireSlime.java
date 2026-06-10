@@ -90,13 +90,12 @@ public class FireSlime extends Entity implements IAttackable {
     public void update() {
         if (Activitynow == 0) {
             // --- 1. DETEKSI PLAYER DI AREA 5x5 ---
-            // Cek apakah hitbox player menyentuh radar 5x5 Slime
             if (getAggroArea().intersects(gp.player.getHitbox())) {
                 isChasing = true;
-                this.speed = gp.player.speed; // Samakan kecepatan dengan player
+                this.speed = gp.player.speed; 
             } else {
                 isChasing = false;
-                this.speed = defaultSpeed; // Kembali lambat jika player menjauh
+                this.speed = defaultSpeed; 
             }
 
             // --- 2. CABANG AI (MENGEJAR vs BERSANTAI) ---
@@ -105,13 +104,11 @@ public class FireSlime extends Entity implements IAttackable {
                 int nextX = x;
                 int nextY = y;
                 
-                // Tentukan arah pergerakan dengan melihat posisi X dan Y player
                 if (x < gp.player.x) { direction = "RIGHT"; nextX += speed; }
                 if (x > gp.player.x) { direction = "LEFT"; nextX -= speed; }
                 if (y < gp.player.y) { direction = "DOWN"; nextY += speed; }
                 if (y > gp.player.y) { direction = "UP"; nextY -= speed; }
 
-                // Cek tabrakan agar tidak menembus tembok saat mengejar
                 if (!gp.collidesWithWall(nextX, y, hitbox) && !gp.collidesWithClosedGate(nextX, y, hitbox)) {
                     x = nextX;
                 }
@@ -121,32 +118,26 @@ public class FireSlime extends Entity implements IAttackable {
 
             } else {
                 // LOGIKA RANDOM WANDER (ISTIRAHAT & JALAN ACAK)
-                
-                // --- 1. PENGATUR WAKTU GANTI STATUS (DIAM <-> JALAN) ---
                 actionLockCounter++;
                 if (actionLockCounter >= actionTargetDuration) {
                     isMoving = !isMoving; 
                     actionLockCounter = 0; 
 
-                    Random random = new java.util.Random();
+                    java.util.Random random = new java.util.Random();
                     if (isMoving) {
-                        // Jika mulai jalan, tentukan durasi jalan (1 - 4 detik)
                         int randomDetik = random.nextInt(4) + 1;
                         actionTargetDuration = randomDetik * 60;
                         
-                        // Tentukan arah acak awal
                         int i = random.nextInt(100) + 1;
                         if (i <= 25) { direction = "UP"; }
                         else if (i > 25 && i <= 50) { direction = "DOWN"; }
                         else if (i > 50 && i <= 75) { direction = "LEFT"; }
                         else { direction = "RIGHT"; }
                     } else {
-                        // Jika mulai istirahat, diam selama 2 detik (120 frame)
-                        actionTargetDuration = 500; 
+                        actionTargetDuration = 120; // Istirahat 2 detik
                     }
                 }
 
-                // --- 2. EKSEKUSI PERGERAKAN (DI LUAR BLOK WAKTU DI ATAS) ---
                 if (isMoving) {
                     int nextX = x;
                     int nextY = y;
@@ -157,11 +148,9 @@ public class FireSlime extends Entity implements IAttackable {
                         case "RIGHT": nextX += speed; break;
                     }
 
-                    // Cek tabrakan
                     boolean nabrakX = gp.collidesWithWall(nextX, y, hitbox) || gp.collidesWithClosedGate(nextX, y, hitbox);
                     boolean nabrakY = gp.collidesWithWall(x, nextY, hitbox) || gp.collidesWithClosedGate(x, nextY, hitbox);
 
-                    // Kalau tidak nabrak, jalan seperti biasa
                     if (!nabrakX) {
                         x = nextX;
                     }
@@ -169,10 +158,8 @@ public class FireSlime extends Entity implements IAttackable {
                         y = nextY;
                     }
 
-                    // --- ANTI NYANGKUT TEMBOK ---
-                    // Jika menabrak, langsung undi arah baru detik itu juga!
                     if (nabrakX || nabrakY) {
-                        Random random = new java.util.Random();
+                        java.util.Random random = new java.util.Random();
                         int i = random.nextInt(100) + 1;
                         if (i <= 25) { direction = "UP"; }
                         else if (i > 25 && i <= 50) { direction = "DOWN"; }
@@ -182,15 +169,22 @@ public class FireSlime extends Entity implements IAttackable {
                 }
             }
 
+            // --- 3. LOGIKA ANIMASI JALAN & IDLE ---
+            // Berada di posisi paling bawah Activitynow == 0 agar selalu dieksekusi!
+            animationCounter++;
+            if (animationCounter >= animationDelay) {
+                currentFrame = (currentFrame + 1) % animationFrames.length;
+                animationCounter = 0;
+            }
+
         } else if (Activitynow == 2) {
-            // Logika animasi mati (diperbaiki agar menggunakan counter delay)
+            // Logika animasi mati 
             disapearCounter++;
             if (disapearCounter >= disapearDelay) {
                 disapearFrame++;
-                // Jika sudah mencapai frame terakhir animasi mati
                 if (disapearFrame >= disapearAnimation.length) {
-                    disapearFrame = disapearAnimation.length - 1; // tetap di frame terakhir
-                    this.readyToRemove = true; // Tandai bahwa slime sudah siap dihapus dari map
+                    disapearFrame = disapearAnimation.length - 1; 
+                    this.readyToRemove = true; 
                 }
                 disapearCounter = 0;
             }
@@ -200,8 +194,8 @@ public class FireSlime extends Entity implements IAttackable {
             if (attackCounter >= attackDelay) {
                 attackFrame++;
                 if (attackFrame >= attackAnimation.length) {
-                    attackFrame = 0; // kembali ke frame pertama setelah selesai
-                    Activitynow = 0; // kembali ke idle setelah serangan selesai
+                    attackFrame = 0; 
+                    Activitynow = 0; 
                 }
                 attackCounter = 0;
             }
