@@ -6,6 +6,7 @@ import java.awt.image.BufferedImage;
 
 import Entitiy.Activity.IAttackable;
 import Main.GamePanel;
+import java.util.Random;
 
 public class Slime2 extends Entity implements IAttackable {
 
@@ -34,15 +35,29 @@ public class Slime2 extends Entity implements IAttackable {
     public boolean hasDealtDamage = false; // Mencegah damage berkali-kali dalam 1 pukulan
     public int currentHp = 50;
 
+        // Variabel untuk pergerakan AI
+    public int actionLockCounter = 0; // Timer untuk ganti status
+    public int actionTargetDuration = 60; // Target waktu (berubah-ubah nanti)
+    public boolean isMoving = false; // Penanda apakah sedang jalan atau diam
+    public String direction = "DOWN"; // Arah saat ini
+
+    public boolean isChasing = false; // Penanda apakah sedang mengejar
+    public int defaultSpeed; // Menyimpan kecepatan asli slime saat santai
+
     public Slime2(int x, int y, int speed, GamePanel gp) {
         super(x, y, speed, 50); // HP 50 untuk FireSlime
         this.gp = gp;
+        this.defaultSpeed = speed;
         this.Activitynow = 0; // Mulai dengan status idle
         hitbox = new Rectangle();
         hitbox.x = 0; // Agar pas di tengah sprite ukuran 64x64
         hitbox.y = 4;
         hitbox.width = gp.getTileSize();  // lebar hitbox
         hitbox.height = gp.getTileSize(); // tinggi hitbox
+
+        attackHitbox = new Rectangle();
+        attackHitbox.width = gp.getTileSize();
+        attackHitbox.height = gp.getTileSize();
 
         try {
             int spriteWidth = 64; // Lebar setiap sprite
@@ -76,21 +91,102 @@ public class Slime2 extends Entity implements IAttackable {
 
     public void update() {
         if (Activitynow == 0) {
-            // Logika pergerakan atau perilaku slime di sini
+            // --- 1. DETEKSI PLAYER DI AREA 5x5 ---
+            if (getAggroArea().intersects(gp.player.getHitbox())) {
+                isChasing = true;
+                this.speed = gp.player.speed; 
+            } else {
+                isChasing = false;
+                this.speed = defaultSpeed; 
+            }
+
+            // --- 2. CABANG AI (MENGEJAR vs BERSANTAI) ---
+            if (isChasing) {
+                // LOGIKA MENGEJAR PLAYER
+                int nextX = x;
+                int nextY = y;
+                
+                if (x < gp.player.x) { direction = "RIGHT"; nextX += speed; }
+                if (x > gp.player.x) { direction = "LEFT"; nextX -= speed; }
+                if (y < gp.player.y) { direction = "DOWN"; nextY += speed; }
+                if (y > gp.player.y) { direction = "UP"; nextY -= speed; }
+
+                if (!gp.collidesWithWall(nextX, y, hitbox) && !gp.collidesWithClosedGate(nextX, y, hitbox)) {
+                    x = nextX;
+                }
+                if (!gp.collidesWithWall(x, nextY, hitbox) && !gp.collidesWithClosedGate(x, nextY, hitbox)) {
+                    y = nextY;
+                }
+
+            } else {
+                // LOGIKA RANDOM WANDER (ISTIRAHAT & JALAN ACAK)
+                actionLockCounter++;
+                if (actionLockCounter >= actionTargetDuration) {
+                    isMoving = !isMoving; 
+                    actionLockCounter = 0; 
+
+                    java.util.Random random = new java.util.Random();
+                    if (isMoving) {
+                        int randomDetik = random.nextInt(4) + 1;
+                        actionTargetDuration = randomDetik * 60;
+                        
+                        int i = random.nextInt(100) + 1;
+                        if (i <= 25) { direction = "UP"; }
+                        else if (i > 25 && i <= 50) { direction = "DOWN"; }
+                        else if (i > 50 && i <= 75) { direction = "LEFT"; }
+                        else { direction = "RIGHT"; }
+                    } else {
+                        actionTargetDuration = 120; // Istirahat 2 detik
+                    }
+                }
+
+                if (isMoving) {
+                    int nextX = x;
+                    int nextY = y;
+                    switch (direction) {
+                        case "UP": nextY -= speed; break;
+                        case "DOWN": nextY += speed; break;
+                        case "LEFT": nextX -= speed; break;
+                        case "RIGHT": nextX += speed; break;
+                    }
+
+                    boolean nabrakX = gp.collidesWithWall(nextX, y, hitbox) || gp.collidesWithClosedGate(nextX, y, hitbox);
+                    boolean nabrakY = gp.collidesWithWall(x, nextY, hitbox) || gp.collidesWithClosedGate(x, nextY, hitbox);
+
+                    if (!nabrakX) {
+                        x = nextX;
+                    }
+                    if (!nabrakY) {
+                        y = nextY;
+                    }
+
+                    if (nabrakX || nabrakY) {
+                        java.util.Random random = new java.util.Random();
+                        int i = random.nextInt(100) + 1;
+                        if (i <= 25) { direction = "UP"; }
+                        else if (i > 25 && i <= 50) { direction = "DOWN"; }
+                        else if (i > 50 && i <= 75) { direction = "LEFT"; }
+                        else { direction = "RIGHT"; }
+                    }
+                }
+            }
+
+            // --- 3. LOGIKA ANIMASI JALAN & IDLE ---
+            // Berada di posisi paling bawah Activitynow == 0 agar selalu dieksekusi!
             animationCounter++;
             if (animationCounter >= animationDelay) {
                 currentFrame = (currentFrame + 1) % animationFrames.length;
                 animationCounter = 0;
             }
+
         } else if (Activitynow == 2) {
-            // Logika animasi mati (diperbaiki agar menggunakan counter delay)
+            // Logika animasi mati 
             disapearCounter++;
             if (disapearCounter >= disapearDelay) {
                 disapearFrame++;
-                // Jika sudah mencapai frame terakhir animasi mati
                 if (disapearFrame >= disapearAnimation.length) {
-                    disapearFrame = disapearAnimation.length - 1; // tetap di frame terakhir
-                    this.readyToRemove = true; // Tandai bahwa slime sudah siap dihapus dari map
+                    disapearFrame = disapearAnimation.length - 1; 
+                    this.readyToRemove = true; 
                 }
                 disapearCounter = 0;
             }
@@ -100,8 +196,8 @@ public class Slime2 extends Entity implements IAttackable {
             if (attackCounter >= attackDelay) {
                 attackFrame++;
                 if (attackFrame >= attackAnimation.length) {
-                    attackFrame = 0; // kembali ke frame pertama setelah selesai
-                    Activitynow = 0; // kembali ke idle setelah serangan selesai
+                    attackFrame = 0; 
+                    Activitynow = 0; 
                 }
                 attackCounter = 0;
             }
@@ -119,15 +215,23 @@ public class Slime2 extends Entity implements IAttackable {
         g2.setColor(new java.awt.Color(255, 0, 0, 150)); // Merah semi-transparan
         g2.fillRect(screenX, screenY, width, height);
 
-        if (Activitynow == 1) { // GAMBAR HITBOX ATTACK AREA SLIME, HAPUS AJA KALAU GAME SUDAH JADI
+        if (Activitynow == 1) { // GAMBAR HITBOX ATTACK AREA SLIME
             g2.setColor(new java.awt.Color(255, 165, 0, 150)); // Oranye semi-transparan
             
-            // Hitung posisi X dan Y agar area 3x3 ini berada persis di tengah Slime
-            int attackDrawX = screenX + hitbox.x;
-            int attackDrawY = screenY + hitbox.y;
+            // Ambil posisi langsung dari method getAttackHitboxArea
+            Rectangle attackArea = getAttackHitboxArea();
             
-            g2.fillRect(attackDrawX, attackDrawY, hitbox.width, hitbox.height);
+            // Konversi posisi dunia ke posisi layar kamera
+            int attackDrawX = attackArea.x - camX;
+            int attackDrawY = attackArea.y - camY;
+            
+            g2.fillRect(attackDrawX, attackDrawY, attackArea.width, attackArea.height);
         }
+
+        // --- DEBUG: GAMBAR RADAR 5x5 SLIME (HIJAU) ---
+        g2.setColor(new java.awt.Color(0, 255, 0, 80)); // Hijau sangat pudar
+        Rectangle radar = getAggroArea();
+        g2.fillRect(radar.x - camX, radar.y - camY, radar.width, radar.height);
 
         // Hanya gambar jika masuk ke dalam pandangan monitor
         if (x + width > camX &&
@@ -149,6 +253,17 @@ public class Slime2 extends Entity implements IAttackable {
                 }
             }
         }
+    }
+
+    public Rectangle getAggroArea() {
+        int areaWidth = gp.getTileSize() * 7;
+        int areaHeight = gp.getTileSize() * 7;
+        
+        // Geser X dan Y sejauh 2 tile ke kiri dan ke atas agar pas di tengah
+        int areaX = this.x - (gp.getTileSize() * 3);
+        int areaY = this.y - (gp.getTileSize() * 3);
+        
+        return new Rectangle(areaX, areaY, areaWidth, areaHeight);
     }
 
     @Override
@@ -188,6 +303,7 @@ public class Slime2 extends Entity implements IAttackable {
         return new Rectangle(areaX, areaY, hitbox.width, hitbox.height);
     }
 
+
     /**
      * Mengecek apakah slime menabrak player.
      * Jika menabrak, slime akan menyerang dan player menerima damage.
@@ -200,6 +316,28 @@ public class Slime2 extends Entity implements IAttackable {
 
         // 1. TRIGGER ANIMASI: Jika player masuk area, Slime bersiap menyerang
         if (this.getAttackHitboxArea().intersects(player.getHitbox())) {
+            // --- TAMBAHAN SISTEM ANTI TEMBUS TEMBOK (LINE OF SIGHT) ---
+            // Ambil titik tengah (center) dari badan Slime
+            int slimeCenterX = this.x + hitbox.x + (hitbox.width / 2);
+            int slimeCenterY = this.y + hitbox.y + (hitbox.height / 2);
+            
+            // Ambil titik tengah (center) dari badan Player
+            int playerCenterX = player.x + player.hitbox.x + (player.hitbox.width / 2);
+            int playerCenterY = player.y + player.hitbox.y + (player.hitbox.height / 2);
+
+            // Cari koordinat tepat di tengah-tengah antara Slime dan Player
+            int midX = (slimeCenterX + playerCenterX) / 2;
+            int midY = (slimeCenterY + playerCenterY) / 2;
+
+            // Buat kotak bayangan kecil (8x8 pixel) di titik tengah tersebut
+            Rectangle lineOfSight = new Rectangle(-4, -4, 8, 8);
+
+            // Cek apakah di tengah-tengah mereka ada tembok atau gerbang tertutup
+            if (gp.collidesWithWall(midX, midY, lineOfSight) || gp.collidesWithClosedGate(midX, midY, lineOfSight)) {
+                // Terhalang tembok! Hentikan fungsi di sini agar Slime tidak menyerang
+                return; 
+            }
+            // ----------------------------------------------------------
             if (this.Activitynow == 0) {
                 this.Activitynow = 1;      // Mulai serang
                 this.attackFrame = 0;
@@ -215,15 +353,23 @@ public class Slime2 extends Entity implements IAttackable {
             // Cek lagi, apakah player MASIH ada di area saat pukulan mendarat?
             // (Ini memberi kesempatan player untuk menghindar dengan mundur)
             if (this.getAttackHitboxArea().intersects(player.getHitbox())) {
+                int sCX = this.x + hitbox.x + (hitbox.width / 2);
+                int sCY = this.y + hitbox.y + (hitbox.height / 2);
+                int pCX = player.x + player.hitbox.x + (player.hitbox.width / 2);
+                int pCY = player.y + player.hitbox.y + (player.hitbox.height / 2);
+                int mX = (sCX + pCX) / 2;
+                int mY = (sCY + pCY) / 2;
+                Rectangle los = new Rectangle(-4, -4, 8, 8);
                 
-                player.darah.takeDamage(damage); 
-                System.out.println("BAM! Pukulan Slime mendarat!");
-                
-                this.hasDealtDamage = true; // Kunci agar damage tidak dobel di frame yang sama
-                
-                // Efek kebal singkat untuk player (hanya 30 frame / 0.5 detik)
-                // Karena delay serangan asli sekarang murni diatur oleh durasi animasi Slime
-                player.damageCooldown = 30; 
+                if (!gp.collidesWithWall(mX, mY, los) && !gp.collidesWithClosedGate(mX, mY, los)) {
+                    
+                    // Pemain benar-benar terkena pukulan tanpa halangan tembok
+                    player.darah.takeDamage(damage); 
+                    System.out.println("BAM! Pukulan Slime mendarat!");
+                    
+                    this.hasDealtDamage = true; 
+                    player.damageCooldown = 30; 
+                }
             }
         }
     }
