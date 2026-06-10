@@ -28,7 +28,7 @@ public class Slime3 extends Entity implements IAttackable {
     public Rectangle hitbox;
     public Rectangle attackHitbox;
     public boolean readyToRemove = false; // Penanda untuk dihapus dari ArrayList
-    private final int damage = 5;
+    private final int damage = 10;
     public boolean hasDealtDamage = false; // Mencegah damage berkali-kali dalam 1 pukulan
     public int currentHp = 50;
 
