@@ -28,13 +28,16 @@ public class Darah {
     }
 
     public void update(int hp) {
-        if (hp < 0) {
+        if (hp <= 0) {
             hp = 0;
+            System.out.println("Game Over! Player has been defeated.");
+            System.exit(0);
         }
         if (hp > maxHP) {
             hp = maxHP;
         }
         this.currentHP = hp;
+
     }
 
     

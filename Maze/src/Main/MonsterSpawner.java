@@ -47,7 +47,7 @@ public class MonsterSpawner {
                         Math.abs(pixelY - gp.player.y) > gp.getTileSize() * 3) {
 
                         Random rng = new Random();
-                        int rndm = 1;
+                        int rndm = 0;
                         if(rndm == 0){
                             FireSlime newMonster = new FireSlime(pixelX, pixelY, 1, gp);
                             gp.monsters.add(newMonster);

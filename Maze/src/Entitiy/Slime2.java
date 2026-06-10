@@ -125,7 +125,7 @@ public class Slime2 extends Entity implements IAttackable {
                     isMoving = !isMoving; 
                     actionLockCounter = 0; 
 
-                    java.util.Random random = new java.util.Random();
+                    Random random = new Random();
                     if (isMoving) {
                         int randomDetik = random.nextInt(4) + 1;
                         actionTargetDuration = randomDetik * 60;
@@ -136,7 +136,7 @@ public class Slime2 extends Entity implements IAttackable {
                         else if (i > 50 && i <= 75) { direction = "LEFT"; }
                         else { direction = "RIGHT"; }
                     } else {
-                        actionTargetDuration = 120; // Istirahat 2 detik
+                        actionTargetDuration = 500; // Istirahat 2 detik
                     }
                 }
 
@@ -255,36 +255,27 @@ public class Slime2 extends Entity implements IAttackable {
         }
     }
 
-    public Rectangle getAggroArea() {
-        int areaWidth = gp.getTileSize() * 7;
-        int areaHeight = gp.getTileSize() * 7;
-        
-        // Geser X dan Y sejauh 2 tile ke kiri dan ke atas agar pas di tengah
-        int areaX = this.x - (gp.getTileSize() * 3);
-        int areaY = this.y - (gp.getTileSize() * 3);
-        
-        return new Rectangle(areaX, areaY, areaWidth, areaHeight);
-    }
-
+    
     @Override
     public void takeDamage(int damageAmount) {
         if (Activitynow == 2) {
             return;
         }
-
+        
         this.currentHp -= damageAmount;
         System.out.println("Slime 2 terkena serangan! Sisa HP: " + this.currentHp);
-
+        
         // Jika HP habis, ubah state menjadi mati
         if (this.currentHp <= 0) {
             this.currentHp = 0;
             this.Activitynow = 2; // memicu animasi mati disapearAnimation
         }
     }
-
+    
     @Override
     public boolean isDead() {
         return Activitynow == 2;
+   
     }
 
     public Rectangle getHitboxArea() {
@@ -304,6 +295,17 @@ public class Slime2 extends Entity implements IAttackable {
     }
 
 
+    public Rectangle getAggroArea() {
+        int areaWidth = gp.getTileSize() * 7;
+        int areaHeight = gp.getTileSize() * 7;
+        
+        // Geser X dan Y sejauh 2 tile ke kiri dan ke atas agar pas di tengah
+        int areaX = this.x - (gp.getTileSize() * 3);
+        int areaY = this.y - (gp.getTileSize() * 3);
+        
+        return new Rectangle(areaX, areaY, areaWidth, areaHeight);
+    }
+
     /**
      * Mengecek apakah slime menabrak player.
      * Jika menabrak, slime akan menyerang dan player menerima damage.
@@ -314,8 +316,9 @@ public class Slime2 extends Entity implements IAttackable {
             return;
         }
 
-        // 1. TRIGGER ANIMASI: Jika player masuk area, Slime bersiap menyerang
+        // 1. TRIGGER ANIMASI: Cek apakah Player masuk ke area serangan (3x3)
         if (this.getAttackHitboxArea().intersects(player.getHitbox())) {
+            
             // --- TAMBAHAN SISTEM ANTI TEMBUS TEMBOK (LINE OF SIGHT) ---
             // Ambil titik tengah (center) dari badan Slime
             int slimeCenterX = this.x + hitbox.x + (hitbox.width / 2);
@@ -338,6 +341,8 @@ public class Slime2 extends Entity implements IAttackable {
                 return; 
             }
             // ----------------------------------------------------------
+
+            // Jika tidak terhalang tembok, Slime bersiap menyerang
             if (this.Activitynow == 0) {
                 this.Activitynow = 1;      // Mulai serang
                 this.attackFrame = 0;
@@ -347,12 +352,13 @@ public class Slime2 extends Entity implements IAttackable {
         }
 
         // 2. TRIGGER DAMAGE: Berikan damage TEPAT di pertengahan animasi (misal Frame ke-5)
-        // Angka 5 bisa kamu ganti (0-9) sesuai gambar frame mana yang paling pas terlihat memukul
-        if (this.Activitynow == 1 && this.attackFrame == 6 && !this.hasDealtDamage) {
+        if (this.Activitynow == 1 && this.attackFrame == 5 && !this.hasDealtDamage) {
             
             // Cek lagi, apakah player MASIH ada di area saat pukulan mendarat?
-            // (Ini memberi kesempatan player untuk menghindar dengan mundur)
             if (this.getAttackHitboxArea().intersects(player.getHitbox())) {
+                
+                // --- CEK TEMBOK LAGI SAAT DAMAGE MASUK ---
+                // (Untuk berjaga-jaga jika player lari bersembunyi ke balik tembok saat animasi memukul diputar)
                 int sCX = this.x + hitbox.x + (hitbox.width / 2);
                 int sCY = this.y + hitbox.y + (hitbox.height / 2);
                 int pCX = player.x + player.hitbox.x + (player.hitbox.width / 2);
@@ -373,5 +379,4 @@ public class Slime2 extends Entity implements IAttackable {
             }
         }
     }
-    
 }

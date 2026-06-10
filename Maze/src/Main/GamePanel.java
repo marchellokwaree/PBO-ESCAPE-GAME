@@ -790,10 +790,6 @@ public class GamePanel extends JPanel implements Runnable {
                     player.damageCooldown = 60; // Jangan terkena damage lagi selama sekitar 1 detik
 
                     System.out.println("Player hit by fire trap! HP: " + player.darah.getCurrentHP());
-                    if (player.darah.getCurrentHP() <= 0) {
-                        System.out.println("Game Over! Player has been defeated.");
-                        System.exit(0);
-                    }
                 }
             }
             if (obstacle instanceof PressurePlate) {

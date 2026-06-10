@@ -21,7 +21,7 @@ public class FireSlime extends Entity implements IAttackable {
     private int attackCounter = 0; // untuk animasi serangan
     private final int animationDelay = 10; // delay untuk animasi jalan dan idle
     private final int disapearDelay = 10; // delay untuk animasi mati
-    private final int attackDelay = 20; // delay untuk animasi serangan
+    private final int attackDelay = 12; // delay untuk animasi serangan
     private int width = 32;
     private int height = 32;
     GamePanel gp;
@@ -134,7 +134,7 @@ public class FireSlime extends Entity implements IAttackable {
                         else if (i > 50 && i <= 75) { direction = "LEFT"; }
                         else { direction = "RIGHT"; }
                     } else {
-                        actionTargetDuration = 120; // Istirahat 2 detik
+                        actionTargetDuration = 500; // Istirahat 2 detik
                     }
                 }
 

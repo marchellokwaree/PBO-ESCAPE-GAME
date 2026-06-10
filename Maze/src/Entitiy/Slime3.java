@@ -134,7 +134,7 @@ public class Slime3 extends Entity implements IAttackable {
                         else if (i > 50 && i <= 75) { direction = "LEFT"; }
                         else { direction = "RIGHT"; }
                     } else {
-                        actionTargetDuration = 120; // Istirahat 2 detik
+                        actionTargetDuration = 500; // Istirahat 2 detik
                     }
                 }
 
