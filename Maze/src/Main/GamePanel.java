@@ -418,6 +418,15 @@ public class GamePanel extends JPanel implements Runnable {
                         System.out.println("FireSlime berhasil dihapus dari Map!");
                     }
                 }
+                if(monster instanceof Slime2){
+                    Slime2 slime = (Slime2) monster;
+                    slime.checkPlayerCollision(player);
+
+                    if(slime.readyToRemove){
+                        iterator.remove();
+                        
+                    }
+                }
             }
         }
 
@@ -729,6 +738,9 @@ public class GamePanel extends JPanel implements Runnable {
         for (Entity monster : monsters) {
             if (monster instanceof FireSlime) {
                 ((FireSlime) monster).draw(g2);
+            }
+            if(monster instanceof Slime2){
+                ((Slime2) monster).draw(g2);
             }
         }
         

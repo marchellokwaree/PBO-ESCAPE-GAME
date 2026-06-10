@@ -7,7 +7,9 @@ import java.awt.image.BufferedImage;
 import Entitiy.Activity.IAttackable;
 import Main.GamePanel;
 
-public class FireSlime extends Entity implements IAttackable {
+public class Slime2 extends Entity implements IAttackable {
+
+
     private BufferedImage bufferedImage;
     private BufferedImage[] animationFrames = new BufferedImage[6]; // untuk jalan dan idle
     private BufferedImage[] disapearAnimation = new BufferedImage[10]; // untuk animasi mati
@@ -20,7 +22,7 @@ public class FireSlime extends Entity implements IAttackable {
     private int attackCounter = 0; // untuk animasi serangan
     private final int animationDelay = 10; // delay untuk animasi jalan dan idle
     private final int disapearDelay = 10; // delay untuk animasi mati
-    private final int attackDelay = 20; // delay untuk animasi serangan
+    private final int attackDelay = 13; // delay untuk animasi serangan
     private int width = 32;
     private int height = 32;
     GamePanel gp;
@@ -28,29 +30,25 @@ public class FireSlime extends Entity implements IAttackable {
     public Rectangle hitbox;
     public Rectangle attackHitbox;
     public boolean readyToRemove = false; // Penanda untuk dihapus dari ArrayList
-    private final int damage = 5;
+    private final int damage = 15;
     public boolean hasDealtDamage = false; // Mencegah damage berkali-kali dalam 1 pukulan
     public int currentHp = 50;
 
-    public FireSlime(int x, int y, int speed, GamePanel gp) {
+    public Slime2(int x, int y, int speed, GamePanel gp) {
         super(x, y, speed, 50); // HP 50 untuk FireSlime
         this.gp = gp;
         this.Activitynow = 0; // Mulai dengan status idle
         hitbox = new Rectangle();
-        hitbox.x = 8;       // offset dari kiri sprite
-        hitbox.y = 4;       // offset dari atas sprite
-        hitbox.width = gp.getTileSize() - 16;  // lebar hitbox
-        hitbox.height = gp.getTileSize() - 4; // tinggi hitbox
-
-        attackHitbox = new Rectangle(); // area damage dari tengah slime
-        attackHitbox.width = gp.getTileSize() * 3; 
-        attackHitbox.height = gp.getTileSize() * 3; // tinggi area serangan sebesar 3 tile
+        hitbox.x = 0; // Agar pas di tengah sprite ukuran 64x64
+        hitbox.y = 4;
+        hitbox.width = gp.getTileSize();  // lebar hitbox
+        hitbox.height = gp.getTileSize(); // tinggi hitbox
 
         try {
             int spriteWidth = 64; // Lebar setiap sprite
             int spriteHeight = 64; // Tinggi setiap sprite
             int rowY = 0; // Y untuk baris pertama
-            this.bufferedImage = loadBufferedImage("/Assets/Enemy/PNG/Slime1/With_Shadow/Slime1_Idle_with_shadow.png");
+            this.bufferedImage = loadBufferedImage("/Assets/Enemy/PNG/Slime2/With_Shadow/Slime2_Idle_with_shadow.png");
             for (int i = 0; i < animationFrames.length; i++) {
                 int colX = i * spriteWidth; // X untuk setiap kolom
                 animationFrames[i] = bufferedImage.getSubimage(colX, rowY, spriteWidth, spriteHeight);
@@ -58,14 +56,14 @@ public class FireSlime extends Entity implements IAttackable {
             }
             // load disappear animation
 
-            this.bufferedImage = loadBufferedImage("/Assets/Enemy/PNG/Slime1/With_Shadow/Slime1_Death_with_shadow.png");
+            this.bufferedImage = loadBufferedImage("/Assets/Enemy/PNG/Slime2/With_Shadow/Slime2_Death_with_shadow.png");
             for (int i = 0; i < disapearAnimation.length; i++) {
                 int colX = i * spriteWidth; // X untuk setiap kolom
                 disapearAnimation[i] = bufferedImage.getSubimage(colX, rowY, spriteWidth, spriteHeight);
             }
 
             // loaad attack animation
-            this.bufferedImage = loadBufferedImage("/Assets/Enemy/PNG/Slime1/With_Shadow/Slime1_Attack_with_shadow.png");
+            this.bufferedImage = loadBufferedImage("/Assets/Enemy/PNG/Slime2/With_Shadow/Slime2_Attack_with_shadow.png");
             for (int i = 0; i < attackAnimation.length; i++) {
                 int colX = i * spriteWidth; // X untuk setiap kolom
                 attackAnimation[i] = bufferedImage.getSubimage(colX, rowY, spriteWidth, spriteHeight);
@@ -121,13 +119,14 @@ public class FireSlime extends Entity implements IAttackable {
         g2.setColor(new java.awt.Color(255, 0, 0, 150)); // Merah semi-transparan
         g2.fillRect(screenX, screenY, width, height);
 
+        if (Activitynow == 1) { // GAMBAR HITBOX ATTACK AREA SLIME, HAPUS AJA KALAU GAME SUDAH JADI
             g2.setColor(new java.awt.Color(255, 165, 0, 150)); // Oranye semi-transparan
             
             // Hitung posisi X dan Y agar area 3x3 ini berada persis di tengah Slime
-            int attackDrawX = screenX - gp.getTileSize();
-            int attackDrawY = screenY - gp.getTileSize();
+            int attackDrawX = screenX + hitbox.x;
+            int attackDrawY = screenY + hitbox.y;
             
-            g2.fillRect(attackDrawX, attackDrawY, attackHitbox.width, attackHitbox.height);
+            g2.fillRect(attackDrawX, attackDrawY, hitbox.width, hitbox.height);
         }
 
         // Hanya gambar jika masuk ke dalam pandangan monitor
@@ -159,7 +158,7 @@ public class FireSlime extends Entity implements IAttackable {
         }
 
         this.currentHp -= damageAmount;
-        System.out.println("FireSlime terkena serangan! Sisa HP: " + this.currentHp);
+        System.out.println("Slime 2 terkena serangan! Sisa HP: " + this.currentHp);
 
         // Jika HP habis, ubah state menjadi mati
         if (this.currentHp <= 0) {
@@ -183,10 +182,10 @@ public class FireSlime extends Entity implements IAttackable {
     public Rectangle getAttackHitboxArea() {
         // Geser X dan Y sejauh 1 tile ke kiri dan ke atas
         // agar Slime (yang ukurannya 1 tile) berada tepat di tengah area 3x3 ini
-        int areaX = this.x - gp.getTileSize();
-        int areaY = this.y - gp.getTileSize();
+        int areaX = this.x + hitbox.x;
+        int areaY = this.y + hitbox.y;
         
-        return new Rectangle(areaX, areaY, attackHitbox.width, attackHitbox.height);
+        return new Rectangle(areaX, areaY, hitbox.width, hitbox.height);
     }
 
     /**
@@ -211,7 +210,7 @@ public class FireSlime extends Entity implements IAttackable {
 
         // 2. TRIGGER DAMAGE: Berikan damage TEPAT di pertengahan animasi (misal Frame ke-5)
         // Angka 5 bisa kamu ganti (0-9) sesuai gambar frame mana yang paling pas terlihat memukul
-        if (this.Activitynow == 1 && this.attackFrame == 5 && !this.hasDealtDamage) {
+        if (this.Activitynow == 1 && this.attackFrame == 6 && !this.hasDealtDamage) {
             
             // Cek lagi, apakah player MASIH ada di area saat pukulan mendarat?
             // (Ini memberi kesempatan player untuk menghindar dengan mundur)
@@ -228,5 +227,5 @@ public class FireSlime extends Entity implements IAttackable {
             }
         }
     }
-
+    
 }

@@ -2,6 +2,8 @@ package Main;
 import Entitiy.Entity;
 import java.util.Random;
 import Entitiy.FireSlime;
+import Entitiy.Slime2;
+
 import java.util.ArrayList;
 public class MonsterSpawner {
     private GamePanel gp;
@@ -10,6 +12,7 @@ public class MonsterSpawner {
     private final int maxMonsters = 15; // Jumlah maksimum monster yang bisa muncul
     private final int spawnInterval = 10000; // Interval spawn dalam milidetik (10 detik)
     private int spawnTimer = 0; // Timer untuk menghitung waktu spawn
+    
     public MonsterSpawner(GamePanel gp) {
         this.gp = gp;
     }
@@ -41,15 +44,24 @@ public class MonsterSpawner {
                 if (gp.player != null) {
                     if (Math.abs(pixelX - gp.player.x) > gp.getTileSize() * 3 || 
                         Math.abs(pixelY - gp.player.y) > gp.getTileSize() * 3) {
-                        
-                        FireSlime newMonster = new FireSlime(pixelX, pixelY, 1, gp);
-                        gp.monsters.add(newMonster);
-                        spawned++;
 
-                        System.out.println("Berhasil! Spawned FireSlime at Pixel: (" + pixelX + ", " + pixelY + ")");
+                        Random rng = new Random();
+                        int rndm = rng.nextInt(2);
+                        if(rndm == 0){
+                            FireSlime newMonster = new FireSlime(pixelX, pixelY, 1, gp);
+                            gp.monsters.add(newMonster);
+                            spawned++;
+                            System.out.println("Berhasil! Spawned FireSlime at Pixel: (" + pixelX + ", " + pixelY + ")");
+                        }else if(rndm == 1){
+                            Slime2 newMonster = new Slime2(pixelX, pixelY, 1, gp);
+                            gp.monsters.add(newMonster);
+                            spawned++;
+                            System.out.println("Berhasil! Spawned Slime 2 at Pixel: (" + pixelX + ", " + pixelY + ")");
+                        }
+
                     }
                 }
-                System.out.println("Spawned FireSlime at: (" + x + ", " + y + ")");
+                // System.out.println("Spawned FireSlime at: (" + x + ", " + y + ")");
             }
         }
 

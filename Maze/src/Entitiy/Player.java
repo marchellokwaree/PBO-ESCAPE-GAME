@@ -3,6 +3,7 @@ package Entitiy;
 import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.Rectangle;
+import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -226,7 +227,7 @@ public class Player extends Entity {
 
         // --- DEBUG: GAMBAR KOTAK PUKULAN ---
         // --- DEBUG: GAMBAR KOTAK PUKULAN (Letakkan di akhir method draw) ---
-        g2.setColor(new java.awt.Color(0, 0, 255, 150)); // Warna Biru Transparan
+        g2.setColor(new java.awt.Color(0, 0, 255, 150)); // INI HITBOX ATTACK PLAYER, HAPUS KALAU SUDAH JADI
         
         int attackDrawX = x - camX;
         int attackDrawY = y - camY;
@@ -245,11 +246,12 @@ public class Player extends Entity {
                 attackDrawX += gp.getTileSize() - 8;
                 break;
         }
+
+        // SWITCH DAN DEKLARASI VARIABEL JANGAN DIHAPUS
         
-        g2.fillRect(attackDrawX, attackDrawY, gp.getTileSize(), gp.getTileSize());
+        g2.fillRect(attackDrawX, attackDrawY, gp.getTileSize(), gp.getTileSize()); // INI HITBOX ATTACK PLAYER, HAPUS KALAU SUDAH JADI
 
-
-        java.awt.geom.AffineTransform originalTransform = g2.getTransform();
+        AffineTransform originalTransform = g2.getTransform();
 
         int width = gp.getTileSize();
         int height = gp.getTileSize();
@@ -315,9 +317,18 @@ public class Player extends Entity {
             if (monster instanceof FireSlime) {
                 FireSlime slime = (FireSlime) monster;
                 
-                if (attackArea.intersects(slime.getHitboxArea())) {
+                if (attackArea.intersects(slime.getHitboxArea())){
                     slime.takeDamage(damage);
                     System.out.println("Berhasil memukul FireSlime dari arah: " + direction);
+                }
+            }
+
+            if(monster instanceof Slime2){
+                Slime2 slime = (Slime2) monster;
+
+                if(attackArea.intersects(slime.getHitboxArea())){
+                    slime.takeDamage(damage);
+                    System.out.println("Berhasil memukul Slime 2 dari arah: " + direction);
                 }
             }
         }
