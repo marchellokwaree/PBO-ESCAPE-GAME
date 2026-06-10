@@ -121,6 +121,7 @@ public class FireSlime extends Entity implements IAttackable {
         g2.setColor(new java.awt.Color(255, 0, 0, 150)); // Merah semi-transparan
         g2.fillRect(screenX, screenY, width, height);
 
+        if (Activitynow == 1) { // GAMBAR HITBOX ATTACK AREA SLIME, HAPUS AJA KALAU GAME SUDAH JADI
             g2.setColor(new java.awt.Color(255, 165, 0, 150)); // Oranye semi-transparan
             
             // Hitung posisi X dan Y agar area 3x3 ini berada persis di tengah Slime
