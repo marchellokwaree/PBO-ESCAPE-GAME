@@ -331,6 +331,15 @@ public class Player extends Entity {
                     System.out.println("Berhasil memukul Slime 2 dari arah: " + direction);
                 }
             }
+
+            if(monster instanceof Slime3){
+                Slime3 slime = (Slime3) monster;
+
+                if(attackArea.intersects(slime.getHitboxArea())){
+                    slime.takeDamage(damage);
+                    System.out.println("Berhasil memukul Slime 3 dari arah: " + direction);
+                }
+            }
         }
     }
 }

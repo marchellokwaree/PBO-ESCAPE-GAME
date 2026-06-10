@@ -424,6 +424,15 @@ public class GamePanel extends JPanel implements Runnable {
 
                     if(slime.readyToRemove){
                         iterator.remove();
+
+                    }
+                }
+                if(monster instanceof Slime3){
+                    Slime3 slime = (Slime3) monster;
+                    slime.checkPlayerCollision(player);
+
+                    if(slime.readyToRemove){
+                        iterator.remove();
                         
                     }
                 }
@@ -741,6 +750,9 @@ public class GamePanel extends JPanel implements Runnable {
             }
             if(monster instanceof Slime2){
                 ((Slime2) monster).draw(g2);
+            }
+            if(monster instanceof Slime3){
+                ((Slime3) monster).draw(g2);
             }
         }
         

@@ -3,6 +3,7 @@ import Entitiy.Entity;
 import java.util.Random;
 import Entitiy.FireSlime;
 import Entitiy.Slime2;
+import Entitiy.Slime3;
 
 import java.util.ArrayList;
 public class MonsterSpawner {
@@ -46,7 +47,7 @@ public class MonsterSpawner {
                         Math.abs(pixelY - gp.player.y) > gp.getTileSize() * 3) {
 
                         Random rng = new Random();
-                        int rndm = rng.nextInt(2);
+                        int rndm = 2;
                         if(rndm == 0){
                             FireSlime newMonster = new FireSlime(pixelX, pixelY, 1, gp);
                             gp.monsters.add(newMonster);
@@ -57,6 +58,11 @@ public class MonsterSpawner {
                             gp.monsters.add(newMonster);
                             spawned++;
                             System.out.println("Berhasil! Spawned Slime 2 at Pixel: (" + pixelX + ", " + pixelY + ")");
+                        }else if(rndm == 2){
+                            Slime3 newMonster = new Slime3(pixelX, pixelY, 1, gp);
+                            gp.monsters.add(newMonster);
+                            spawned++;
+                            System.out.println("Berhasil! Spawned Slime 3 at Pixel: (" + pixelX + ", " + pixelY + ")");
                         }
 
                     }
