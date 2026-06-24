@@ -6,7 +6,7 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 
 public class KeyHandler implements KeyListener, MouseListener {
-    public boolean upPressed, downPressed, leftPressed, rightPressed, leftMousePressed;
+    public boolean upPressed, downPressed, leftPressed, rightPressed, leftMousePressed, rightMousePressed;
 
     @Override
     public void keyTyped(KeyEvent e) {}
@@ -38,12 +38,18 @@ public class KeyHandler implements KeyListener, MouseListener {
         if (e.getButton() == MouseEvent.BUTTON1) { // BUTTON1 is the Left Click
             leftMousePressed = true;
         }
+        if (e.getButton() == MouseEvent.BUTTON3) { // BUTTON3 adalah Klik Kanan
+            rightMousePressed = true;
+        }
     }
 
     @Override
     public void mouseReleased(MouseEvent e) {
         if (e.getButton() == MouseEvent.BUTTON1) {
             leftMousePressed = false;
+        }
+        if (e.getButton() == MouseEvent.BUTTON3) {
+            rightMousePressed = false;
         }
     }
 

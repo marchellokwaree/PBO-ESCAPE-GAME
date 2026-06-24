@@ -50,10 +50,10 @@ public class Slime2 extends Entity implements IAttackable {
         this.defaultSpeed = speed;
         this.Activitynow = 0; // Mulai dengan status idle
         hitbox = new Rectangle();
-        hitbox.x = 0; // Agar pas di tengah sprite ukuran 64x64
+        hitbox.x = 8; // Agar pas di tengah sprite ukuran 64x64
         hitbox.y = 4;
-        hitbox.width = gp.getTileSize();  // lebar hitbox
-        hitbox.height = gp.getTileSize(); // tinggi hitbox
+        hitbox.width = gp.getTileSize() - 16;  // lebar hitbox
+        hitbox.height = gp.getTileSize() - 4; // tinggi hitbox
 
         attackHitbox = new Rectangle();
         attackHitbox.width = gp.getTileSize();

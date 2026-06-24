@@ -120,6 +120,10 @@ public class GamePanel extends JPanel implements Runnable {
                     entities.add(new RedHood(j * tileSize, i * tileSize, 0, this));
                     Key++;
                 }
+
+                if ("C".equals(map1[i][j])) {
+                    obstacles.add(new Chest(j * tileSize, i * tileSize, tileSize, tileSize));
+                }
             }
         }
 
@@ -310,6 +314,18 @@ public class GamePanel extends JPanel implements Runnable {
                     }
                 }
             }
+
+            if (obstacle instanceof Chest) {
+                Chest chest = (Chest) obstacle;
+                
+                // Buat area padat (hitbox) sebesar 1 kotak ubin/tile di posisi peti
+                Rectangle chestBounds = new Rectangle(chest.x, chest.y, tileSize, tileSize);
+
+                // Jika posisi pemain selanjutnya menabrak area peti, kembalikan nilai true (terblokir)
+                if (playerFutureBounds.intersects(chestBounds)) {
+                    return true; 
+                }
+            }
         }
         return false;
     }
@@ -393,6 +409,9 @@ public class GamePanel extends JPanel implements Runnable {
             }
             if (obstacle instanceof HealPotion) {
                 ((HealPotion) obstacle).update();
+            }
+            if (obstacle instanceof Chest) {
+                ((Chest) obstacle).update();
             }
         }
         // Update smooth camera after updating entities
@@ -702,6 +721,7 @@ public class GamePanel extends JPanel implements Runnable {
                 }
             }
         }
+        
 
         // Gambar semua obstacles
         for (Obstacle obstacle : obstacles) {
@@ -723,6 +743,9 @@ public class GamePanel extends JPanel implements Runnable {
             if (obstacle instanceof HealPotion) {
                 ((HealPotion) obstacle).draw(g2, this);
             }
+            if (obstacle instanceof Chest) {
+                ((Chest) obstacle).draw(g2, this);
+            }
         }
         // Gambar semua Red Hood
         for (Entity entity : entities) {
@@ -731,8 +754,6 @@ public class GamePanel extends JPanel implements Runnable {
             }
         }
 
-        
-        // Gambar semua monster
         for (Entity monster : monsters) {
             if (monster instanceof FireSlime) {
                 ((FireSlime) monster).draw(g2);
@@ -744,6 +765,35 @@ public class GamePanel extends JPanel implements Runnable {
                 ((Slime3) monster).draw(g2);
             }
         }
+        
+        for (Obstacle obstacle : obstacles) {
+            if (obstacle instanceof Chest) {
+                Chest chest = (Chest) obstacle;
+                
+                if (chest.showChestUI) {
+                    int uiWidth = screenWidth - 200;
+                    int uiHeight = screenHeight - 200;
+                    int uiX = 100;
+                    int uiY = 100;
+
+                    // Background hitam semi-transparan
+                    g2.setColor(new java.awt.Color(0, 0, 0, 200)); 
+                    g2.fillRoundRect(uiX, uiY, uiWidth, uiHeight, 35, 35);
+                    
+                    // Garis pinggiran putih
+                    g2.setColor(java.awt.Color.WHITE);
+                    g2.setStroke(new java.awt.BasicStroke(5));
+                    g2.drawRoundRect(uiX + 5, uiY + 5, uiWidth - 10, uiHeight - 10, 25, 25);
+
+                    // Teks judul
+                    g2.setFont(new java.awt.Font("Arial", java.awt.Font.BOLD, 30));
+                    g2.drawString("Isi Peti (Chest Loot)", uiX + 30, uiY + 50);
+                    
+                    // Hapus kata 'break;' di sini agar aman
+                }
+            }
+        }
+        
         
         if (player != null){
                 player.draw(g2);
@@ -836,6 +886,33 @@ public class GamePanel extends JPanel implements Runnable {
                     }
                     it.remove(); // Hapus potion setelah digunakan dengan aman
                     System.out.println("Player consumed a heal potion! HP: " + player.darah.getCurrentHP());
+                }
+            }
+            if (obstacle instanceof Chest) {
+                Chest chest = (Chest) obstacle;
+                
+                // Buat area interaksi sedikit lebih besar dari ukuran peti (misal peti ukuran 64x64)
+                Rectangle interactArea = new Rectangle(chest.x - 10, chest.y - 10, 84, 84);
+                
+                // Jika pemain berada di dekat peti ini
+                if (interactArea.intersects(player.getHitbox())) {
+                    
+                    // Jika pemain menekan klik kanan
+                    if (keyH.rightMousePressed) {
+                        if (!chest.isOpen) {
+                            chest.isOpen = true; // Buka penutup peti (atau chest.open() sesuai kode Anda)
+                        }
+                        
+                        // Balikkan status UI KHUSUS untuk peti ini saja
+                        chest.showChestUI = !chest.showChestUI; 
+                        
+                        // Matikan status klik agar menu tidak berkedip
+                        keyH.rightMousePressed = false; 
+                    }
+                } 
+                else {
+                    // Jika pemain berjalan menjauh dari peti ini, otomatis sembunyikan menu UI-nya
+                    chest.showChestUI = false;
                 }
             }
         }
