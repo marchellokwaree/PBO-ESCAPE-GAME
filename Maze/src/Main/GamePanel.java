@@ -57,6 +57,7 @@ public class GamePanel extends JPanel implements Runnable {
     Image wallTUp, wallTDown, wallTLeft, wallTRight, wallTIntersection;
 
     public MonsterSpawner spawner;
+    public Inventory inventory;
 
     public GamePanel() {
 
@@ -139,6 +140,7 @@ public class GamePanel extends JPanel implements Runnable {
         clampCamera();
 
         spawner = new MonsterSpawner(this);
+        inventory = new Inventory(this);
     }
 
     public String[][] getMap() {
@@ -751,6 +753,10 @@ public class GamePanel extends JPanel implements Runnable {
 
         if (timer != null) {
             timer.draw(g2, this);
+        }
+
+        if (inventory != null) {
+            inventory.draw(g2);
         }
 
         g2.dispose();
