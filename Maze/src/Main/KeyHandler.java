@@ -6,7 +6,7 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 
 public class KeyHandler implements KeyListener, MouseListener {
-    public boolean upPressed, downPressed, leftPressed, rightPressed, leftMousePressed, rightMousePressed;
+    public boolean upPressed, downPressed, leftPressed, rightPressed, leftMousePressed, rightMousePressed, key1Pressed, key2Pressed, key3Pressed, key4Pressed;
 
     public int mouseX, mouseY;
 
@@ -20,6 +20,11 @@ public class KeyHandler implements KeyListener, MouseListener {
         if (code == KeyEvent.VK_S) downPressed = true;
         if (code == KeyEvent.VK_A) leftPressed = true;
         if (code == KeyEvent.VK_D) rightPressed = true;
+
+        if (code == KeyEvent.VK_1) key1Pressed = true;
+        if (code == KeyEvent.VK_2) key2Pressed = true;
+        if (code == KeyEvent.VK_3) key3Pressed = true;
+        if (code == KeyEvent.VK_4) key4Pressed = true;
     }
 
     @Override
@@ -29,6 +34,11 @@ public class KeyHandler implements KeyListener, MouseListener {
         if (code == KeyEvent.VK_S) downPressed = false;
         if (code == KeyEvent.VK_A) leftPressed = false;
         if (code == KeyEvent.VK_D) rightPressed = false;
+
+        if (code == KeyEvent.VK_1) key1Pressed = false;
+        if (code == KeyEvent.VK_2) key2Pressed = false;
+        if (code == KeyEvent.VK_3) key3Pressed = false;
+        if (code == KeyEvent.VK_4) key4Pressed = false;
     }
 
     @Override

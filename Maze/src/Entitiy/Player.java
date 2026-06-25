@@ -28,7 +28,10 @@ public class Player extends Entity {
     int spriteNum = 1;
     boolean hadapKiri = false;
     public String direction = "DOWN"; // Default menghadap bawah
-    public int damage = 10;
+    public int baseDamage = 10; 
+    public int baseDefense = 0; 
+    public int attackDamage = 10; 
+    public int defense = 0;
     public int damageCooldown = 0;
     public int normalSpeed = 2;
     public int slowSpeed = 1;
@@ -318,7 +321,7 @@ public class Player extends Entity {
                 FireSlime slime = (FireSlime) monster;
                 
                 if (attackArea.intersects(slime.getHitboxArea())){
-                    slime.takeDamage(damage);
+                    slime.takeDamage(this.attackDamage);
                     System.out.println("Berhasil memukul FireSlime dari arah: " + direction);
                 }
             }
@@ -327,7 +330,7 @@ public class Player extends Entity {
                 Slime2 slime = (Slime2) monster;
 
                 if(attackArea.intersects(slime.getHitboxArea())){
-                    slime.takeDamage(damage);
+                    slime.takeDamage(this.attackDamage);
                     System.out.println("Berhasil memukul Slime 2 dari arah: " + direction);
                 }
             }
@@ -336,10 +339,30 @@ public class Player extends Entity {
                 Slime3 slime = (Slime3) monster;
 
                 if(attackArea.intersects(slime.getHitboxArea())){
-                    slime.takeDamage(damage);
+                    slime.takeDamage(this.attackDamage);
                     System.out.println("Berhasil memukul Slime 3 dari arah: " + direction);
                 }
             }
         }
+    }
+
+    /**
+     * Method sentral untuk menerima damage dari sumber manapun (Monster/Trap)
+     * Menggunakan sistem Defense persentase (Damage Reduction %)
+     */
+    public void terimaDamage(int damageAsli) {
+        // 1. Batasi defense maksimal 100% agar damage tidak jadi minus (malah nge-heal)
+        int persenDef = Math.min(this.defense, 100);
+        
+        // 2. Hitung rumus persentase: Damage Asli dikurangi (Persentase dari Damage Asli)
+        int damageAkhir = damageAsli - (damageAsli * persenDef / 100);
+        
+        // 3. Pastikan minimal damage adalah 0
+        damageAkhir = Math.max(0, damageAkhir);
+        
+        // 4. Kurangi HP pemain
+        this.darah.takeDamage(damageAkhir);
+        
+        System.out.println("Terkena Hit! Base Damage: " + damageAsli + " | Blocked: " + persenDef + "% | Damage Masuk: " + damageAkhir);
     }
 }

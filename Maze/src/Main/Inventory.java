@@ -13,6 +13,7 @@ public class Inventory {
     BufferedImage spriteSheet;
     boolean isVisible = true;
     public Item[] slots = new Item[4];
+    public Item equippedItem;
     public Inventory(GamePanel gp) {
         this.x = (gp.screenWidth - 216) / 2; // Center horizontally
         this.y = gp.screenHeight - 48; // Position at the bottom of the screen
@@ -63,28 +64,39 @@ public class Inventory {
 
     public void draw(Graphics2D g2) {
         g2.drawImage(image, x, y, width, height, null);
+        
+        // 1. Menggambar isi tas (4 kotak berdempetan di kanan)
         for (int i = 0; i < slots.length; i++) {
             if (slots[i] != null) {
+                int itemSize = 28; 
                 
-                // 1. UKURAN ITEM (Perkecil agar tidak keluar garis kotak)
-                // Coba turunkan dari 32 ke 24 atau 26
-                int itemSize = 24; 
+                // GESER KE KANAN: Naikkan dari 58 menjadi 68
+                int offsetX = this.x + 68; 
                 
-                // 2. POSISI AWAL (Padding kiri dan atas)
-                // Ubah angka ini untuk menggeser posisi item di kotak pertama
-                int offsetX = this.x + 13; // Tambah angka untuk geser ke KANAN
-                int offsetY = this.y + 10; // Tambah angka untuk geser ke BAWAH
+                // GESER KE ATAS: Turunkan dari 18 menjadi 12 (atau 10 jika masih kurang atas)
+                int offsetY = this.y + 8; 
                 
-                // 3. JARAK ANTAR KOTAK
-                // Jarak dari kotak 1 ke kotak 2, dst.
-                int jarakAntarSlot = i * 45; 
+                // Jarak antar slot sudah pas, biarkan 40
+                int jarakAntarSlot = i * 34; 
                 
                 int slotX = offsetX + jarakAntarSlot; 
                 int slotY = offsetY;
                 
-                // Menggambar item dengan variabel yang sudah disesuaikan
                 slots[i].draw(g2, slotX, slotY, itemSize, itemSize);
             }
+        }
+
+        // 2. Menggambar item yang sedang dipakai (kotak terpisah di paling kiri)
+        if (equippedItem != null) {
+            int itemSize = 28;
+            
+            // GESER KE KANAN: Naikkan dari 10 menjadi 18
+            int kotakKiriX = this.x + 13;
+            
+            // GESER KE ATAS: Turunkan dari 18 menjadi 12
+            int kotakKiriY = this.y + 8;
+            
+            equippedItem.draw(g2, kotakKiriX, kotakKiriY, itemSize, itemSize);
         }
     }
 

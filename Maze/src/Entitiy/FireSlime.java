@@ -366,7 +366,7 @@ public class FireSlime extends Entity implements IAttackable {
                 if (!gp.collidesWithWall(mX, mY, los) && !gp.collidesWithClosedGate(mX, mY, los)) {
                     
                     // Pemain benar-benar terkena pukulan tanpa halangan tembok
-                    player.darah.takeDamage(damage); 
+                    player.terimaDamage(damage);
                     System.out.println("BAM! Pukulan Slime mendarat!");
                     
                     this.hasDealtDamage = true; 

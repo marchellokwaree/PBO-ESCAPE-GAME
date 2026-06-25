@@ -4,6 +4,8 @@ import Obstacle.*;
 import Entitiy.*;
 import Item.Item;
 import Item.DamageItem;
+import Item.DefenseItem;
+
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
@@ -124,8 +126,8 @@ public class GamePanel extends JPanel implements Runnable {
                 }
 
                 if ("C".equals(map1[i][j])) {
-                    // Tambahkan objek 'new DamageItem()' sebagai parameter ke-5
-                    obstacles.add(new Chest(j * tileSize, i * tileSize, tileSize, tileSize, new DamageItem()));
+                    // Gunakan getRandomItem() sebagai parameter ke-5
+                    obstacles.add(new Chest(j * tileSize, i * tileSize, tileSize, tileSize, getRandomItem()));
                 }
             }
         }
@@ -479,6 +481,23 @@ public class GamePanel extends JPanel implements Runnable {
             
             // Reset status klik agar tidak menyerang berkali-kali dalam 1 detik
             keyH.leftMousePressed = false; 
+        }
+
+        if (keyH.key1Pressed) {
+            equipItem(0);
+            keyH.key1Pressed = false; 
+        }
+        if (keyH.key2Pressed) {
+            equipItem(1);
+            keyH.key2Pressed = false; 
+        }
+        if (keyH.key3Pressed) {
+            equipItem(2);
+            keyH.key3Pressed = false; 
+        }
+        if (keyH.key4Pressed) {
+            equipItem(3);
+            keyH.key4Pressed = false; 
         }
 
     }
@@ -861,20 +880,20 @@ public class GamePanel extends JPanel implements Runnable {
                 }
             }
             if (obstacle instanceof FireTrap) {
-
                 FireTrap fireTrap = (FireTrap) obstacle;
                 Rectangle fireHitbox = new Rectangle(fireTrap.x, fireTrap.y, 30, 30);
 
-                if (fireTrap.active && fireHitbox.intersects(player.getHitbox())
-                        && player.damageCooldown == 0) {
-                    player.darah.takeDamage(30);
+                if (fireTrap.active && fireHitbox.intersects(player.getHitbox()) && player.damageCooldown == 0) {
+                    
+                    // ===== CUKUP PANGGIL METHOD BARU INI =====
+                    int damageTrap = 30; // Tentukan damage murni trap
+                    player.terimaDamage(damageTrap); 
+                    // =========================================
                     
                     if (player.darah.getCurrentHP() < 0) {
                         player.darah.update(0);
                     }
-                    player.damageCooldown = 60; // Jangan terkena damage lagi selama sekitar 1 detik
-
-                    System.out.println("Player hit by fire trap! HP: " + player.darah.getCurrentHP());
+                    player.damageCooldown = 60; 
                 }
             }
             if (obstacle instanceof PressurePlate) {
@@ -990,6 +1009,50 @@ public class GamePanel extends JPanel implements Runnable {
                     
                 }
             }
+        }
+    }
+
+    private Item getRandomItem() {
+        int randomNum = (int) (Math.random() * 8) + 1; 
+        
+        switch (randomNum) {
+            // 4 Item Damage
+            case 1: return new DamageItem("Pedang Kayu", 5); 
+            case 2: return new DamageItem("Pedang Besi", 15); 
+            case 3: return new DamageItem("Kapak Ganda", 25); 
+            case 4: return new DamageItem("Pedang Petir", 40);
+            
+            // 4 Item Defense
+            case 5: return new DefenseItem("Baju Besi", 15); 
+            case 6: return new DefenseItem("Baju Perunggu", 30);
+            case 7: return new DefenseItem("Armor Emas", 45);
+            case 8: return new DefenseItem("Armor Dewa", 60);
+            
+            default: return new DamageItem("Pedang Kayu",  5);
+        }
+    }
+
+    // Letakkan di dalam GamePanel.java (misalnya di bagian paling bawah class)
+    private void equipItem(int slotIndex) {
+        
+        // Pastikan slot inventory yang ditekan ada isinya (tidak kosong)
+        if (inventory.slots[slotIndex] != null) {
+            
+            // 1. "Copy" referensi item dari slot kanan ke kotak equip kiri
+            inventory.equippedItem = inventory.slots[slotIndex];
+            
+            // 2. RESET STATUS KE NILAI AWAL (Pencegah Bug Infinite Stats)
+            player.attackDamage = player.baseDamage; // Reset ke 10
+            player.defense = player.baseDefense;     // Reset ke 0
+            
+            // 3. TERAPKAN EFEK ITEM BARU
+            inventory.equippedItem.use(player);      // Memanggil fungsi use() di item
+            
+            System.out.println("Berhasil meng-equip: " + inventory.equippedItem.name);
+            System.out.println("Status Sekarang -> ATK: " + player.attackDamage + " | DEF: " + player.defense);
+            
+        } else {
+            System.out.println("Slot " + (slotIndex + 1) + " kosong!");
         }
     }
 

@@ -2,6 +2,7 @@ package Item;
 
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
+import Entitiy.Player;
 
 public abstract class Item {
     public String name;
@@ -9,7 +10,7 @@ public abstract class Item {
     
     // Abstract method yang harus di-override oleh item spesifik
     // Anda bisa passing class Player di sini jika damage ada di class Player (misal: use(Player p))
-    public abstract void use(); 
+    public abstract void use(Player p); 
 
     // Method untuk menggambar item di layar (di dalam slot inventory)
     public void draw(Graphics2D g2, int x, int y, int width, int height) {
