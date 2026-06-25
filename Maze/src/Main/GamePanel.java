@@ -1017,10 +1017,10 @@ public class GamePanel extends JPanel implements Runnable {
         
         switch (randomNum) {
             // 4 Item Damage
-            case 1: return new DamageItem("Pedang Kayu", 5); 
+            case 1: return new DamageItem("Pedang Kayu", 10); 
             case 2: return new DamageItem("Pedang Besi", 15); 
-            case 3: return new DamageItem("Kapak Ganda", 25); 
-            case 4: return new DamageItem("Pedang Petir", 40);
+            case 3: return new DamageItem("Kapak Ganda", 20); 
+            case 4: return new DamageItem("Pedang Petir", 25);
             
             // 4 Item Defense
             case 5: return new DefenseItem("Baju Besi", 15); 
