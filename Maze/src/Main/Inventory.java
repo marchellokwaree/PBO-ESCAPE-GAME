@@ -72,8 +72,8 @@ public class Inventory {
                 
                 // 2. POSISI AWAL (Padding kiri dan atas)
                 // Ubah angka ini untuk menggeser posisi item di kotak pertama
-                int offsetX = this.x + 20; // Tambah angka untuk geser ke KANAN
-                int offsetY = this.y + 20; // Tambah angka untuk geser ke BAWAH
+                int offsetX = this.x + 13; // Tambah angka untuk geser ke KANAN
+                int offsetY = this.y + 10; // Tambah angka untuk geser ke BAWAH
                 
                 // 3. JARAK ANTAR KOTAK
                 // Jarak dari kotak 1 ke kotak 2, dst.
