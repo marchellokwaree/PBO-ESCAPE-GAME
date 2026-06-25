@@ -8,6 +8,8 @@ import java.awt.event.MouseListener;
 public class KeyHandler implements KeyListener, MouseListener {
     public boolean upPressed, downPressed, leftPressed, rightPressed, leftMousePressed, rightMousePressed;
 
+    public int mouseX, mouseY;
+
     @Override
     public void keyTyped(KeyEvent e) {}
 
@@ -35,10 +37,14 @@ public class KeyHandler implements KeyListener, MouseListener {
 
     @Override
     public void mousePressed(MouseEvent e) {
-        if (e.getButton() == MouseEvent.BUTTON1) { // BUTTON1 is the Left Click
+        // 2. TAMBAHKAN DUA BARIS INI UNTUK MENCATAT POSISI
+        mouseX = e.getX();
+        mouseY = e.getY();
+
+        if (e.getButton() == MouseEvent.BUTTON1) { 
             leftMousePressed = true;
         }
-        if (e.getButton() == MouseEvent.BUTTON3) { // BUTTON3 adalah Klik Kanan
+        if (e.getButton() == MouseEvent.BUTTON3) { 
             rightMousePressed = true;
         }
     }

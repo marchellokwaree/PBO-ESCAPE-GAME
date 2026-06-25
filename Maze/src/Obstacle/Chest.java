@@ -1,4 +1,5 @@
 package Obstacle;
+import Item.Item;
 import java.awt.image.BufferedImage;
 import java.awt.Graphics2D;
 import Main.GamePanel;
@@ -11,9 +12,10 @@ public class Chest extends Obstacle {
     public boolean active = false;
     public boolean isOpen = false;
     public boolean showChestUI = false;
-    public Chest(int x, int y, int width, int height) {
+    private Item storedItem;
+    public Chest(int x, int y, int width, int height, Item item) {
         super(x, y, width, height);
-
+        this.storedItem = item;
         try {
             this.spriteSheet = loadBufferedImage("/Assets/ASSET/coins-chests-etc-2-0.png");
             int frameWidth = 16;
@@ -69,11 +71,27 @@ public class Chest extends Obstacle {
         super.drawCamera(g2, gp , frame);
     }
 
-    public void open() {
-        isOpen = true;
+    public Item openChest() {
+        if (!isOpen) {
+            isOpen = true; // Aktifkan animasi peti terbuka
+            Item itemToGive = storedItem; // Ambil itemnya
+            storedItem = null; // Kosongkan isi peti agar tidak bisa diambil lagi
+            return itemToGive; // Kembalikan item tersebut ke pemanggil (Player/GamePanel)
+        }
+        return null; // Jika peti sudah terbuka sebelumnya, tidak memberi item apa-apa
     }
 
     public void close() {
         isOpen = false;
+    }
+
+    public Item getStoredItem() {
+        return storedItem;
+    }
+
+    public Item takeItem() {
+        Item itemToGive = storedItem;
+        storedItem = null; // Kosongkan peti
+        return itemToGive;
     }
 }

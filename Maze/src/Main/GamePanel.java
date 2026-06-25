@@ -2,6 +2,8 @@ package Main;
 
 import Obstacle.*;
 import Entitiy.*;
+import Item.Item;
+import Item.DamageItem;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
@@ -122,7 +124,8 @@ public class GamePanel extends JPanel implements Runnable {
                 }
 
                 if ("C".equals(map1[i][j])) {
-                    obstacles.add(new Chest(j * tileSize, i * tileSize, tileSize, tileSize));
+                    // Tambahkan objek 'new DamageItem()' sebagai parameter ke-5
+                    obstacles.add(new Chest(j * tileSize, i * tileSize, tileSize, tileSize, new DamageItem()));
                 }
             }
         }
@@ -462,11 +465,18 @@ public class GamePanel extends JPanel implements Runnable {
 
         // Contoh di dalam GamePanel.java
         // Di dalam method update() GamePanel
-        if (keyH.leftMousePressed) {
+        boolean sedangBukaPeti = false;
+        for (Obstacle obs : obstacles) {
+            if (obs instanceof Chest && ((Chest) obs).showChestUI) {
+                sedangBukaPeti = true;
+                break; // Ketemu 1 peti yang terbuka, langsung keluar dari pencarian
+            }
+        }
 
-            // Panggil method attack milik player, masukkan list/array monster-nya
+        // 2. Jika klik kiri ditekan, DAN pemain TIDAK sedang membuka peti, baru serang
+        if (keyH.leftMousePressed && !sedangBukaPeti) {
             player.attackEnemies(monsters); 
-
+            
             // Reset status klik agar tidak menyerang berkali-kali dalam 1 detik
             keyH.leftMousePressed = false; 
         }
@@ -788,6 +798,25 @@ public class GamePanel extends JPanel implements Runnable {
                     // Teks judul
                     g2.setFont(new java.awt.Font("Arial", java.awt.Font.BOLD, 30));
                     g2.drawString("Isi Peti (Chest Loot)", uiX + 30, uiY + 50);
+
+                    Item loot = chest.getStoredItem();
+                    if (loot != null && loot.image != null) {
+                        // Posisi item di dalam UI peti
+                        int itemX = uiX + 50;
+                        int itemY = uiY + 100;
+                        int itemSize = 64; // Diperbesar agar mudah diklik
+                        
+                        // Gambar ikon item
+                        g2.drawImage(loot.image, itemX, itemY, itemSize, itemSize, null);
+                        
+                        // Gambar nama item di sebelahnya
+                        g2.setFont(new java.awt.Font("Arial", java.awt.Font.PLAIN, 24));
+                        g2.drawString(loot.name, itemX + 80, itemY + 40);
+                    } else {
+                        // Jika peti kosong
+                        g2.setFont(new java.awt.Font("Arial", java.awt.Font.ITALIC, 20));
+                        g2.drawString("Peti sudah kosong...", uiX + 50, uiY + 120);
+                    }
                     
                     // Hapus kata 'break;' di sini agar aman
                 }
@@ -890,28 +919,53 @@ public class GamePanel extends JPanel implements Runnable {
             }
             if (obstacle instanceof Chest) {
                 Chest chest = (Chest) obstacle;
-                
-                // Buat area interaksi sedikit lebih besar dari ukuran peti (misal peti ukuran 64x64)
                 Rectangle interactArea = new Rectangle(chest.x - 10, chest.y - 10, 84, 84);
                 
-                // Jika pemain berada di dekat peti ini
                 if (interactArea.intersects(player.getHitbox())) {
                     
-                    // Jika pemain menekan klik kanan
+                    // 1. KLIK KANAN: Hanya untuk memunculkan animasi & buka/tutup UI
                     if (keyH.rightMousePressed) {
                         if (!chest.isOpen) {
-                            chest.isOpen = true; // Buka penutup peti (atau chest.open() sesuai kode Anda)
+                            chest.isOpen = true; 
                         }
-                        
-                        // Balikkan status UI KHUSUS untuk peti ini saja
                         chest.showChestUI = !chest.showChestUI; 
-                        
-                        // Matikan status klik agar menu tidak berkedip
                         keyH.rightMousePressed = false; 
                     }
+
+                    // 2. KLIK KIRI: Untuk mengambil item DARI DALAM UI
+                    if (chest.showChestUI && keyH.leftMousePressed) {
+                        Item loot = chest.getStoredItem();
+                        
+                        // Pastikan item ada
+                        if (loot != null) {
+                            // Koordinat ini HARUS SAMA dengan posisi item saat di-draw di paintComponent
+                            int uiX = 100;
+                            int uiY = 100;
+                            int itemX = uiX + 50;
+                            int itemY = uiY + 100;
+                            int itemSize = 64;
+                            
+                            // Buat hitbox kotak area klik pada layar (UI)
+                            Rectangle itemClickArea = new Rectangle(itemX, itemY, itemSize, itemSize);
+                            
+                            // Cek apakah posisi X & Y mouse kita berada di dalam kotak ikon item
+                            if (itemClickArea.contains(keyH.mouseX, keyH.mouseY)) {
+                                
+                                // Masukkan ke inventory
+                                boolean masuk = inventory.addItem(loot);
+                                if (masuk) {
+                                    chest.takeItem(); // Item benar-benar hilang dari peti
+                                    System.out.println(loot.name + " diambil dari peti!");
+                                } else {
+                                    System.out.println("Inventory penuh!");
+                                }
+                            }
+                        }
+                        keyH.leftMousePressed = false; // Matikan agar klik tidak spam
+                    }
+
                 } 
                 else {
-                    // Jika pemain berjalan menjauh dari peti ini, otomatis sembunyikan menu UI-nya
                     chest.showChestUI = false;
                 }
             }
