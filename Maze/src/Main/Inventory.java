@@ -6,6 +6,8 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import javax.imageio.ImageIO;
+import Item.DamageItem;
+import Item.DefenseItem;
 public class Inventory {
     BufferedImage image;
     int x, y;
@@ -13,7 +15,8 @@ public class Inventory {
     BufferedImage spriteSheet;
     boolean isVisible = true;
     public Item[] slots = new Item[4];
-    public Item equippedItem;
+    public Item equippedWeapon;
+    public Item equippedArmor;
     public Inventory(GamePanel gp) {
         this.x = (gp.screenWidth - 216) / 2; // Center horizontally
         this.y = gp.screenHeight - 48; // Position at the bottom of the screen
@@ -65,39 +68,80 @@ public class Inventory {
     public void draw(Graphics2D g2) {
         g2.drawImage(image, x, y, width, height, null);
         
-        // 1. Menggambar isi tas (4 kotak berdempetan di kanan)
+        // Hanya menggambar 4 kotak di tas (sebelah kanan)
         for (int i = 0; i < slots.length; i++) {
             if (slots[i] != null) {
                 int itemSize = 28; 
                 
-                // GESER KE KANAN: Naikkan dari 58 menjadi 68
+                // Gunakan angka offset X dan Y yang sudah kamu sesuaikan sebelumnya
                 int offsetX = this.x + 68; 
-                
-                // GESER KE ATAS: Turunkan dari 18 menjadi 12 (atau 10 jika masih kurang atas)
-                int offsetY = this.y + 8; 
-                
-                // Jarak antar slot sudah pas, biarkan 40
+                int offsetY = this.y + 7; 
                 int jarakAntarSlot = i * 34; 
                 
                 int slotX = offsetX + jarakAntarSlot; 
                 int slotY = offsetY;
                 
+                // ===== LOGIKA HIGHLIGHT WARNA BACKGROUND =====
+                // Cek apakah item di kotak ini adalah senjata yang sedang dipakai?
+                if (slots[i] == equippedWeapon) {
+                    // Beri background Kuning (dengan efek transparan / Alpha 150)
+                    g2.setColor(new java.awt.Color(255, 255, 0, 150)); 
+                    g2.fillRect(slotX, slotY, itemSize, itemSize);
+                } 
+                // Cek apakah item di kotak ini adalah armor yang sedang dipakai?
+                else if (slots[i] == equippedArmor) {
+                    // Beri background Oranye (dengan efek transparan / Alpha 150)
+                    g2.setColor(new java.awt.Color(255, 165, 0, 150)); 
+                    g2.fillRect(slotX, slotY, itemSize, itemSize);
+                }
+                // ==============================================
+                
+                // Gambar ikon item DI ATAS warna background tersebut
                 slots[i].draw(g2, slotX, slotY, itemSize, itemSize);
             }
         }
 
-        // 2. Menggambar item yang sedang dipakai (kotak terpisah di paling kiri)
-        if (equippedItem != null) {
-            int itemSize = 28;
+        int textX = this.x + 5;
+        int textY = this.y - 25; // Minus berarti posisinya naik ke atas kotak UI
+        
+        g2.setFont(new java.awt.Font("Arial", java.awt.Font.BOLD, 13));
+
+        // 1. Teks untuk Senjata (Weapon)
+        if (equippedWeapon != null && equippedWeapon instanceof DamageItem) {
+            DamageItem weapon = (DamageItem) equippedWeapon;
             
-            // GESER KE KANAN: Naikkan dari 10 menjadi 18
-            int kotakKiriX = this.x + 13;
+            String teksSenjata = "Senjata: " + weapon.name + " (+ " + weapon.bonusDamage + " DMG)";
             
-            // GESER KE ATAS: Turunkan dari 18 menjadi 12
-            int kotakKiriY = this.y + 8;
+            // Bayangan Hitam (Drop Shadow) agar teks terbaca jelas di atas latar map
+            g2.setColor(java.awt.Color.BLACK);
+            g2.drawString(teksSenjata, textX + 2, textY + 2);
             
-            equippedItem.draw(g2, kotakKiriX, kotakKiriY, itemSize, itemSize);
+            // Teks Utama (Warna Kuning)
+            g2.setColor(java.awt.Color.YELLOW);
+            g2.drawString(teksSenjata, textX, textY);
+            
+            // MENGATUR TUMPUKAN: 
+            // Tambah nilai Y agar jika pemain memakai Armor juga, 
+            // teks armornya akan tergambar di bawah teks senjata ini (Tumpuk atas bawah).
+            textY += 20; 
         }
+
+        // 2. Teks untuk Baju Besi (Armor)
+        if (equippedArmor != null && equippedArmor instanceof DefenseItem) {
+            DefenseItem armor = (DefenseItem) equippedArmor;
+            
+            String teksArmor = "Pelindung: " + armor.name + " (+ " + armor.bonusDef + "% Reduksi)";
+            
+            // Bayangan Hitam (Drop Shadow)
+            g2.setColor(java.awt.Color.BLACK);
+            g2.drawString(teksArmor, textX + 2, textY + 2);
+            
+            // Teks Utama (Warna Oranye)
+            g2.setColor(new java.awt.Color(255, 165, 0)); // Oranye Solid
+            g2.drawString(teksArmor, textX, textY);
+        }
+        
+        // (Kode yang menggambar item di kotak terpisah sebelah kiri SUDAH DIHAPUS)
     }
 
     public boolean addItem(Item item) {

@@ -483,22 +483,24 @@ public class GamePanel extends JPanel implements Runnable {
             keyH.leftMousePressed = false; 
         }
 
+        // ===== LOGIKA TOMBOL ITEM DI DALAM METHOD update() =====
         if (keyH.key1Pressed) {
-            equipItem(0);
+            handleSlotKey(0); // GANTI INI
             keyH.key1Pressed = false; 
         }
         if (keyH.key2Pressed) {
-            equipItem(1);
+            handleSlotKey(1); // GANTI INI
             keyH.key2Pressed = false; 
         }
         if (keyH.key3Pressed) {
-            equipItem(2);
+            handleSlotKey(2); // GANTI INI
             keyH.key3Pressed = false; 
         }
         if (keyH.key4Pressed) {
-            equipItem(3);
+            handleSlotKey(3); // GANTI INI
             keyH.key4Pressed = false; 
         }
+        // =====================================================
 
     }
 
@@ -816,26 +818,52 @@ public class GamePanel extends JPanel implements Runnable {
 
                     // Teks judul
                     g2.setFont(new java.awt.Font("Arial", java.awt.Font.BOLD, 30));
-                    g2.drawString("Isi Peti (Chest Loot)", uiX + 30, uiY + 50);
+                    g2.drawString("Isi Peti (Maks 3 Item)", uiX + 30, uiY + 50);
 
-                    Item loot = chest.getStoredItem();
-                    if (loot != null && loot.image != null) {
-                        // Posisi item di dalam UI peti
-                        int itemX = uiX + 50;
-                        int itemY = uiY + 100;
-                        int itemSize = 64; // Diperbesar agar mudah diklik
+                    // ===== MENGGAMBAR 3 SLOT PETI =====
+                    int itemSize = 64; 
+                    int startX = uiX + 50;
+                    int startY = uiY + 100;
+                    
+                    // UBAH ANGKA INI: Perbesar jaraknya dari 85 menjadi 140
+                    int jarakAntarItem = 140;
+
+                    for (int i = 0; i < chest.chestSlots.length; i++) {
+                        int slotX = startX + (i * jarakAntarItem);
                         
-                        // Gambar ikon item
-                        g2.drawImage(loot.image, itemX, itemY, itemSize, itemSize, null);
-                        
-                        // Gambar nama item di sebelahnya
-                        g2.setFont(new java.awt.Font("Arial", java.awt.Font.PLAIN, 24));
-                        g2.drawString(loot.name, itemX + 80, itemY + 40);
-                    } else {
-                        // Jika peti kosong
-                        g2.setFont(new java.awt.Font("Arial", java.awt.Font.ITALIC, 20));
-                        g2.drawString("Peti sudah kosong...", uiX + 50, uiY + 120);
+                        // Gambar kotak background transparan untuk setiap slot peti
+                        g2.setColor(new java.awt.Color(255, 255, 255, 50));
+                        g2.fillRoundRect(slotX, startY, itemSize, itemSize, 15, 15);
+
+                        // Jika ada isinya, gambar item, nama, dan efek statusnya
+                        if (chest.chestSlots[i] != null && chest.chestSlots[i].image != null) {
+                            
+                            Item itemDiPeti = chest.chestSlots[i];
+                            
+                            // 1. Gambar Ikon Item
+                            g2.drawImage(itemDiPeti.image, slotX, startY, itemSize, itemSize, null);
+                            
+                            // 2. Gambar Nama Item (Warna Putih, Font Bold)
+                            g2.setColor(java.awt.Color.WHITE);
+                            g2.setFont(new java.awt.Font("Arial", java.awt.Font.BOLD, 14));
+                            g2.drawString(itemDiPeti.name, slotX, startY + itemSize + 20);
+                            
+                            // 3. Gambar Status Efek di bawah namanya
+                            g2.setFont(new java.awt.Font("Arial", java.awt.Font.PLAIN, 13)); 
+                            
+                            if (itemDiPeti instanceof DamageItem) {
+                                DamageItem weapon = (DamageItem) itemDiPeti;
+                                g2.setColor(java.awt.Color.YELLOW);
+                                g2.drawString("+ " + weapon.bonusDamage + " DMG", slotX, startY + itemSize + 38);
+                            } 
+                            else if (itemDiPeti instanceof DefenseItem) {
+                                DefenseItem armor = (DefenseItem) itemDiPeti;
+                                g2.setColor(new java.awt.Color(255, 165, 0)); // Oranye
+                                g2.drawString("+ " + armor.bonusDef + "% DEF", slotX, startY + itemSize + 38);
+                            }
+                        }
                     }
+                    // ==================================
                     
                     // Hapus kata 'break;' di sini agar aman
                 }
@@ -953,34 +981,32 @@ public class GamePanel extends JPanel implements Runnable {
 
                     // 2. KLIK KIRI: Untuk mengambil item DARI DALAM UI
                     if (chest.showChestUI && keyH.leftMousePressed) {
-                        Item loot = chest.getStoredItem();
                         
-                        // Pastikan item ada
-                        if (loot != null) {
-                            // Koordinat ini HARUS SAMA dengan posisi item saat di-draw di paintComponent
-                            int uiX = 100;
-                            int uiY = 100;
-                            int itemX = uiX + 50;
-                            int itemY = uiY + 100;
-                            int itemSize = 64;
-                            
-                            // Buat hitbox kotak area klik pada layar (UI)
-                            Rectangle itemClickArea = new Rectangle(itemX, itemY, itemSize, itemSize);
-                            
-                            // Cek apakah posisi X & Y mouse kita berada di dalam kotak ikon item
-                            if (itemClickArea.contains(keyH.mouseX, keyH.mouseY)) {
+                        int startX = 150; 
+                        int startY = 200; 
+                        int itemSize = 64;
+                        
+                        // UBAH JUGA ANGKA INI: Samakan dengan yang ada di paintComponent
+                        int jarakAntarItem = 140;
+                        
+                        // Cek kotak mana yang diklik oleh mouse
+                        for (int i = 0; i < chest.chestSlots.length; i++) {
+                            if (chest.chestSlots[i] != null) {
+                                int slotX = startX + (i * jarakAntarItem);
+                                Rectangle itemClickArea = new Rectangle(slotX, startY, itemSize, itemSize);
                                 
-                                // Masukkan ke inventory
-                                boolean masuk = inventory.addItem(loot);
-                                if (masuk) {
-                                    chest.takeItem(); // Item benar-benar hilang dari peti
-                                    System.out.println(loot.name + " diambil dari peti!");
-                                } else {
-                                    System.out.println("Inventory penuh!");
+                                if (itemClickArea.contains(keyH.mouseX, keyH.mouseY)) {
+                                    // Pindahkan ke tas
+                                    boolean masuk = inventory.addItem(chest.chestSlots[i]);
+                                    if (masuk) {
+                                        System.out.println(chest.chestSlots[i].name + " diambil dari peti!");
+                                        chest.chestSlots[i] = null; // Kosongkan slot peti tersebut
+                                    }
+                                    break; // Cukup ambil 1 item per klik
                                 }
                             }
                         }
-                        keyH.leftMousePressed = false; // Matikan agar klik tidak spam
+                        keyH.leftMousePressed = false; 
                     }
 
                 } 
@@ -1032,24 +1058,100 @@ public class GamePanel extends JPanel implements Runnable {
         }
     }
 
+    // Method baru untuk menangani logika tombol 1-4 dengan cerdas
+    private void handleSlotKey(int slotIndex) {
+        Chest openChest = null;
+        for (Obstacle obs : obstacles) {
+            if (obs instanceof Chest && ((Chest) obs).showChestUI) {
+                openChest = (Chest) obs;
+                break;
+            }
+        }
+
+        // JIKA PETI TERBUKA -> Taruh barang ke dalam peti
+        if (openChest != null) {
+            Item itemDiTas = inventory.slots[slotIndex];
+
+            if (itemDiTas != null) {
+                boolean berhasilDitaruh = false;
+                
+                // Cari slot kosong di dalam peti
+                for (int i = 0; i < openChest.chestSlots.length; i++) {
+                    if (openChest.chestSlots[i] == null) { // Jika ketemu kotak kosong
+                        
+                        // 1. Lepas equip jika sedang dipakai
+                        if (itemDiTas == inventory.equippedWeapon) inventory.equippedWeapon = null;
+                        if (itemDiTas == inventory.equippedArmor) inventory.equippedArmor = null;
+                        
+                        player.attackDamage = player.baseDamage;
+                        player.defense = player.baseDefense;
+                        if (inventory.equippedWeapon != null) inventory.equippedWeapon.use(player);
+                        if (inventory.equippedArmor != null) inventory.equippedArmor.use(player);
+                        
+                        // 2. Pindahkan barang dari Tas ke Peti
+                        openChest.chestSlots[i] = itemDiTas;
+                        inventory.slots[slotIndex] = null; 
+                        
+                        System.out.println(itemDiTas.name + " ditaruh ke dalam peti!");
+                        berhasilDitaruh = true;
+                        break; // Keluar dari loop agar tidak ter-copy ke kotak lain
+                    }
+                }
+                
+                if (!berhasilDitaruh) {
+                    System.out.println("Peti sudah penuh! Maksimal 3 item.");
+                }
+            }
+        } 
+        // JIKA TIDAK ADA PETI TERBUKA -> Fitur Equip Normal
+        else {
+            equipItem(slotIndex);
+        }
+    }
+
     // Letakkan di dalam GamePanel.java (misalnya di bagian paling bawah class)
     private void equipItem(int slotIndex) {
-        
         // Pastikan slot inventory yang ditekan ada isinya (tidak kosong)
         if (inventory.slots[slotIndex] != null) {
             
-            // 1. "Copy" referensi item dari slot kanan ke kotak equip kiri
-            inventory.equippedItem = inventory.slots[slotIndex];
+            Item itemToEquip = inventory.slots[slotIndex];
+            
+            // 1A. LOGIKA UNEQUIP (LEPAS ITEM)
+            // Jika item yang ditekan sama persis dengan yang sedang dipakai, maka lepas!
+            if (itemToEquip == inventory.equippedWeapon) {
+                inventory.equippedWeapon = null;
+                System.out.println("Senjata dilepas!");
+            } 
+            else if (itemToEquip == inventory.equippedArmor) {
+                inventory.equippedArmor = null;
+                System.out.println("Armor dilepas!");
+            } 
+            // 1B. LOGIKA EQUIP (PASANG ITEM BARU)
+            // Jika belum dipakai, maka cek tipe class-nya lalu pasang
+            else {
+                if (itemToEquip instanceof DamageItem) {
+                    inventory.equippedWeapon = itemToEquip; 
+                    System.out.println("Senjata baru di-equip!");
+                } 
+                else if (itemToEquip instanceof DefenseItem) {
+                    inventory.equippedArmor = itemToEquip; 
+                    System.out.println("Armor baru di-equip!");
+                }
+            }
             
             // 2. RESET STATUS KE NILAI AWAL (Pencegah Bug Infinite Stats)
-            player.attackDamage = player.baseDamage; // Reset ke 10
-            player.defense = player.baseDefense;     // Reset ke 0
+            player.attackDamage = player.baseDamage; 
+            player.defense = player.baseDefense;     
             
-            // 3. TERAPKAN EFEK ITEM BARU
-            inventory.equippedItem.use(player);      // Memanggil fungsi use() di item
+            // 3. TERAPKAN EFEK DARI ITEM YANG MASIH TERPASANG (JIKA ADA)
+            if (inventory.equippedWeapon != null) {
+                inventory.equippedWeapon.use(player);
+            }
+            if (inventory.equippedArmor != null) {
+                inventory.equippedArmor.use(player);
+            }
             
-            System.out.println("Berhasil meng-equip: " + inventory.equippedItem.name);
-            System.out.println("Status Sekarang -> ATK: " + player.attackDamage + " | DEF: " + player.defense);
+            System.out.println("Status Sekarang -> ATK: " + player.attackDamage + " | DEF: " + player.defense + "%");
             
         } else {
             System.out.println("Slot " + (slotIndex + 1) + " kosong!");

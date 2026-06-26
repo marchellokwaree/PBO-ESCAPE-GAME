@@ -12,10 +12,10 @@ public class Chest extends Obstacle {
     public boolean active = false;
     public boolean isOpen = false;
     public boolean showChestUI = false;
-    private Item storedItem;
+    public Item[] chestSlots = new Item[3];
     public Chest(int x, int y, int width, int height, Item item) {
         super(x, y, width, height);
-        this.storedItem = item;
+        this.chestSlots[0] = item;
         try {
             this.spriteSheet = loadBufferedImage("/Assets/ASSET/coins-chests-etc-2-0.png");
             int frameWidth = 16;
@@ -71,27 +71,18 @@ public class Chest extends Obstacle {
         super.drawCamera(g2, gp , frame);
     }
 
-    public Item openChest() {
+    // Ubah tipe kembalian dari 'Item' menjadi 'void' karena tidak lagi mengeluarkan item
+    public void openChest() {
         if (!isOpen) {
             isOpen = true; // Aktifkan animasi peti terbuka
-            Item itemToGive = storedItem; // Ambil itemnya
-            storedItem = null; // Kosongkan isi peti agar tidak bisa diambil lagi
-            return itemToGive; // Kembalikan item tersebut ke pemanggil (Player/GamePanel)
+            System.out.println("Peti berhasil dibuka!");
+            
+            // Kode 'storedItem' dihapus seluruhnya karena kita sekarang 
+            // menggunakan UI dan Array 'chestSlots'
         }
-        return null; // Jika peti sudah terbuka sebelumnya, tidak memberi item apa-apa
     }
 
     public void close() {
         isOpen = false;
-    }
-
-    public Item getStoredItem() {
-        return storedItem;
-    }
-
-    public Item takeItem() {
-        Item itemToGive = storedItem;
-        storedItem = null; // Kosongkan peti
-        return itemToGive;
     }
 }
