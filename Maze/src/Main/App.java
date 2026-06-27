@@ -5,7 +5,7 @@ import javax.swing.JFrame;
 
 public class App {
     public static void main(String[] args) throws Exception {
-        JFrame frame = new JFrame("Maze Pak Hendrawan");
+        JFrame frame = new JFrame("Maze Game");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setResizable(false);
         frame.getContentPane().setBackground(new Color(0, 0, 0));
