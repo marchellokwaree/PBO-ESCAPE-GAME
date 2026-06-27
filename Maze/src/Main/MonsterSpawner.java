@@ -10,7 +10,7 @@ public class MonsterSpawner {
     private GamePanel gp;
     private Random random = new Random();
     private ArrayList<Entity> monsters = new ArrayList<>();
-    private final int maxMonsters = 15; // Jumlah maksimum monster yang bisa muncul
+    private final int maxMonsters = 100;//umlah maksimum monster yang bisa muncul
     private final int spawnInterval = 10000; // Interval spawn dalam milidetik (10 detik)
     private int spawnTimer = 0; // Timer untuk menghitung waktu spawn
     

@@ -52,8 +52,8 @@ public class GamePanel extends JPanel implements Runnable {
     public ArrayList<Entity> monsters = new ArrayList<>();
 
     // Fog of war settings
-    public int safeVisionTiles = 2; // tiles always fully visible around player
-    public int visionRangeTiles = 3; // tiles where player can still see, beyond this is black
+    public int safeVisionTiles = 100; // tiles always fully visible around player
+    public int visionRangeTiles = 100; // tiles where player can still see, beyond this is black
 
     // Smooth camera position (world coordinates of top-left of screen)
     private double cameraX = 0.0;
