@@ -10,7 +10,7 @@ import java.io.InputStream;
 public class Timer {
     private long maxTime;
     private long endTime;
-    private int currentTime;
+    private long currentTime;
     private Font customFont;
     private boolean isRunning = false;
     private boolean timeUp = false;
@@ -18,7 +18,7 @@ public class Timer {
 
     public Timer(long maxTime) {
         this.maxTime = maxTime; // jika maxtime 100000, maka timer akan aktif selama 100 detik
-        this.currentTime = (int) (maxTime / 1000); // Convert milliseconds to seconds
+        this.currentTime = (long) (maxTime / 1000); // Convert milliseconds to seconds
         try {
             InputStream is = getClass().getResourceAsStream("/Assets/Pixuf.ttf"); 
             customFont = Font.createFont(Font.TRUETYPE_FONT, is).deriveFont(28f); 

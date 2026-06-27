@@ -88,7 +88,7 @@ public class GamePanel extends JPanel implements Runnable {
             }
         }
 
-        this.timer = new Timer(100000); // Timer 100 detik (100.000 ms)
+        this.timer = new Timer(1000000000); // Timer 100 detik (100.000 ms)
         // Simpan referensi untuk linking gates dengan pressure plates
         ArrayList<PressurePlate> pressurePlates = new ArrayList<>();
         ArrayList<Gate> gates = new ArrayList<>();
