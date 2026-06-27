@@ -51,6 +51,10 @@ public class GamePanel extends JPanel implements Runnable {
     public BufferedImage bufferedImage;
     public ArrayList<Entity> monsters = new ArrayList<>();
 
+    // Fog of war settings
+    public int safeVisionTiles = 2; // tiles always fully visible around player
+    public int visionRangeTiles = 3; // tiles where player can still see, beyond this is black
+
     // Smooth camera position (world coordinates of top-left of screen)
     private double cameraX = 0.0;
     private double cameraY = 0.0;
@@ -84,7 +88,6 @@ public class GamePanel extends JPanel implements Runnable {
             }
         }
 
-        
         this.timer = new Timer(100000); // Timer 100 detik (100.000 ms)
         // Simpan referensi untuk linking gates dengan pressure plates
         ArrayList<PressurePlate> pressurePlates = new ArrayList<>();
@@ -98,7 +101,7 @@ public class GamePanel extends JPanel implements Runnable {
                 if ("I".equals(map1[i][j])) {
                     obstacles.add(new IceTrap(j * tileSize, i * tileSize, tileSize, tileSize));
                 }
-            
+
                 if ("G".equals(map1[i][j])) {
                     obstacles.add(new Finish(j * tileSize, i * tileSize, tileSize, tileSize));
                 }
@@ -155,6 +158,7 @@ public class GamePanel extends JPanel implements Runnable {
     public String[][] getMap() {
         return map1;
     }
+
     public Player getPlayer() {
         return player; // agar player bisa di akses di obstacle
     }
@@ -267,12 +271,15 @@ public class GamePanel extends JPanel implements Runnable {
     public int getTileSize() {
         return tileSize;
     }
+
     public int getMaxWorldCol() {
         return maxWorldCol;
     }
+
     public int getMaxWorldRow() {
         return maxWorldRow;
     }
+
     public boolean collidesWithWall(int nextX, int nextY, Rectangle hitbox) {
         // Hitung posisi absolut hitbox di koordinat world untuk posisi selanjutnya
         int hitboxLeftX = nextX + hitbox.x;
@@ -322,13 +329,14 @@ public class GamePanel extends JPanel implements Runnable {
 
             if (obstacle instanceof Chest) {
                 Chest chest = (Chest) obstacle;
-                
+
                 // Buat area padat (hitbox) sebesar 1 kotak ubin/tile di posisi peti
                 Rectangle chestBounds = new Rectangle(chest.x, chest.y, tileSize, tileSize);
 
-                // Jika posisi pemain selanjutnya menabrak area peti, kembalikan nilai true (terblokir)
+                // Jika posisi pemain selanjutnya menabrak area peti, kembalikan nilai true
+                // (terblokir)
                 if (playerFutureBounds.intersects(chestBounds)) {
-                    return true; 
+                    return true;
                 }
             }
         }
@@ -340,7 +348,7 @@ public class GamePanel extends JPanel implements Runnable {
         gameThread.start();
         timer.start(); // Mulai timer saat game thread dimulai
         if (spawner != null) {
-            spawner.SpawnMonsters(5); 
+            spawner.SpawnMonsters(5);
         }
     }
 
@@ -378,8 +386,6 @@ public class GamePanel extends JPanel implements Runnable {
             }
         }
 
-
-
     }
 
     public void update() {
@@ -392,7 +398,7 @@ public class GamePanel extends JPanel implements Runnable {
             }
         }
 
-        if  (timer != null) {
+        if (timer != null) {
             timer.update();
         }
         for (Obstacle obstacle : obstacles) {
@@ -430,36 +436,36 @@ public class GamePanel extends JPanel implements Runnable {
         Iterator<Entity> iterator = monsters.iterator();
         while (iterator.hasNext()) {
             Entity monster = iterator.next();
-            
+
             if (monster != null) {
-                monster.update(); 
-                
+                monster.update();
+
                 if (monster instanceof FireSlime) {
                     FireSlime slime = (FireSlime) monster;
-                    slime.checkPlayerCollision(player); 
-                    
+                    slime.checkPlayerCollision(player);
+
                     // Jika slime sudah mati dan animasi matinya sudah selesai
                     if (slime.readyToRemove) {
                         iterator.remove(); // Menghapus slime dari ArrayList dengan aman
                         System.out.println("FireSlime berhasil dihapus dari Map!");
                     }
                 }
-                if(monster instanceof Slime2){
+                if (monster instanceof Slime2) {
                     Slime2 slime = (Slime2) monster;
                     slime.checkPlayerCollision(player);
 
-                    if(slime.readyToRemove){
+                    if (slime.readyToRemove) {
                         iterator.remove();
 
                     }
                 }
-                if(monster instanceof Slime3){
+                if (monster instanceof Slime3) {
                     Slime3 slime = (Slime3) monster;
                     slime.checkPlayerCollision(player);
 
-                    if(slime.readyToRemove){
+                    if (slime.readyToRemove) {
                         iterator.remove();
-                        
+
                     }
                 }
             }
@@ -477,35 +483,36 @@ public class GamePanel extends JPanel implements Runnable {
 
         // 2. Jika klik kiri ditekan, DAN pemain TIDAK sedang membuka peti, baru serang
         if (keyH.leftMousePressed && !sedangBukaPeti) {
-            player.attackEnemies(monsters); 
-            
+            player.attackEnemies(monsters);
+
             // Reset status klik agar tidak menyerang berkali-kali dalam 1 detik
-            keyH.leftMousePressed = false; 
+            keyH.leftMousePressed = false;
         }
 
         // ===== LOGIKA TOMBOL ITEM DI DALAM METHOD update() =====
         if (keyH.key1Pressed) {
             handleSlotKey(0); // GANTI INI
-            keyH.key1Pressed = false; 
+            keyH.key1Pressed = false;
         }
         if (keyH.key2Pressed) {
             handleSlotKey(1); // GANTI INI
-            keyH.key2Pressed = false; 
+            keyH.key2Pressed = false;
         }
         if (keyH.key3Pressed) {
             handleSlotKey(2); // GANTI INI
-            keyH.key3Pressed = false; 
+            keyH.key3Pressed = false;
         }
         if (keyH.key4Pressed) {
             handleSlotKey(3); // GANTI INI
-            keyH.key4Pressed = false; 
+            keyH.key4Pressed = false;
         }
         // =====================================================
 
     }
 
     private void updateCamera() {
-        if (player == null) return;
+        if (player == null)
+            return;
 
         double targetX = player.x - player.screenX;
         double targetY = player.y - player.screenY;
@@ -517,13 +524,17 @@ public class GamePanel extends JPanel implements Runnable {
     }
 
     private void clampCamera() {
-        if (cameraX < 0) cameraX = 0;
+        if (cameraX < 0)
+            cameraX = 0;
         double maxCamX = Math.max(0, worldWidth - screenWidth);
-        if (cameraX > maxCamX) cameraX = maxCamX;
+        if (cameraX > maxCamX)
+            cameraX = maxCamX;
 
-        if (cameraY < 0) cameraY = 0;
+        if (cameraY < 0)
+            cameraY = 0;
         double maxCamY = Math.max(0, worldHeight - screenHeight);
-        if (cameraY > maxCamY) cameraY = maxCamY;
+        if (cameraY > maxCamY)
+            cameraY = maxCamY;
     }
 
     public int getCameraXInt() {
@@ -717,44 +728,57 @@ public class GamePanel extends JPanel implements Runnable {
         }
     }
 
+    private int getFogAlphaForDistance(double distanceTiles) {
+        if (distanceTiles <= safeVisionTiles) {
+            return 0; // fully visible
+        }
+        if (distanceTiles >= visionRangeTiles) {
+            return 255; // outside visible range
+        }
+
+        double range = visionRangeTiles - safeVisionTiles;
+        if (range <= 0) {
+            return 255;
+        }
+
+        double normalized = (distanceTiles - safeVisionTiles) / range;
+        int alpha = (int) Math.round(normalized * 255);
+        return Math.min(255, Math.max(0, alpha));
+    }
+
     @Override
     protected void paintComponent(Graphics g) {
-        super.paintComponent(g);
-        Graphics2D g2 = (Graphics2D) g;
-        int camX = getCameraXInt();
-        int camY = getCameraYInt();
+        super.paintComponent(g); // clear background
+        Graphics2D g2 = (Graphics2D) g; // use 2D graphics for drawing
+        int camX = getCameraXInt(); // camera world x position
+        int camY = getCameraYInt(); // camera world y position
 
+        // Draw every visible map tile
         for (int i = 0; i < maxWorldRow; i++) {
             for (int j = 0; j < maxWorldCol; j++) {
+                int worldX = j * tileSize; // tile x in world coordinates
+                int worldY = i * tileSize; // tile y in world coordinates
+                int screenX = worldX - camX; // convert to screen x
+                int screenY = worldY - camY; // convert to screen y
 
-                int worldX = j * tileSize;
-                int worldY = i * tileSize;
-
-                int screenX = worldX - camX;
-                int screenY = worldY - camY;
-
-                // Hanya gambar tile jika masuk ke dalam pandangan layar monitor
                 if (worldX + tileSize > camX &&
                         worldX - tileSize < camX + screenWidth &&
                         worldY + tileSize > camY &&
                         worldY - tileSize < camY + screenHeight) {
-
                     if (floorTile != null) {
-                        g2.drawImage(floorTile, screenX, screenY, tileSize, tileSize, null);
+                        g2.drawImage(floorTile, screenX, screenY, tileSize, tileSize, null); // floor tile
                     }
-
                     if ("1".equals(map1[i][j])) {
-                        Image wallImage = getWallImageForTile(i, j);
+                        Image wallImage = getWallImageForTile(i, j); // choose correct wall sprite
                         if (wallImage != null) {
-                            g2.drawImage(wallImage, screenX, screenY, tileSize, tileSize, null);
+                            g2.drawImage(wallImage, screenX, screenY, tileSize, tileSize, null); // wall tile
                         }
                     }
                 }
             }
         }
-        
 
-        // Gambar semua obstacles
+        // Draw all obstacles
         for (Obstacle obstacle : obstacles) {
             if (obstacle instanceof FireTrap) {
                 ((FireTrap) obstacle).draw(g2, this);
@@ -778,29 +802,69 @@ public class GamePanel extends JPanel implements Runnable {
                 ((Chest) obstacle).draw(g2, this);
             }
         }
-        // Gambar semua Red Hood
+
+        // Draw red hood enemies
         for (Entity entity : entities) {
             if (entity instanceof RedHood) {
                 ((RedHood) entity).draw(g2, this);
             }
         }
 
+        // Draw monsters
         for (Entity monster : monsters) {
             if (monster instanceof FireSlime) {
                 ((FireSlime) monster).draw(g2);
             }
-            if(monster instanceof Slime2){
+            if (monster instanceof Slime2) {
                 ((Slime2) monster).draw(g2);
             }
-            if(monster instanceof Slime3){
+            if (monster instanceof Slime3) {
                 ((Slime3) monster).draw(g2);
             }
         }
-        
+
+        // Fog of war overlay: darken tiles by distance
+        if (player != null) {
+            double playerCenterX = player.x + tileSize * 0.5; // player center x
+            double playerCenterY = player.y + tileSize * 0.5; // player center y
+            double playerTileX = playerCenterX / tileSize; // player tile x
+            double playerTileY = playerCenterY / tileSize; // player tile y
+
+            g2.setComposite(java.awt.AlphaComposite.SrcOver); // normal drawing mode
+            for (int i = 0; i < maxWorldRow; i++) {
+                for (int j = 0; j < maxWorldCol; j++) {
+                    int worldX = j * tileSize;
+                    int worldY = i * tileSize;
+                    int screenX = worldX - camX;
+                    int screenY = worldY - camY;
+
+                    if (screenX + tileSize < 0 || screenX > screenWidth || screenY + tileSize < 0
+                            || screenY > screenHeight) {
+                        continue; // skip off-screen tiles
+                    }
+
+                    double dx = (j + 0.5) - playerTileX; // tile delta x from player
+                    double dy = (i + 0.5) - playerTileY; // tile delta y from player
+                    double distanceTiles = Math.sqrt(dx * dx + dy * dy); // Euclidean distance in tiles
+                    int alpha = getFogAlphaForDistance(distanceTiles); // opacity based on distance
+                    if (alpha > 0) {
+                        g2.setColor(new java.awt.Color(0, 0, 0, alpha));
+                        g2.fillRect(screenX, screenY, tileSize, tileSize); // draw fog tile
+                    }
+                }
+            }
+        }
+
+        // Draw player and UI on top of fog
+        if (player != null) {
+            player.draw(g2);
+            player.darah.draw(g2);
+        }
+
+        // Draw chest UI if open
         for (Obstacle obstacle : obstacles) {
             if (obstacle instanceof Chest) {
                 Chest chest = (Chest) obstacle;
-                
                 if (chest.showChestUI) {
                     int uiWidth = screenWidth - 200;
                     int uiHeight = screenHeight - 200;
@@ -808,9 +872,9 @@ public class GamePanel extends JPanel implements Runnable {
                     int uiY = 100;
 
                     // Background hitam semi-transparan
-                    g2.setColor(new java.awt.Color(0, 0, 0, 200)); 
+                    g2.setColor(new java.awt.Color(0, 0, 0, 200));
                     g2.fillRoundRect(uiX, uiY, uiWidth, uiHeight, 35, 35);
-                    
+
                     // Garis pinggiran putih
                     g2.setColor(java.awt.Color.WHITE);
                     g2.setStroke(new java.awt.BasicStroke(5));
@@ -821,68 +885,35 @@ public class GamePanel extends JPanel implements Runnable {
                     g2.drawString("Isi Peti (Maks 3 Item)", uiX + 30, uiY + 50);
 
                     // ===== MENGGAMBAR 3 SLOT PETI =====
-                    int itemSize = 64; 
+                    int itemSize = 64;
                     int startX = uiX + 50;
                     int startY = uiY + 100;
-                    
-                    // UBAH ANGKA INI: Perbesar jaraknya dari 85 menjadi 140
                     int jarakAntarItem = 140;
 
-                    for (int i = 0; i < chest.chestSlots.length; i++) {
-                        int slotX = startX + (i * jarakAntarItem);
-                        
-                        // Gambar kotak background transparan untuk setiap slot peti
+                    for (int k = 0; k < chest.chestSlots.length; k++) {
+                        int slotX = startX + (k * jarakAntarItem);
                         g2.setColor(new java.awt.Color(255, 255, 255, 50));
                         g2.fillRoundRect(slotX, startY, itemSize, itemSize, 15, 15);
-
-                        // Jika ada isinya, gambar item, nama, dan efek statusnya
-                        if (chest.chestSlots[i] != null && chest.chestSlots[i].image != null) {
-                            
-                            Item itemDiPeti = chest.chestSlots[i];
-                            
-                            // 1. Gambar Ikon Item
+                        if (chest.chestSlots[k] != null && chest.chestSlots[k].image != null) {
+                            Item itemDiPeti = chest.chestSlots[k];
                             g2.drawImage(itemDiPeti.image, slotX, startY, itemSize, itemSize, null);
-                            
-                            // 2. Gambar Nama Item (Warna Putih, Font Bold)
                             g2.setColor(java.awt.Color.WHITE);
                             g2.setFont(new java.awt.Font("Arial", java.awt.Font.BOLD, 14));
                             g2.drawString(itemDiPeti.name, slotX, startY + itemSize + 20);
-                            
-                            // 3. Gambar Status Efek di bawah namanya
-                            g2.setFont(new java.awt.Font("Arial", java.awt.Font.PLAIN, 13)); 
-                            
+                            g2.setFont(new java.awt.Font("Arial", java.awt.Font.PLAIN, 13));
                             if (itemDiPeti instanceof DamageItem) {
                                 DamageItem weapon = (DamageItem) itemDiPeti;
                                 g2.setColor(java.awt.Color.YELLOW);
                                 g2.drawString("+ " + weapon.bonusDamage + " DMG", slotX, startY + itemSize + 38);
-                            } 
-                            else if (itemDiPeti instanceof DefenseItem) {
+                            } else if (itemDiPeti instanceof DefenseItem) {
                                 DefenseItem armor = (DefenseItem) itemDiPeti;
-                                g2.setColor(new java.awt.Color(255, 165, 0)); // Oranye
+                                g2.setColor(new java.awt.Color(255, 165, 0));
                                 g2.drawString("+ " + armor.bonusDef + "% DEF", slotX, startY + itemSize + 38);
                             }
                         }
                     }
-                    // ==================================
-                    
-                    // Hapus kata 'break;' di sini agar aman
                 }
             }
-        }
-        
-        
-        if (player != null){
-                player.draw(g2);
-                player.darah.draw(g2);
-
-        }
-
-        if (timer != null) {
-            timer.draw(g2, this);
-        }
-
-        if (inventory != null) {
-            inventory.draw(g2);
         }
 
         g2.dispose();
@@ -912,16 +943,16 @@ public class GamePanel extends JPanel implements Runnable {
                 Rectangle fireHitbox = new Rectangle(fireTrap.x, fireTrap.y, 30, 30);
 
                 if (fireTrap.active && fireHitbox.intersects(player.getHitbox()) && player.damageCooldown == 0) {
-                    
+
                     // ===== CUKUP PANGGIL METHOD BARU INI =====
                     int damageTrap = 30; // Tentukan damage murni trap
-                    player.terimaDamage(damageTrap); 
+                    player.terimaDamage(damageTrap);
                     // =========================================
-                    
+
                     if (player.darah.getCurrentHP() < 0) {
                         player.darah.update(0);
                     }
-                    player.damageCooldown = 60; 
+                    player.damageCooldown = 60;
                 }
             }
             if (obstacle instanceof PressurePlate) {
@@ -967,34 +998,34 @@ public class GamePanel extends JPanel implements Runnable {
             if (obstacle instanceof Chest) {
                 Chest chest = (Chest) obstacle;
                 Rectangle interactArea = new Rectangle(chest.x - 10, chest.y - 10, 84, 84);
-                
+
                 if (interactArea.intersects(player.getHitbox())) {
-                    
+
                     // 1. KLIK KANAN: Hanya untuk memunculkan animasi & buka/tutup UI
                     if (keyH.rightMousePressed) {
                         if (!chest.isOpen) {
-                            chest.isOpen = true; 
+                            chest.isOpen = true;
                         }
-                        chest.showChestUI = !chest.showChestUI; 
-                        keyH.rightMousePressed = false; 
+                        chest.showChestUI = !chest.showChestUI;
+                        keyH.rightMousePressed = false;
                     }
 
                     // 2. KLIK KIRI: Untuk mengambil item DARI DALAM UI
                     if (chest.showChestUI && keyH.leftMousePressed) {
-                        
-                        int startX = 150; 
-                        int startY = 200; 
+
+                        int startX = 150;
+                        int startY = 200;
                         int itemSize = 64;
-                        
+
                         // UBAH JUGA ANGKA INI: Samakan dengan yang ada di paintComponent
                         int jarakAntarItem = 140;
-                        
+
                         // Cek kotak mana yang diklik oleh mouse
                         for (int i = 0; i < chest.chestSlots.length; i++) {
                             if (chest.chestSlots[i] != null) {
                                 int slotX = startX + (i * jarakAntarItem);
                                 Rectangle itemClickArea = new Rectangle(slotX, startY, itemSize, itemSize);
-                                
+
                                 if (itemClickArea.contains(keyH.mouseX, keyH.mouseY)) {
                                     // Pindahkan ke tas
                                     boolean masuk = inventory.addItem(chest.chestSlots[i]);
@@ -1006,11 +1037,10 @@ public class GamePanel extends JPanel implements Runnable {
                                 }
                             }
                         }
-                        keyH.leftMousePressed = false; 
+                        keyH.leftMousePressed = false;
                     }
 
-                } 
-                else {
+                } else {
                     chest.showChestUI = false;
                 }
             }
@@ -1032,29 +1062,38 @@ public class GamePanel extends JPanel implements Runnable {
                     redHood.startDisappear();
                     System.out.println("you got a key ");
                     Key--;
-                    
+
                 }
             }
         }
     }
 
     private Item getRandomItem() {
-        int randomNum = (int) (Math.random() * 8) + 1; 
-        
+        int randomNum = (int) (Math.random() * 8) + 1;
+
         switch (randomNum) {
             // 4 Item Damage
-            case 1: return new DamageItem("Pedang Kayu", 10); 
-            case 2: return new DamageItem("Pedang Besi", 15); 
-            case 3: return new DamageItem("Kapak Ganda", 20); 
-            case 4: return new DamageItem("Pedang Petir", 25);
-            
+            case 1:
+                return new DamageItem("Pedang Kayu", 10);
+            case 2:
+                return new DamageItem("Pedang Besi", 15);
+            case 3:
+                return new DamageItem("Kapak Ganda", 20);
+            case 4:
+                return new DamageItem("Pedang Petir", 25);
+
             // 4 Item Defense
-            case 5: return new DefenseItem("Baju Besi", 15); 
-            case 6: return new DefenseItem("Baju Perunggu", 30);
-            case 7: return new DefenseItem("Armor Emas", 45);
-            case 8: return new DefenseItem("Armor Dewa", 60);
-            
-            default: return new DamageItem("Pedang Kayu",  5);
+            case 5:
+                return new DefenseItem("Baju Besi", 15);
+            case 6:
+                return new DefenseItem("Baju Perunggu", 30);
+            case 7:
+                return new DefenseItem("Armor Emas", 45);
+            case 8:
+                return new DefenseItem("Armor Dewa", 60);
+
+            default:
+                return new DamageItem("Pedang Kayu", 5);
         }
     }
 
@@ -1074,35 +1113,39 @@ public class GamePanel extends JPanel implements Runnable {
 
             if (itemDiTas != null) {
                 boolean berhasilDitaruh = false;
-                
+
                 // Cari slot kosong di dalam peti
                 for (int i = 0; i < openChest.chestSlots.length; i++) {
                     if (openChest.chestSlots[i] == null) { // Jika ketemu kotak kosong
-                        
+
                         // 1. Lepas equip jika sedang dipakai
-                        if (itemDiTas == inventory.equippedWeapon) inventory.equippedWeapon = null;
-                        if (itemDiTas == inventory.equippedArmor) inventory.equippedArmor = null;
-                        
+                        if (itemDiTas == inventory.equippedWeapon)
+                            inventory.equippedWeapon = null;
+                        if (itemDiTas == inventory.equippedArmor)
+                            inventory.equippedArmor = null;
+
                         player.attackDamage = player.baseDamage;
                         player.defense = player.baseDefense;
-                        if (inventory.equippedWeapon != null) inventory.equippedWeapon.use(player);
-                        if (inventory.equippedArmor != null) inventory.equippedArmor.use(player);
-                        
+                        if (inventory.equippedWeapon != null)
+                            inventory.equippedWeapon.use(player);
+                        if (inventory.equippedArmor != null)
+                            inventory.equippedArmor.use(player);
+
                         // 2. Pindahkan barang dari Tas ke Peti
                         openChest.chestSlots[i] = itemDiTas;
-                        inventory.slots[slotIndex] = null; 
-                        
+                        inventory.slots[slotIndex] = null;
+
                         System.out.println(itemDiTas.name + " ditaruh ke dalam peti!");
                         berhasilDitaruh = true;
                         break; // Keluar dari loop agar tidak ter-copy ke kotak lain
                     }
                 }
-                
+
                 if (!berhasilDitaruh) {
                     System.out.println("Peti sudah penuh! Maksimal 3 item.");
                 }
             }
-        } 
+        }
         // JIKA TIDAK ADA PETI TERBUKA -> Fitur Equip Normal
         else {
             equipItem(slotIndex);
@@ -1113,36 +1156,34 @@ public class GamePanel extends JPanel implements Runnable {
     private void equipItem(int slotIndex) {
         // Pastikan slot inventory yang ditekan ada isinya (tidak kosong)
         if (inventory.slots[slotIndex] != null) {
-            
+
             Item itemToEquip = inventory.slots[slotIndex];
-            
+
             // 1A. LOGIKA UNEQUIP (LEPAS ITEM)
             // Jika item yang ditekan sama persis dengan yang sedang dipakai, maka lepas!
             if (itemToEquip == inventory.equippedWeapon) {
                 inventory.equippedWeapon = null;
                 System.out.println("Senjata dilepas!");
-            } 
-            else if (itemToEquip == inventory.equippedArmor) {
+            } else if (itemToEquip == inventory.equippedArmor) {
                 inventory.equippedArmor = null;
                 System.out.println("Armor dilepas!");
-            } 
+            }
             // 1B. LOGIKA EQUIP (PASANG ITEM BARU)
             // Jika belum dipakai, maka cek tipe class-nya lalu pasang
             else {
                 if (itemToEquip instanceof DamageItem) {
-                    inventory.equippedWeapon = itemToEquip; 
+                    inventory.equippedWeapon = itemToEquip;
                     System.out.println("Senjata baru di-equip!");
-                } 
-                else if (itemToEquip instanceof DefenseItem) {
-                    inventory.equippedArmor = itemToEquip; 
+                } else if (itemToEquip instanceof DefenseItem) {
+                    inventory.equippedArmor = itemToEquip;
                     System.out.println("Armor baru di-equip!");
                 }
             }
-            
+
             // 2. RESET STATUS KE NILAI AWAL (Pencegah Bug Infinite Stats)
-            player.attackDamage = player.baseDamage; 
-            player.defense = player.baseDefense;     
-            
+            player.attackDamage = player.baseDamage;
+            player.defense = player.baseDefense;
+
             // 3. TERAPKAN EFEK DARI ITEM YANG MASIH TERPASANG (JIKA ADA)
             if (inventory.equippedWeapon != null) {
                 inventory.equippedWeapon.use(player);
@@ -1150,9 +1191,9 @@ public class GamePanel extends JPanel implements Runnable {
             if (inventory.equippedArmor != null) {
                 inventory.equippedArmor.use(player);
             }
-            
+
             System.out.println("Status Sekarang -> ATK: " + player.attackDamage + " | DEF: " + player.defense + "%");
-            
+
         } else {
             System.out.println("Slot " + (slotIndex + 1) + " kosong!");
         }
