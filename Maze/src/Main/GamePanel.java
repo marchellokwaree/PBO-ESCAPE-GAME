@@ -915,6 +915,11 @@ public class GamePanel extends JPanel implements Runnable {
                 }
             }
         }
+        
+        // Draw inventory UI last so it stays visible above the fog and map
+        if (inventory != null) {
+            inventory.draw(g2);
+        }
 
         g2.dispose();
     }
