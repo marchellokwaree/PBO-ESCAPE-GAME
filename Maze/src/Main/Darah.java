@@ -5,21 +5,24 @@ import java.awt.Font;
 import java.awt.Graphics2D;
 import java.io.InputStream;
 import java.util.Random;
+
 public class Darah {
     private int currentHP;
     private final int maxHP;
     private Font customFont;
+    private GamePanel gp; // Referensi ke GamePanel untuk trigger LoseGame
 
-    public Darah() {
+    public Darah(GamePanel gp) {
+        this.gp = gp;
         this.maxHP = 100;
         this.currentHP = maxHP;
 
         try {
             // Ganti path ini sesuai dengan lokasi file .ttf Anda!
-            InputStream is = getClass().getResourceAsStream("/Assets/Pixuf.ttf"); 
-            
+            InputStream is = getClass().getResourceAsStream("/Assets/Pixuf.ttf");
+
             // Buat font dari file, lalu atur ukurannya (misal: ukuran 14)
-            customFont = Font.createFont(Font.TRUETYPE_FONT, is).deriveFont(14f); 
+            customFont = Font.createFont(Font.TRUETYPE_FONT, is).deriveFont(14f);
         } catch (Exception e) {
             System.out.println("Gagal load font, kembali ke Arial biasa.");
             e.printStackTrace();
@@ -30,8 +33,12 @@ public class Darah {
     public void update(int hp) {
         if (hp <= 0) {
             hp = 0;
+            this.currentHP = hp;
             System.out.println("Game Over! Player has been defeated.");
-            System.exit(0);
+
+            gp.LoseGame();
+
+            return;
         }
         if (hp > maxHP) {
             hp = maxHP;
@@ -40,13 +47,11 @@ public class Darah {
 
     }
 
-    
-
     public void draw(Graphics2D g2) {
-        int x = 14 ; // Posisi X dengan offset getaran
-        int y = 10 ; // Posisi Y dengan offset getaran
+        int x = 14; // Posisi X dengan offset getaran
+        int y = 10; // Posisi Y dengan offset getaran
         int width = 212;
-        int height = 28;    
+        int height = 28;
         int radius = 12;
 
         // Background panel with transparansi agar tidak terlalu menutupi
@@ -68,7 +73,9 @@ public class Darah {
 
         // Health fill
         int barWidth = (int) ((currentHP / (double) maxHP) * innerWidth);
-        Color hpColor = currentHP > 70 ? new Color(0, 191, 0) : currentHP > 50 ? new Color(235, 150, 40) : currentHP > 20 ? new Color(200, 60, 60) : new Color(150, 0, 0);
+        Color hpColor = currentHP > 70 ? new Color(0, 191, 0)
+                : currentHP > 50 ? new Color(235, 150, 40)
+                        : currentHP > 20 ? new Color(200, 60, 60) : new Color(150, 0, 0);
         g2.setColor(hpColor);
         g2.fillRoundRect(innerX, innerY, Math.max(barWidth, 2), innerHeight, radius, radius);
 

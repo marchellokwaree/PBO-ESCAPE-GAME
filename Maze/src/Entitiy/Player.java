@@ -84,7 +84,7 @@ public class Player extends Entity {
         this.screenX = defaultScreenX;
         this.screenY = defaultScreenY;
 
-        this.darah = new Darah();
+        this.darah = new Darah(gp);
     }
 
     

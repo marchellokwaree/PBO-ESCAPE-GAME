@@ -20,9 +20,11 @@ import java.util.Iterator;
 
 import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
+import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
+import java.awt.Font;
 import java.awt.Rectangle;
 
 public class GamePanel extends JPanel implements Runnable {
@@ -66,6 +68,12 @@ public class GamePanel extends JPanel implements Runnable {
 
     public MonsterSpawner spawner;
     public Inventory inventory;
+    private boolean gameOver = false; // Flag untuk mencegah multiple win/lose triggers
+
+    // Lark 1A cheat console
+    private ArrayList<int[]> larkPositions = new ArrayList<>(); // Posisi tile "L" di map
+    private boolean cheatPopupOpen = false; // Flag popup sedang terbuka
+    private boolean wasOnLarkTile = false; // Deteksi masuk tile L (edge detection)
 
     public GamePanel() {
 
@@ -126,6 +134,10 @@ public class GamePanel extends JPanel implements Runnable {
                 if ("N".equals(map1[i][j])) {
                     entities.add(new RedHood(j * tileSize, i * tileSize, 0, this));
                     Key++;
+                }
+
+                if ("L".equals(map1[i][j])) {
+                    larkPositions.add(new int[]{j * tileSize, i * tileSize});
                 }
 
                 if ("C".equals(map1[i][j])) {
@@ -371,13 +383,9 @@ public class GamePanel extends JPanel implements Runnable {
 
             checkDamage();
             if (timer.isTimeUp()) {
-                // Tampilkan pesan "Game Over" menggunakan JOptionPane
-                gameThread = null; // Hentikan game loop
-                SwingUtilities.invokeLater(() -> {
-                    JOptionPane.showMessageDialog(this, "Time's Up! Game Over!", "Game Over",
-                            JOptionPane.INFORMATION_MESSAGE);
-                    System.exit(0); // Keluar dari aplikasi setelah menutup dialog
-                });
+                // Waktu habis, tampilkan layar Game Over
+                System.out.println("Time's Up! Game Over!");
+                LoseGame();
             }
             try {
                 Thread.sleep(1000 / 60); // Tidur sebentar untuk mengurangi beban CPU, target sekitar 60 FPS
@@ -774,6 +782,19 @@ public class GamePanel extends JPanel implements Runnable {
                             g2.drawImage(wallImage, screenX, screenY, tileSize, tileSize, null); // wall tile
                         }
                     }
+
+                    // Draw Lark 1A marker tile
+                    if ("L".equals(map1[i][j])) {
+                        // Glowing cyan marker
+                        g2.setColor(new Color(0, 200, 255, 80));
+                        g2.fillRect(screenX, screenY, tileSize, tileSize);
+                        g2.setColor(new Color(0, 200, 255, 180));
+                        g2.drawRect(screenX + 1, screenY + 1, tileSize - 2, tileSize - 2);
+                        // Label "L"
+                        g2.setColor(new Color(0, 255, 255));
+                        g2.setFont(new Font("Arial", Font.BOLD, 12));
+                        g2.drawString("L", screenX + 10, screenY + 22);
+                    }
                 }
             }
         }
@@ -925,8 +946,46 @@ public class GamePanel extends JPanel implements Runnable {
     }
 
     protected void WinGame() {
+        if (gameOver) return; // Cegah multiple trigger
+        gameOver = true;
         System.out.println("Congratulations! You've reached the exit!");
-        System.exit(0); // Keluar dari game
+        stopGame();
+        SwingUtilities.invokeLater(() -> {
+            JFrame frame = (JFrame) SwingUtilities.getWindowAncestor(this);
+            if (frame != null) {
+                GameOverPanel gameOverPanel = new GameOverPanel(frame, true);
+                frame.setContentPane(gameOverPanel);
+                frame.revalidate();
+                frame.repaint();
+                frame.pack();
+                frame.setLocationRelativeTo(null);
+            }
+        });
+    }
+
+    public void LoseGame() {
+        if (gameOver) return; // Cegah multiple trigger
+        gameOver = true;
+        System.out.println("Game Over! You lost.");
+        stopGame();
+        SwingUtilities.invokeLater(() -> {
+            JFrame frame = (JFrame) SwingUtilities.getWindowAncestor(this);
+            if (frame != null) {
+                GameOverPanel gameOverPanel = new GameOverPanel(frame, false);
+                frame.setContentPane(gameOverPanel);
+                frame.revalidate();
+                frame.repaint();
+                frame.pack();
+                frame.setLocationRelativeTo(null);
+            }
+        });
+    }
+
+    /**
+     * Menghentikan game thread dan semua proses game dengan aman.
+     */
+    private void stopGame() {
+        gameThread = null;
     }
 
     protected void checkDamage() {
@@ -1070,6 +1129,63 @@ public class GamePanel extends JPanel implements Runnable {
 
                 }
             }
+        }
+
+        // ===== LARK 1A CHEAT CONSOLE =====
+        // Deteksi apakah player berdiri di atas tile "L"
+        boolean isOnLarkTile = false;
+        for (int[] larkPos : larkPositions) {
+            Rectangle larkHitbox = new Rectangle(larkPos[0], larkPos[1], tileSize, tileSize);
+            if (larkHitbox.intersects(player.getHitbox())) {
+                isOnLarkTile = true;
+                break;
+            }
+        }
+
+        // Edge detection: popup hanya muncul saat PERTAMA KALI masuk tile L
+        if (isOnLarkTile && !wasOnLarkTile && !cheatPopupOpen) {
+            cheatPopupOpen = true;
+            SwingUtilities.invokeLater(() -> {
+                String input = JOptionPane.showInputDialog(
+                        this,
+                        "Masukkan Cheat Code:\n\n• 99 = Instant Win\n• heal = Full HP",
+                        "LARK 1A - Cheat Console",
+                        JOptionPane.PLAIN_MESSAGE);
+                if (input != null && !input.trim().isEmpty()) {
+                    processCheatCode(input.trim());
+                }
+                cheatPopupOpen = false;
+            });
+        }
+        wasOnLarkTile = isOnLarkTile;
+        // ===== END LARK 1A =====
+    }
+
+    /**
+     * Memproses cheat code yang dimasukkan melalui Lark 1A console.
+     */
+    private void processCheatCode(String code) {
+        switch (code.toLowerCase()) {
+            case "99":
+                System.out.println("CHEAT ACTIVATED: Instant Win!");
+                WinGame();
+                break;
+            case "heal":
+                if (player != null && player.darah != null) {
+                    player.darah.heal(100);
+                    System.out.println("CHEAT ACTIVATED: Full Heal! HP: " + player.darah.getCurrentHP());
+                }
+                break;
+            default:
+                System.out.println("Cheat code tidak dikenali: " + code);
+                SwingUtilities.invokeLater(() -> {
+                    JOptionPane.showMessageDialog(
+                            this,
+                            "Cheat code \"" + code + "\" tidak dikenali!",
+                            "LARK 1A",
+                            JOptionPane.WARNING_MESSAGE);
+                });
+                break;
         }
     }
 
