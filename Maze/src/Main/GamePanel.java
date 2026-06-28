@@ -1349,7 +1349,8 @@ public class GamePanel extends JPanel implements Runnable {
             case "speed":
                 if (player != null) {
                     player.speed += 2;
-                    System.out.println("CHEAT ACTIVATED: Speed increased! Speed: " + player.speed);
+                    player.normalSpeed += 2;
+                    System.out.println("CHEAT ACTIVATED: Speed increased! Speed: " + player.speed + ", Normal Speed: " + player.normalSpeed);
                 }
                 break;
             default:

@@ -54,7 +54,7 @@ public class RedHood extends Entity {
         hitbox = new Rectangle();
         hitbox.x = 4; // offset dari kiri sprite
         hitbox.y = 4; // offset dari atas sprite
-        hitbox.width = gp.getTileSize() -16; // lebar hitbox
+        hitbox.width = gp.getTileSize() - 16; // lebar hitbox
         hitbox.height = gp.getTileSize() - 8; // tinggi hitbox
     }
 
@@ -127,9 +127,9 @@ public class RedHood extends Entity {
 
             // Optimasi: Hanya gambar jika objek masuk dalam area layar
             if (x + width > camX &&
-                x - width < camX + gp.screenWidth &&
-                y + height > camY &&
-                y - height < camY + gp.screenHeight) {
+                    x - width < camX + gp.screenWidth &&
+                    y + height > camY &&
+                    y - height < camY + gp.screenHeight) {
 
                 g2.drawImage(img, screenX, screenY, 32, 32, null);
             }
