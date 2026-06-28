@@ -6,14 +6,11 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
-import java.awt.Image;
 import java.awt.RenderingHints;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.geom.RoundRectangle2D;
 import java.awt.image.BufferedImage;
 import java.io.File;
-import java.io.InputStream;
 import java.net.URL;
 import javax.imageio.ImageIO;
 import javax.swing.BorderFactory;
@@ -23,8 +20,6 @@ import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JFrame;
-import javax.swing.SwingConstants;
-
 
 /**
  * Custom JButton dengan rounded corners untuk tampilan yang lebih modern.
@@ -100,8 +95,6 @@ public class HUDPanel extends JPanel {
 	// tombol Start ditekan.
 	private final JFrame parentFrame;
 
-
-
 	// Background image
 	private BufferedImage backgroundImage;
 
@@ -117,26 +110,27 @@ public class HUDPanel extends JPanel {
 		setPreferredSize(new Dimension(900, 700));
 		setOpaque(false);
 		setLayout(new BorderLayout(0, 0));
-		
+
 		try {
-		    // Gunakan method bantuanmu! (Gunakan slash di awal agar sesuai dengan logic method)
-		    File fontFile = resolveFile("/Assets/Pixuf.ttf");
-				
-		    if (fontFile.exists()) {
-		        // Buat font dari file, lalu atur ukurannya
-		        customFont = Font.createFont(Font.TRUETYPE_FONT, fontFile).deriveFont(16f);
-		        setFont(customFont);
-		    } else {
-		        System.out.println("Path yang dicoba: " + fontFile.getAbsolutePath());
-		        throw new Exception("Font file benar-benar tidak ditemukan oleh resolveFile.");
-		    }
-		
+			// Gunakan method bantuanmu! (Gunakan slash di awal agar sesuai dengan logic
+			// method)
+			File fontFile = resolveFile("/Assets/Pixuf.ttf");
+
+			if (fontFile.exists()) {
+				// Buat font dari file, lalu atur ukurannya
+				customFont = Font.createFont(Font.TRUETYPE_FONT, fontFile).deriveFont(16f);
+				setFont(customFont);
+			} else {
+				System.out.println("Path yang dicoba: " + fontFile.getAbsolutePath());
+				throw new Exception("Font file benar-benar tidak ditemukan oleh resolveFile.");
+			}
+
 		} catch (Exception e) {
-		    System.out.println("Gagal load font: " + e.getMessage());
-		
-		    // Fallback WAJIB agar tidak NullPointerException saat createTitleLabel
-		    customFont = new Font("Arial", Font.BOLD, 16); 
-		    setFont(customFont); 
+			System.out.println("Gagal load font: " + e.getMessage());
+
+			// Fallback WAJIB agar tidak NullPointerException saat createTitleLabel
+			customFont = new Font("Arial", Font.BOLD, 16);
+			setFont(customFont);
 		}
 
 		// Load background image
@@ -154,7 +148,6 @@ public class HUDPanel extends JPanel {
 		JLabel footerLabel = createFooterLabel();
 		add(footerLabel, BorderLayout.SOUTH);
 
-		
 	}
 
 	/**
@@ -287,31 +280,29 @@ public class HUDPanel extends JPanel {
 	}
 
 	private File resolveFile(String path) {
-	    String normalizedPath = path.replace('/', File.separatorChar);
-	    String userDir = System.getProperty("user.dir");
-		
-	    // Coba path 1: di dalam src
-	    File candidate = new File(userDir + File.separator + "src" + normalizedPath);
-	    if (candidate.exists()) {
-	        return candidate;
-	    }
-	
-	    // Coba path 2: langsung di root
-	    candidate = new File(userDir + normalizedPath);
-	    if (candidate.exists()) {
-	        return candidate;
-	    }
-	
-	    // Coba path 3: kalau project ada di dalam folder Maze
-	    candidate = new File(userDir + File.separator + "Maze" + File.separator + "src" + normalizedPath);
-	    if (candidate.exists()) {
-	        return candidate;
-	    }
-	
-	    // Default fallback
-	    return new File(userDir + File.separator + "src" + normalizedPath);
+		String normalizedPath = path.replace('/', File.separatorChar);
+		String userDir = System.getProperty("user.dir");
+
+		// Coba path 1: di dalam src
+		File candidate = new File(userDir + File.separator + "src" + normalizedPath);
+		if (candidate.exists()) {
+			return candidate;
+		}
+
+		// Coba path 2: langsung di root
+		candidate = new File(userDir + normalizedPath);
+		if (candidate.exists()) {
+			return candidate;
+		}
+
+		// Coba path 3: kalau project ada di dalam folder Maze
+		candidate = new File(userDir + File.separator + "Maze" + File.separator + "src" + normalizedPath);
+		if (candidate.exists()) {
+			return candidate;
+		}
+
+		// Default fallback
+		return new File(userDir + File.separator + "src" + normalizedPath);
 	}
 
 }
-
-

@@ -1,13 +1,11 @@
 package Obstacle;
+
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
-import java.io.IOException;
-import java.net.URL;
-
-import javax.imageio.ImageIO;
 
 import Main.GamePanel;
-public class IceTrap extends Obstacle{
+
+public class IceTrap extends Obstacle {
     private BufferedImage spriteSheet;
     private BufferedImage[] animationFrames = new BufferedImage[4];
     private int currentFrame = 0;
@@ -22,18 +20,18 @@ public class IceTrap extends Obstacle{
             this.spriteSheet = loadBufferedImage("/Assets/ASSET/Traps/Ice_Trap_2.jpeg");
             int frameWidth = 120;
             int frameHeight = 120;
-            int xstart = 67+270;
+            int xstart = 67 + 270;
             int ystart = 605;
             for (int i = 0; i < animationFrames.length; i++) {
                 int colx = xstart + (i * frameWidth);
                 if (i == 1) {
-                    colx = 67+135; // Tambahkan 1 pixel untuk frame kedua
+                    colx = 67 + 135; // Tambahkan 1 pixel untuk frame kedua
                 }
                 if (i == 2) {
-                    colx = 67+270; // Tambahkan 1 pixel untuk frame kedua
+                    colx = 67 + 270; // Tambahkan 1 pixel untuk frame kedua
                 }
                 if (i == 3) {
-                    colx = 67+405; // Tambahkan 1 pixel untuk frame kedua
+                    colx = 67 + 405; // Tambahkan 1 pixel untuk frame kedua
                 }
                 animationFrames[i] = spriteSheet.getSubimage(colx, ystart, frameWidth, frameHeight);
             }
@@ -43,8 +41,6 @@ public class IceTrap extends Obstacle{
             e.printStackTrace();
         }
     }
-
-    
 
     public void update() {
         animationCounter++;
@@ -76,6 +72,6 @@ public class IceTrap extends Obstacle{
 
     public void draw(Graphics2D g2, GamePanel gp) {
         BufferedImage frame = getCurrentFrame();
-        super.drawCamera(g2, gp , frame);
+        super.drawCamera(g2, gp, frame);
     }
 }

@@ -4,14 +4,15 @@ package Obstacle;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 
-import java.io.IOException;
 import Main.GamePanel;
+
 public class HealPotion extends Obstacle {
     private BufferedImage spriteSheet;
     private BufferedImage[] animationFrames = new BufferedImage[8];
     private int currentFrame = 0;
     private int animationCounter = 0;
     private final int animationDelay = 6;
+
     public HealPotion(int x, int y, int width, int height) {
         super(x, y, width, height);
         try {
@@ -70,9 +71,9 @@ public class HealPotion extends Obstacle {
 
             // Optimasi: Hanya gambar jika objek masuk dalam area layar
             if (x + width > camX &&
-                x - width < camX + gp.screenWidth &&
-                y + height > camY &&
-                y - height < camY + gp.screenHeight) {
+                    x - width < camX + gp.screenWidth &&
+                    y + height > camY &&
+                    y - height < camY + gp.screenHeight) {
 
                 g2.drawImage(img, screenX, screenY, 20, 20, null);
             }
@@ -81,8 +82,7 @@ public class HealPotion extends Obstacle {
 
     public void draw(Graphics2D g2, GamePanel gp) {
         BufferedImage frame = getCurrentFrame();
-        drawCamera(g2, gp , frame);
+        drawCamera(g2, gp, frame);
     }
 
-     
 }

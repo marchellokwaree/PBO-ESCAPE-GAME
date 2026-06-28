@@ -5,15 +5,7 @@ import java.awt.Image;
 import java.awt.Rectangle;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.URL;
-import java.util.ArrayList;
-
 import Main.Darah;
-import javax.imageio.ImageIO;
-
 import Main.GamePanel;
 import Main.KeyHandler;
 
@@ -28,9 +20,9 @@ public class Player extends Entity {
     int spriteNum = 1;
     boolean hadapKiri = false;
     public String direction = "DOWN"; // Default menghadap bawah
-    public int baseDamage = 10; 
-    public int baseDefense = 0; 
-    public int attackDamage = 10; 
+    public int baseDamage = 10;
+    public int baseDefense = 0;
+    public int attackDamage = 10;
     public int defense = 0;
     public int damageCooldown = 0;
     public int normalSpeed = 2;
@@ -46,6 +38,12 @@ public class Player extends Entity {
     public boolean isAttacking = false;
     public int attackCooldown = 0; // Cooldown antar serangan
 
+    // Slash effect variables
+    BufferedImage[] slashImages = new BufferedImage[5];
+    public boolean isSlashActive = false;
+    public int slashCounter = 0;
+    public int slashFrame = 0;
+    public String slashDirection = "DOWN";
 
     // Constructor disesuaikan dengan GamePanel kamu (5 parameter)
     public Player(GamePanel gp, KeyHandler keyH, Image playerImg, int x, int y) {
@@ -69,12 +67,24 @@ public class Player extends Entity {
             e.printStackTrace();
         }
 
+        try {
+            BufferedImage slashSheet = loadBufferedImage("/Assets/Slash.png");
+            if (slashSheet != null) {
+                for (int i = 0; i < 5; i++) {
+                    slashImages[i] = slashSheet.getSubimage(i * 64, 0, 64, 64);
+                }
+            }
+        } catch (Exception e) {
+            System.out.println("Error loading slash spritesheet: " + e.getMessage());
+            e.printStackTrace();
+        }
+
         // Sesuaikan hitbox dengan ukuran tile 24x24.
         // Hitbox lebih kecil agar tidak menabrak dinding di bawah/sekitar sprite.
         hitbox = new Rectangle();
-        hitbox.x = 8;       // offset dari kiri sprite
-        hitbox.y = 4;       // offset dari atas sprite
-        hitbox.width = gp.getTileSize() - 16;  // lebar hitbox
+        hitbox.x = 8; // offset dari kiri sprite
+        hitbox.y = 4; // offset dari atas sprite
+        hitbox.width = gp.getTileSize() - 16; // lebar hitbox
         hitbox.height = gp.getTileSize() - 4; // tinggi hitbox
         // Mengunci posisi default pemain tepat di tengah jendela game
         this.defaultScreenX = (gp.screenWidth / 2) - (gp.getTileSize() / 2);
@@ -87,7 +97,6 @@ public class Player extends Entity {
         this.darah = new Darah(gp);
     }
 
-    
     public Rectangle getHitbox() {
         return new Rectangle(x + hitbox.x, y + hitbox.y, hitbox.width, hitbox.height);
     }
@@ -96,7 +105,7 @@ public class Player extends Entity {
         updateEffects();
         int nextX = x;
         int nextY = y;
-           // --- KAMERA CLAMPING (Mencegah kamera keluar map) ---
+        // --- KAMERA CLAMPING (Mencegah kamera keluar map) ---
         screenX = defaultScreenX;
         screenY = defaultScreenY;
 
@@ -109,7 +118,7 @@ public class Player extends Entity {
             screenX = gp.screenWidth - (gp.worldWidth - x);
         }
 
-            // Batas Atas
+        // Batas Atas
         if (y < defaultScreenY) {
             screenY = y;
         }
@@ -174,10 +183,10 @@ public class Player extends Entity {
         }
 
         // Collision Check
-        if (!gp.collidesWithWall(nextX, y , this.hitbox) && !gp.collidesWithClosedGate(nextX, y , this.hitbox)) {
+        if (!gp.collidesWithWall(nextX, y, this.hitbox) && !gp.collidesWithClosedGate(nextX, y, this.hitbox)) {
             x = nextX;
         }
-        if (!gp.collidesWithWall(x, nextY , this.hitbox) && !gp.collidesWithClosedGate(x, nextY , this.hitbox)) {
+        if (!gp.collidesWithWall(x, nextY, this.hitbox) && !gp.collidesWithClosedGate(x, nextY, this.hitbox)) {
             y = nextY;
         }
     }
@@ -198,16 +207,25 @@ public class Player extends Entity {
         } else {
             isAttacking = false;
         }
+
+        // Update slash animation
+        if (isSlashActive) {
+            slashCounter++;
+            if (slashCounter > 4) { // Ganti frame setiap 4 update
+                slashFrame++;
+                if (slashFrame >= 5) {
+                    isSlashActive = false;
+                    slashFrame = 0;
+                }
+                slashCounter = 0;
+            }
+        }
     }
 
     public void applySlow(int durationFrames) {
         slowEffectCounter = durationFrames;
         speed = slowSpeed;
     }
-
-    
-
-    
 
     public void draw(Graphics2D g2) {
         int camX = gp.getCameraXInt();
@@ -231,7 +249,7 @@ public class Player extends Entity {
         // --- DEBUG: GAMBAR KOTAK PUKULAN ---
         // --- DEBUG: GAMBAR KOTAK PUKULAN (Letakkan di akhir method draw) ---
         g2.setColor(new java.awt.Color(0, 0, 255, 150)); // INI HITBOX ATTACK PLAYER, HAPUS KALAU SUDAH JADI
-        
+
         int attackDrawX = x - camX;
         int attackDrawY = y - camY;
 
@@ -251,8 +269,9 @@ public class Player extends Entity {
         }
 
         // SWITCH DAN DEKLARASI VARIABEL JANGAN DIHAPUS
-        
-        g2.fillRect(attackDrawX, attackDrawY, gp.getTileSize(), gp.getTileSize()); // INI HITBOX ATTACK PLAYER, HAPUS KALAU SUDAH JADI
+
+        g2.fillRect(attackDrawX, attackDrawY, gp.getTileSize(), gp.getTileSize()); // INI HITBOX ATTACK PLAYER, HAPUS
+                                                                                   // KALAU SUDAH JADI
 
         AffineTransform originalTransform = g2.getTransform();
 
@@ -268,18 +287,66 @@ public class Player extends Entity {
                 g2.drawImage(walkingImage, 0, 0, width, height, null);
             }
 
-        } if (!hadapKiri) {
+        }
+        if (!hadapKiri) {
             if (walkingImage != null) {
                 g2.drawImage(walkingImage, drawX, drawY, gp.getTileSize(), gp.getTileSize(), null);
             }
 
         }
         g2.setTransform(originalTransform);
+
+        // Render slash effect
+        if (isSlashActive && slashImages[slashFrame] != null) {
+            double centerX = x - camX + gp.getTileSize() / 2.0;
+            double centerY = y - camY + gp.getTileSize() / 2.0;
+            double offset = gp.getTileSize();
+
+            switch (slashDirection) {
+                case "UP":
+                    centerY -= offset;
+                    break;
+                case "DOWN":
+                    centerY += offset;
+                    break;
+                case "LEFT":
+                    centerX -= offset;
+                    break;
+                case "RIGHT":
+                    centerX += offset;
+                    break;
+            }
+
+            int slashSize = 64;
+            AffineTransform slashTransform = g2.getTransform();
+            g2.translate(centerX, centerY);
+
+            double angle = 0;
+            switch (slashDirection) {
+                case "RIGHT":
+                    angle = 0;
+                    break;
+                case "DOWN":
+                    angle = Math.toRadians(90);
+                    break;
+                case "LEFT":
+                    angle = Math.toRadians(180);
+                    break;
+                case "UP":
+                    angle = Math.toRadians(270);
+                    break;
+            }
+            g2.rotate(angle);
+
+            g2.drawImage(slashImages[slashFrame], -slashSize / 2, -slashSize / 2, slashSize, slashSize, null);
+            g2.setTransform(slashTransform);
+        }
     }
 
     /**
      * Fungsi untuk menyerang musuh.
-     * Panggil fungsi ini dari GamePanel saat pemain menekan tombol serang (misal: SPASI).
+     * Panggil fungsi ini dari GamePanel saat pemain menekan tombol serang (misal:
+     * SPASI).
      */
     public void attackEnemies(java.util.ArrayList<Entity> monsters) {
         // Cek apakah serangan masih dalam masa cooldown
@@ -290,11 +357,17 @@ public class Player extends Entity {
         // Jika berhasil menyerang, reset cooldown menjadi 60 frame (1 detik)
         attackCooldown = 60;
 
+        // Trigger slash animation
+        isSlashActive = true;
+        slashFrame = 0;
+        slashCounter = 0;
+        slashDirection = direction;
+
         // 1. Buat ukuran kotak pukulan (besarnya 1 tile)
         Rectangle attackArea = new Rectangle();
         attackArea.width = gp.getTileSize() - 8;
         attackArea.height = gp.getTileSize() - 8;
-        
+
         // 2. Tentukan posisi Kotak berdasarkan Arah
         switch (direction) {
             case "UP":
@@ -319,26 +392,26 @@ public class Player extends Entity {
         for (Entity monster : monsters) {
             if (monster instanceof FireSlime) {
                 FireSlime slime = (FireSlime) monster;
-                
-                if (attackArea.intersects(slime.getHitboxArea())){
+
+                if (attackArea.intersects(slime.getHitboxArea())) {
                     slime.takeDamage(this.attackDamage);
                     System.out.println("Berhasil memukul FireSlime dari arah: " + direction);
                 }
             }
 
-            if(monster instanceof Slime2){
+            if (monster instanceof Slime2) {
                 Slime2 slime = (Slime2) monster;
 
-                if(attackArea.intersects(slime.getHitboxArea())){
+                if (attackArea.intersects(slime.getHitboxArea())) {
                     slime.takeDamage(this.attackDamage);
                     System.out.println("Berhasil memukul Slime 2 dari arah: " + direction);
                 }
             }
 
-            if(monster instanceof Slime3){
+            if (monster instanceof Slime3) {
                 Slime3 slime = (Slime3) monster;
 
-                if(attackArea.intersects(slime.getHitboxArea())){
+                if (attackArea.intersects(slime.getHitboxArea())) {
                     slime.takeDamage(this.attackDamage);
                     System.out.println("Berhasil memukul Slime 3 dari arah: " + direction);
                 }
@@ -353,16 +426,18 @@ public class Player extends Entity {
     public void terimaDamage(int damageAsli) {
         // 1. Batasi defense maksimal 100% agar damage tidak jadi minus (malah nge-heal)
         int persenDef = Math.min(this.defense, 100);
-        
-        // 2. Hitung rumus persentase: Damage Asli dikurangi (Persentase dari Damage Asli)
+
+        // 2. Hitung rumus persentase: Damage Asli dikurangi (Persentase dari Damage
+        // Asli)
         int damageAkhir = damageAsli - (damageAsli * persenDef / 100);
-        
+
         // 3. Pastikan minimal damage adalah 0
         damageAkhir = Math.max(0, damageAkhir);
-        
+
         // 4. Kurangi HP pemain
         this.darah.takeDamage(damageAkhir);
-        
-        System.out.println("Terkena Hit! Base Damage: " + damageAsli + " | Blocked: " + persenDef + "% | Damage Masuk: " + damageAkhir);
+
+        System.out.println("Terkena Hit! Base Damage: " + damageAsli + " | Blocked: " + persenDef + "% | Damage Masuk: "
+                + damageAkhir);
     }
 }
