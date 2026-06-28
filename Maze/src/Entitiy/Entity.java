@@ -30,7 +30,7 @@ public class Entity {
             if (stream != null) {
                 return ImageIO.read(stream);
             }
-            File file = resolveImageFile(path);
+            File file = resolveFile(path);
             return ImageIO.read(file);
         } catch (IOException e) {
             System.err.println("Failed to load player buffered image: " + path + " -> " + e.getMessage());
@@ -38,7 +38,7 @@ public class Entity {
         }
     }
 
-    private File resolveImageFile(String path) {
+    protected File resolveFile(String path) {
         String normalizedPath = path.replace('/', File.separatorChar);
         String userDir = System.getProperty("user.dir");
 

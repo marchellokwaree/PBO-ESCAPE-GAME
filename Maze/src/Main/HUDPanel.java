@@ -20,6 +20,11 @@ import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JFrame;
+import javax.sound.sampled.AudioInputStream;
+import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.Clip;
+import java.io.InputStream;
+import java.io.BufferedInputStream;
 
 /**
  * Custom JButton dengan rounded corners untuk tampilan yang lebih modern.
@@ -100,6 +105,8 @@ public class HUDPanel extends JPanel {
 
 	private Font customFont; // custom font untuk tombol dan teks lainnya
 
+	private Clip musicClip;
+
 	/**
 	 * Konstruktor HUDPanel.
 	 * 
@@ -148,6 +155,51 @@ public class HUDPanel extends JPanel {
 		JLabel footerLabel = createFooterLabel();
 		add(footerLabel, BorderLayout.SOUTH);
 
+		// Mainkan background musik
+		playBackgroundMusic();
+	}
+
+	private void playBackgroundMusic() {
+		try {
+			AudioInputStream audioStream = null;
+			// 1. Coba load dari Classpath (Resource)
+			InputStream is = getClass().getResourceAsStream("/Assets/Sound/menu_soundtrack_by_chiphead64.wav");
+			if (is != null) {
+				InputStream bufferedIn = new BufferedInputStream(is);
+				audioStream = AudioSystem.getAudioInputStream(bufferedIn);
+			} else {
+				// 2. Coba load dari File System
+				File soundFile = resolveFile("/Assets/Sound/menu_soundtrack_by_chiphead64.wav");
+				if (soundFile.exists()) {
+					audioStream = AudioSystem.getAudioInputStream(soundFile);
+				}
+			}
+
+			if (audioStream != null) {
+				musicClip = AudioSystem.getClip();
+				musicClip.open(audioStream);
+				musicClip.loop(Clip.LOOP_CONTINUOUSLY);
+				musicClip.start();
+			} else {
+				System.err.println("Soundtrack file not found.");
+			}
+		} catch (Exception e) {
+			System.err.println("Error playing background music: " + e.getMessage());
+			e.printStackTrace();
+		}
+	}
+
+	private void stopBackgroundMusic() {
+		if (musicClip != null) {
+			try {
+				if (musicClip.isRunning()) {
+					musicClip.stop();
+				}
+				musicClip.close();
+			} catch (Exception e) {
+				System.err.println("Error stopping music: " + e.getMessage());
+			}
+		}
 	}
 
 	/**
@@ -261,6 +313,7 @@ public class HUDPanel extends JPanel {
 	 * Panel kemudian diganti menjadi GamePanel dan game dimulai.
 	 */
 	private void onStartPressed() {
+		stopBackgroundMusic();
 
 		// Ganti panel HUD dengan GamePanel.
 		GamePanel gamePanel = new GamePanel();
@@ -276,6 +329,7 @@ public class HUDPanel extends JPanel {
 	 * Menangani aksi ketika tombol Exit ditekan.
 	 */
 	private void onExitPressed() {
+		stopBackgroundMusic();
 		System.exit(0);
 	}
 

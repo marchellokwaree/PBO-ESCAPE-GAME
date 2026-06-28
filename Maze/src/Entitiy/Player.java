@@ -5,6 +5,12 @@ import java.awt.Image;
 import java.awt.Rectangle;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
+import javax.sound.sampled.AudioInputStream;
+import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.Clip;
+import java.io.InputStream;
+import java.io.BufferedInputStream;
+import java.io.File;
 import Main.Darah;
 import Main.GamePanel;
 import Main.KeyHandler;
@@ -45,6 +51,9 @@ public class Player extends Entity {
     public int slashFrame = 0;
     public String slashDirection = "DOWN";
 
+    // Footstep audio variables
+    private Clip footstepClip;
+
     // Constructor disesuaikan dengan GamePanel kamu (5 parameter)
     public Player(GamePanel gp, KeyHandler keyH, Image playerImg, int x, int y) {
         super(x, y, 3); // speed 2
@@ -78,6 +87,9 @@ public class Player extends Entity {
             System.out.println("Error loading slash spritesheet: " + e.getMessage());
             e.printStackTrace();
         }
+
+        // Load footstep sound
+        loadFootstepSound();
 
         // Sesuaikan hitbox dengan ukuran tile 24x24.
         // Hitbox lebih kecil agar tidak menabrak dinding di bawah/sekitar sprite.
@@ -153,6 +165,12 @@ public class Player extends Entity {
         }
         // LOGIKA ANIMASI: Berganti antara spriteNum 1 dan 2 saat bergerak
         if (moving) {
+            if (footstepClip != null && !footstepClip.isRunning()) {
+                footstepClip.setFramePosition(0);
+                footstepClip.loop(Clip.LOOP_CONTINUOUSLY);
+                footstepClip.start();
+            }
+
             spriteCounter++;
             if (spriteCounter > 12) { // Kecepatan ganti kaki
                 if (spriteNum == 1) {
@@ -179,6 +197,9 @@ public class Player extends Entity {
                 currentImage = walkImages[spriteNum - 1]; // Ganti gambar sesuai dengan spriteNum
             }
         } else {
+            if (footstepClip != null && footstepClip.isRunning()) {
+                footstepClip.stop();
+            }
             spriteNum = 1; // Kembali ke posisi diam jika berhenti
         }
 
@@ -439,5 +460,42 @@ public class Player extends Entity {
 
         System.out.println("Terkena Hit! Base Damage: " + damageAsli + " | Blocked: " + persenDef + "% | Damage Masuk: "
                 + damageAkhir);
+    }
+
+    private void loadFootstepSound() {
+        try {
+            AudioInputStream audioStream = null;
+            InputStream is = getClass().getResourceAsStream("/Assets/Sound/Footstep.wav");
+            if (is != null) {
+                InputStream bufferedIn = new BufferedInputStream(is);
+                audioStream = AudioSystem.getAudioInputStream(bufferedIn);
+            } else {
+                File soundFile = resolveFile("/Assets/Sound/Footstep.wav");
+                if (soundFile.exists()) {
+                    audioStream = AudioSystem.getAudioInputStream(soundFile);
+                }
+            }
+
+            if (audioStream != null) {
+                footstepClip = AudioSystem.getClip();
+                footstepClip.open(audioStream);
+            } else {
+                System.err.println("Footstep sound file not found.");
+            }
+        } catch (Exception e) {
+            System.err.println("Error loading footstep sound: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
+    private void playFootstepSound() {
+        if (footstepClip != null) {
+            try {
+                footstepClip.setFramePosition(0);
+                footstepClip.start();
+            } catch (Exception e) {
+                System.err.println("Error playing footstep sound: " + e.getMessage());
+            }
+        }
     }
 }
