@@ -20,7 +20,6 @@ import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
-import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JFrame;
@@ -101,8 +100,7 @@ public class HUDPanel extends JPanel {
 	// tombol Start ditekan.
 	private final JFrame parentFrame;
 
-	// Combo box untuk memilih tingkat kesulitan.
-	private JComboBox<String> difficultyCombo;
+
 
 	// Background image
 	private BufferedImage backgroundImage;
@@ -220,19 +218,6 @@ public class HUDPanel extends JPanel {
 		centerPanel.setOpaque(false);
 		centerPanel.setLayout(new BoxLayout(centerPanel, BoxLayout.Y_AXIS));
 
-		JLabel instructionLabel = new JLabel("Pilih Level / Difficulty");
-		instructionLabel.setFont(customFont.deriveFont(20f));
-		instructionLabel.setForeground(new Color(173, 216, 230));
-		instructionLabel.setAlignmentX(CENTER_ALIGNMENT);
-		instructionLabel.setBorder(BorderFactory.createEmptyBorder(0, 0, 15, 0));
-
-		difficultyCombo = new JComboBox<>(new String[] { "Easy", "Medium", "Hard", "Extreme" });
-		difficultyCombo.setFont(customFont.deriveFont(16f));
-		difficultyCombo.setMaximumSize(new Dimension(300, 45));
-		difficultyCombo.setAlignmentX(CENTER_ALIGNMENT);
-		difficultyCombo.setBackground(new Color(30, 40, 60));
-		difficultyCombo.setForeground(new Color(173, 216, 230));
-
 		RoundedButton startButton = new RoundedButton("PLAY", new Color(100, 200, 100), new Color(150, 255, 150));
 		startButton.setFont(customFont.deriveFont(22f));
 		startButton.setAlignmentX(CENTER_ALIGNMENT);
@@ -257,14 +242,11 @@ public class HUDPanel extends JPanel {
 			}
 		});
 
-		centerPanel.add(Box.createVerticalStrut(80)); // tengahin untuk play exit
-		centerPanel.add(instructionLabel);
-		centerPanel.add(difficultyCombo);
-		centerPanel.add(Box.createVerticalStrut(40)); // tengahin play exit
+		centerPanel.add(Box.createVerticalStrut(140)); // tengahin untuk play exit
 		centerPanel.add(startButton);
 		centerPanel.add(Box.createVerticalStrut(20));
 		centerPanel.add(exitButton);
-		centerPanel.add(Box.createVerticalStrut(80));
+		centerPanel.add(Box.createVerticalStrut(140));
 
 		return centerPanel;
 	}
