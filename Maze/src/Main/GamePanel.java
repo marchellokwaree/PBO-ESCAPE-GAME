@@ -59,7 +59,7 @@ public class GamePanel extends JPanel implements Runnable {
     public Timer timer;
     public ArrayList<Obstacle> obstacles = new ArrayList<>();
     public ArrayList<Entity> entities = new ArrayList<>();
-    public Image floorTile, wallCenter, playerimg, ExitDoor, larkImage;
+    public Image floorTile, wallCenter, playerimg, ExitDoor;
     public BufferedImage bufferedImage, redHoodIcon;
     public ArrayList<Entity> monsters = new ArrayList<>();
 
@@ -81,9 +81,7 @@ public class GamePanel extends JPanel implements Runnable {
     private boolean gameOver = false; // Flag untuk mencegah multiple win/lose triggers
 
     // Lark 1A cheat console
-    private ArrayList<int[]> larkPositions = new ArrayList<>(); // Posisi tile "L" di map
-    private boolean cheatPopupOpen = false; // Flag popup sedang terbuka
-    private boolean wasOnLarkTile = false; // Deteksi masuk tile L (edge detection)
+    public LarkConsole larkConsole;
 
     public GamePanel() {
         try {
@@ -101,6 +99,7 @@ public class GamePanel extends JPanel implements Runnable {
         this.setDoubleBuffered(true);
 
         loadAssets();
+        larkConsole = new LarkConsole(this);
 
         int startX = 0, startY = 0;
         for (int i = 0; i < maxWorldRow; i++) {
@@ -154,7 +153,7 @@ public class GamePanel extends JPanel implements Runnable {
                 }
 
                 if ("L".equals(map1[i][j])) {
-                    larkPositions.add(new int[] { j * tileSize, i * tileSize });
+                    larkConsole.addPosition(j * tileSize, i * tileSize);
                 }
 
                 if ("C".equals(map1[i][j])) {
@@ -202,9 +201,6 @@ public class GamePanel extends JPanel implements Runnable {
 
             // Loading Tiles
             this.floorTile = loadImage("/Assets/lab_tileset_LITE/seperated/tile031.png");
-
-            // Loading Lark 1A Sprite
-            this.larkImage = loadImage("/Assets/ASSET/Lark 1A.png");
 
             this.wallCenter = loadImage("/Assets/lab_tileset_LITE/seperated/tile066.png");
             this.wallCornerBottomLeft = loadImage("/Assets/lab_tileset_LITE/seperated/tile067.png");
@@ -423,7 +419,7 @@ public class GamePanel extends JPanel implements Runnable {
     }
 
     public void update() {
-        if (cheatPopupOpen) {
+        if (larkConsole != null && larkConsole.isCheatPopupOpen()) {
             return;
         }
         if (player != null) {
@@ -814,8 +810,8 @@ public class GamePanel extends JPanel implements Runnable {
 
                     // Draw Lark 1A marker tile
                     if ("L".equals(map1[i][j])) {
-                        if (larkImage != null) {
-                            g2.drawImage(larkImage, screenX, screenY, tileSize, tileSize, null);
+                        if (larkConsole.getLarkImage() != null) {
+                            g2.drawImage(larkConsole.getLarkImage(), screenX, screenY, tileSize, tileSize, null);
                         } else {
                             // Glowing cyan marker (fallback)
                             g2.setColor(new Color(0, 200, 255, 80));
@@ -1173,222 +1169,8 @@ public class GamePanel extends JPanel implements Runnable {
         }
 
         // ===== LARK 1A CHEAT CONSOLE =====
-        // Deteksi apakah player berdiri di atas tile "L"
-        boolean isOnLarkTile = false;
-        for (int[] larkPos : larkPositions) {
-            Rectangle larkHitbox = new Rectangle(larkPos[0], larkPos[1], tileSize, tileSize);
-            if (larkHitbox.intersects(player.getHitbox())) {
-                isOnLarkTile = true;
-                break;
-            }
-        }
-
-        // Edge detection: popup hanya muncul saat PERTAMA KALI masuk tile L
-        if (isOnLarkTile && !wasOnLarkTile && !cheatPopupOpen) {
-            // Reset keys immediately so player stops moving
-            keyH.upPressed = false;
-            keyH.downPressed = false;
-            keyH.leftPressed = false;
-            keyH.rightPressed = false;
-
-            cheatPopupOpen = true;
-            SwingUtilities.invokeLater(() -> {
-                String input = showStyledCheatDialog();
-                if (input != null && !input.trim().isEmpty()) {
-                    processCheatCode(input.trim());
-                }
-                cheatPopupOpen = false;
-            });
-        }
-        wasOnLarkTile = isOnLarkTile;
+        larkConsole.checkCollision();
         // ===== END LARK 1A =====
-    }
-
-    /**
-     * Memperlihatkan dialog cheat console yang didesain retro sesuai tema game.
-     */
-    private String showStyledCheatDialog() {
-        JFrame frame = (JFrame) SwingUtilities.getWindowAncestor(this);
-        JDialog dialog = new JDialog(frame, "LARK 1A - Cheat Console", true);
-        dialog.setUndecorated(true); // Custom title bar
-        dialog.setSize(380, 220);
-        dialog.setLocationRelativeTo(frame);
-
-        JPanel mainPanel = new JPanel();
-        mainPanel.setLayout(null);
-        mainPanel.setBackground(new Color(15, 15, 18));
-        mainPanel.setBorder(javax.swing.BorderFactory.createLineBorder(new Color(0, 200, 255), 2));
-
-        Font pixelFont = null;
-        try {
-            InputStream is = getClass().getResourceAsStream("/Assets/Pixuf.ttf");
-            if (is != null) {
-                pixelFont = Font.createFont(Font.TRUETYPE_FONT, is);
-            }
-        } catch (Exception e) {
-            // Abaikan jika gagal
-        }
-
-        if (pixelFont == null) {
-            pixelFont = new Font("Consolas", Font.BOLD, 14);
-        }
-
-        JLabel titleLabel = new JLabel("LARK 1A - SYSTEM TERMINAL");
-        titleLabel.setBounds(20, 15, 340, 25);
-        titleLabel.setFont(pixelFont.deriveFont(Font.BOLD, 16f));
-        titleLabel.setForeground(new Color(0, 200, 255));
-        mainPanel.add(titleLabel);
-
-        JLabel promptLabel = new JLabel("ENTER ACCESS KEY / CHEAT CODE:");
-        promptLabel.setBounds(20, 45, 340, 20);
-        promptLabel.setFont(pixelFont.deriveFont(12f));
-        promptLabel.setForeground(new Color(200, 200, 200));
-        mainPanel.add(promptLabel);
-
-        JTextField textField = new JTextField();
-        textField.setBounds(20, 75, 340, 35);
-        textField.setBackground(new Color(25, 25, 30));
-        textField.setForeground(new Color(0, 255, 150)); // Hijau neon
-        textField.setCaretColor(new Color(0, 255, 150));
-        textField.setFont(pixelFont.deriveFont(14f));
-        textField.setBorder(javax.swing.BorderFactory.createCompoundBorder(
-                javax.swing.BorderFactory.createLineBorder(new Color(0, 200, 255, 100), 1),
-                javax.swing.BorderFactory.createEmptyBorder(5, 8, 5, 8)));
-        mainPanel.add(textField);
-        final String[] result = { null };
-
-        JButton btnOk = new JButton("EXECUTE") {
-            @Override
-            protected void paintComponent(Graphics g) {
-                Graphics2D g2 = (Graphics2D) g.create();
-                // Clear background with parent's color first to avoid alpha stacking artifact
-                g2.setColor(new Color(15, 15, 18));
-                g2.fillRect(0, 0, getWidth(), getHeight());
-
-                // Draw our custom background
-                if (getModel().isPressed()) {
-                    g2.setColor(new Color(0, 120, 220));
-                } else if (getModel().isRollover()) {
-                    g2.setColor(new Color(0, 150, 255, 60));
-                    setForeground(Color.WHITE);
-                } else {
-                    g2.setColor(new Color(0, 150, 255, 20));
-                    setForeground(new Color(0, 200, 255));
-                }
-                g2.fillRect(0, 0, getWidth(), getHeight());
-
-                // Draw border
-                g2.setColor(new Color(0, 200, 255));
-                g2.drawRect(0, 0, getWidth() - 1, getHeight() - 1);
-                g2.dispose();
-
-                super.paintComponent(g);
-            }
-        };
-        btnOk.setBounds(20, 155, 160, 40);
-        btnOk.setFont(pixelFont.deriveFont(Font.BOLD, 12f));
-        btnOk.setFocusPainted(false);
-        btnOk.setContentAreaFilled(false);
-        btnOk.setBorder(javax.swing.BorderFactory.createEmptyBorder());
-        btnOk.addActionListener(e -> {
-            result[0] = textField.getText();
-            dialog.dispose();
-        });
-        mainPanel.add(btnOk);
-
-        JButton btnCancel = new JButton("ABORT") {
-            @Override
-            protected void paintComponent(Graphics g) {
-                Graphics2D g2 = (Graphics2D) g.create();
-                // Clear background with parent's color first to avoid alpha stacking artifact
-                g2.setColor(new Color(15, 15, 18));
-                g2.fillRect(0, 0, getWidth(), getHeight());
-
-                // Draw our custom background
-                if (getModel().isPressed()) {
-                    g2.setColor(new Color(200, 30, 30));
-                } else if (getModel().isRollover()) {
-                    g2.setColor(new Color(255, 50, 50, 50));
-                    setForeground(Color.WHITE);
-                } else {
-                    g2.setColor(new Color(255, 50, 50, 15));
-                    setForeground(new Color(255, 100, 100));
-                }
-                g2.fillRect(0, 0, getWidth(), getHeight());
-
-                // Draw border
-                g2.setColor(new Color(255, 100, 100));
-                g2.drawRect(0, 0, getWidth() - 1, getHeight() - 1);
-                g2.dispose();
-
-                super.paintComponent(g);
-            }
-        };
-        btnCancel.setBounds(200, 155, 160, 40);
-        btnCancel.setFont(pixelFont.deriveFont(Font.BOLD, 12f));
-        btnCancel.setFocusPainted(false);
-        btnCancel.setContentAreaFilled(false);
-        btnCancel.setBorder(javax.swing.BorderFactory.createEmptyBorder());
-        btnCancel.addActionListener(e -> {
-            dialog.dispose();
-        });
-        mainPanel.add(btnCancel);
-
-        textField.addActionListener(e -> {
-            result[0] = textField.getText();
-            dialog.dispose();
-        });
-
-        dialog.setContentPane(mainPanel);
-        dialog.addWindowListener(new java.awt.event.WindowAdapter() {
-            public void windowOpened(java.awt.event.WindowEvent e) {
-                textField.requestFocusInWindow();
-            }
-        });
-
-        dialog.setVisible(true);
-        return result[0];
-    }
-
-    /**
-     * Memproses cheat code yang dimasukkan melalui Lark 1A console.
-     */
-    private void processCheatCode(String code) {
-        switch (code.toLowerCase()) {
-            case "99":
-                System.out.println("CHEAT ACTIVATED: Instant Win!");
-                WinGame();
-                break;
-            case "heal":
-                if (player != null && player.darah != null) {
-                    player.darah.heal(100);
-                    System.out.println("CHEAT ACTIVATED: Full Heal! HP: " + player.darah.getCurrentHP());
-                }
-                break;
-            case "soeharto":
-                if (player != null && player.darah != null) {
-                    player.darah.heal(-99);
-                    System.out.println("CHEAT ACTIVATED: Ditembak petrus! HP: " + player.darah.getCurrentHP());
-                }
-                break;
-            case "speed":
-                if (player != null) {
-                    player.speed += 2;
-                    player.normalSpeed += 2;
-                    System.out.println("CHEAT ACTIVATED: Speed increased! Speed: " + player.speed + ", Normal Speed: " + player.normalSpeed);
-                }
-                break;
-            default:
-                System.out.println("Cheat code tidak dikenali: " + code);
-                SwingUtilities.invokeLater(() -> {
-                    JOptionPane.showMessageDialog(
-                            this,
-                            "Cheat code \"" + code + "\" tidak dikenali!",
-                            "LARK 1A",
-                            JOptionPane.WARNING_MESSAGE);
-                });
-                break;
-        }
     }
 
     private Item getRandomItem() {
