@@ -5,6 +5,7 @@ import java.awt.Image;
 import java.awt.Rectangle;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
+import Item.Lantern;
 import Main.Darah;
 import Main.GamePanel;
 import Main.KeyHandler;
@@ -102,6 +103,10 @@ public class Player extends Entity {
 
     public Rectangle getHitbox() {
         return new Rectangle(x + hitbox.x, y + hitbox.y, hitbox.width, hitbox.height);
+    }
+
+    public GamePanel getGamePanel() {
+        return this.gp;
     }
 
     public void update() {
@@ -317,6 +322,19 @@ public class Player extends Entity {
 
         }
         g2.setTransform(originalTransform);
+
+        if (gp.inventory != null && gp.inventory.equippedLantern != null
+                && gp.inventory.equippedLantern instanceof Lantern) {
+            Lantern lantern = (Lantern) gp.inventory.equippedLantern;
+            BufferedImage lanternFrame = lantern.getAnimatedFrame();
+            if (lanternFrame != null) {
+                int iconSize = 20;
+                int lanternX = drawX + (gp.getTileSize() - iconSize) / 2;
+                int bob = (int) (Math.sin(System.currentTimeMillis() / 180.0) * 2);
+                int lanternY = drawY - iconSize - 8 + bob;
+                g2.drawImage(lanternFrame, lanternX, lanternY, iconSize, iconSize, null);
+            }
+        }
 
         // Render slash effect
         if (isSlashActive && slashImages[slashFrame] != null) {

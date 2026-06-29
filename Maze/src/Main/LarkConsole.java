@@ -9,6 +9,7 @@ import java.awt.Rectangle;
 import java.io.InputStream;
 import java.util.ArrayList;
 import javax.swing.JButton;
+import javax.swing.JOptionPane;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -16,10 +17,12 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
+import Item.Lantern;
 
 /**
  * LarkConsole class handles the Lark 1A cheat console system.
- * It manages cheat tile positions, collision detection, retro dialog UI, and cheat processing.
+ * It manages cheat tile positions, collision detection, retro dialog UI, and
+ * cheat processing.
  */
 public class LarkConsole {
     private final GamePanel gp;
@@ -38,7 +41,7 @@ public class LarkConsole {
     }
 
     public void addPosition(int x, int y) {
-        larkPositions.add(new int[]{x, y});
+        larkPositions.add(new int[] { x, y });
     }
 
     public void clearPositions() {
@@ -54,10 +57,12 @@ public class LarkConsole {
     }
 
     /**
-     * Checks if the player is standing on any Lark ("L") tiles and triggers the cheat console.
+     * Checks if the player is standing on any Lark ("L") tiles and triggers the
+     * cheat console.
      */
     public void checkCollision() {
-        if (gp.player == null) return;
+        if (gp.player == null)
+            return;
 
         // Deteksi apakah player berdiri di atas tile "L"
         boolean isOnLarkTile = false;
@@ -244,8 +249,21 @@ public class LarkConsole {
     private void processCheatCode(String code) {
         switch (code.toLowerCase()) {
             case "99":
-                System.out.println("CHEAT ACTIVATED: Instant Win!");
-                gp.WinGame();
+                System.out.println("CHEAT ACTIVATED: Instant Win / Lantern test prompt!");
+                int choice = JOptionPane.showOptionDialog(
+                        gp,
+                        "Pilih aksi cheat:\n\nYes = End Game\nNo = Dapatkan Lantern untuk tes.",
+                        "LARK 1A - Cheat Mode",
+                        JOptionPane.YES_NO_OPTION,
+                        JOptionPane.QUESTION_MESSAGE,
+                        null,
+                        new String[] { "End Game", "Dapatkan Lantern" },
+                        "Dapatkan Lantern");
+                if (choice == JOptionPane.YES_OPTION) {
+                    gp.WinGame();
+                } else if (choice == JOptionPane.NO_OPTION) {
+                    grantLantern();
+                }
                 break;
             case "heal":
                 if (gp.player != null && gp.player.darah != null) {
@@ -263,7 +281,8 @@ public class LarkConsole {
                 if (gp.player != null) {
                     gp.player.speed += 2;
                     gp.player.normalSpeed += 2;
-                    System.out.println("CHEAT ACTIVATED: Speed increased! Speed: " + gp.player.speed + ", Normal Speed: " + gp.player.normalSpeed);
+                    System.out.println("CHEAT ACTIVATED: Speed increased! Speed: " + gp.player.speed
+                            + ", Normal Speed: " + gp.player.normalSpeed);
                 }
                 break;
             default:
@@ -276,6 +295,49 @@ public class LarkConsole {
                             JOptionPane.WARNING_MESSAGE);
                 });
                 break;
+        }
+    }
+
+    private void grantLantern() {
+        if (gp == null || gp.inventory == null || gp.player == null) {
+            return;
+        }
+
+        Lantern lantern = new Lantern("Lampu Cheat", 2, 2);
+        boolean added = gp.inventory.addItem(lantern);
+
+        if (gp.inventory.equippedLantern == null) {
+            gp.inventory.equippedLantern = lantern;
+            System.out.println("Lantern cheat di-equip otomatis.");
+        }
+
+        gp.player.attackDamage = gp.player.baseDamage;
+        gp.player.defense = gp.player.baseDefense;
+        gp.safeVisionTiles = gp.baseSafeVisionTiles;
+        gp.visionRangeTiles = gp.baseVisionRangeTiles;
+
+        if (gp.inventory.equippedWeapon != null) {
+            gp.inventory.equippedWeapon.use(gp.player);
+        }
+        if (gp.inventory.equippedArmor != null) {
+            gp.inventory.equippedArmor.use(gp.player);
+        }
+        if (gp.inventory.equippedLantern != null) {
+            gp.inventory.equippedLantern.use(gp.player);
+        }
+
+        if (added) {
+            JOptionPane.showMessageDialog(
+                    gp,
+                    "Lantern cheat telah diberikan dan di-equip untuk pengujian.",
+                    "LARK 1A",
+                    JOptionPane.INFORMATION_MESSAGE);
+        } else {
+            JOptionPane.showMessageDialog(
+                    gp,
+                    "Inventory penuh, tetapi lantern cheat tetap di-equip.",
+                    "LARK 1A",
+                    JOptionPane.WARNING_MESSAGE);
         }
     }
 }

@@ -5,6 +5,7 @@ import Entitiy.*;
 import Item.Item;
 import Item.DamageItem;
 import Item.DefenseItem;
+import Item.Lantern;
 
 import java.awt.Color;
 import javax.sound.sampled.AudioInputStream;
@@ -61,9 +62,14 @@ public class GamePanel extends JPanel implements Runnable {
     public BufferedImage bufferedImage, redHoodIcon;
     public ArrayList<Entity> monsters = new ArrayList<>();
 
-    // Fog of war settings
-    public int safeVisionTiles = 100; // tiles always fully visible around player
-    public int visionRangeTiles = 100; // tiles where player can still see, beyond this is black
+    // Lantern spawn control
+    boolean lanternSpawned = false;
+    boolean lanternCollected = false;
+
+    public final int baseSafeVisionTiles = 2;
+    public final int baseVisionRangeTiles = 3;
+    public int safeVisionTiles = baseSafeVisionTiles; // tiles always fully visible around player
+    public int visionRangeTiles = baseVisionRangeTiles; // tiles where player can still see, beyond this is black
 
     // Smooth camera position (world coordinates of top-left of screen)
     private double cameraX = 0.0;
@@ -214,7 +220,7 @@ public class GamePanel extends JPanel implements Runnable {
             this.wallTDown = loadImage("/Assets/lab_tileset_LITE/seperated/tile041.png");
             this.wallTLeft = loadImage("/Assets/lab_tileset_LITE/seperated/tile054.png");
             this.wallTRight = loadImage("/Assets/lab_tileset_LITE/seperated/tile055.png");
-            
+
             // Loading Red Hood Sprite for UI Icon
             BufferedImage redHoodSheet = loadBufferedImage("/Assets/ASSET/ASSETKARAKTER/AnimationSheet_Character.png");
             if (redHoodSheet != null) {
@@ -871,7 +877,6 @@ public class GamePanel extends JPanel implements Runnable {
             }
         }
 
-        // Fog of war overlay: darken tiles by distance
         if (player != null) {
             double playerCenterX = player.x + tileSize * 0.5; // player center x
             double playerCenterY = player.y + tileSize * 0.5; // player center y
@@ -1170,6 +1175,14 @@ public class GamePanel extends JPanel implements Runnable {
     }
 
     private Item getRandomItem() {
+        if (!lanternSpawned && !lanternCollected) {
+            int lanternChance = (int) (Math.random() * 20) + 1; // 5% chance
+            if (lanternChance == 1) {
+                lanternSpawned = true;
+                return new Lantern("Lampu Lentera", 2, 2);
+            }
+        }
+
         int randomNum = (int) (Math.random() * 8) + 1;
 
         switch (randomNum) {
@@ -1219,7 +1232,7 @@ public class GamePanel extends JPanel implements Runnable {
                 for (int i = 0; i < openChest.chestSlots.length; i++) {
                     if (openChest.chestSlots[i] == null) { // Jika ketemu kotak kosong
 
-                        // 1. Lepas equip jika sedang dipakai
+                        // 1. Lepas equip jika sedang dipakai (kecuali lantern yang selalu terpasang)
                         if (itemDiTas == inventory.equippedWeapon)
                             inventory.equippedWeapon = null;
                         if (itemDiTas == inventory.equippedArmor)
@@ -1227,10 +1240,14 @@ public class GamePanel extends JPanel implements Runnable {
 
                         player.attackDamage = player.baseDamage;
                         player.defense = player.baseDefense;
+                        this.safeVisionTiles = this.baseSafeVisionTiles;
+                        this.visionRangeTiles = this.baseVisionRangeTiles;
                         if (inventory.equippedWeapon != null)
                             inventory.equippedWeapon.use(player);
                         if (inventory.equippedArmor != null)
                             inventory.equippedArmor.use(player);
+                        if (inventory.equippedLantern != null)
+                            inventory.equippedLantern.use(player);
 
                         // 2. Pindahkan barang dari Tas ke Peti
                         openChest.chestSlots[i] = itemDiTas;
@@ -1262,7 +1279,8 @@ public class GamePanel extends JPanel implements Runnable {
             Item itemToEquip = inventory.slots[slotIndex];
 
             // 1A. LOGIKA UNEQUIP (LEPAS ITEM)
-            // Jika item yang ditekan sama persis dengan yang sedang dipakai, maka lepas!
+            // Senjata dan armor boleh dilepas, tetapi lantern tidak bisa dilepas dari slot
+            // normal.
             if (itemToEquip == inventory.equippedWeapon) {
                 inventory.equippedWeapon = null;
                 System.out.println("Senjata dilepas!");
@@ -1271,7 +1289,7 @@ public class GamePanel extends JPanel implements Runnable {
                 System.out.println("Armor dilepas!");
             }
             // 1B. LOGIKA EQUIP (PASANG ITEM BARU)
-            // Jika belum dipakai, maka cek tipe class-nya lalu pasang
+            // Jika belum dipakai, maka cek tipe class-nya lalu pasang.
             else {
                 if (itemToEquip instanceof DamageItem) {
                     inventory.equippedWeapon = itemToEquip;
@@ -1279,12 +1297,16 @@ public class GamePanel extends JPanel implements Runnable {
                 } else if (itemToEquip instanceof DefenseItem) {
                     inventory.equippedArmor = itemToEquip;
                     System.out.println("Armor baru di-equip!");
+                } else if (itemToEquip instanceof Lantern) {
+                    System.out.println("Lantern tidak bisa dilepas atau diubah melalui slot normal.");
                 }
             }
 
             // 2. RESET STATUS KE NILAI AWAL (Pencegah Bug Infinite Stats)
             player.attackDamage = player.baseDamage;
             player.defense = player.baseDefense;
+            this.safeVisionTiles = this.baseSafeVisionTiles;
+            this.visionRangeTiles = this.baseVisionRangeTiles;
 
             // 3. TERAPKAN EFEK DARI ITEM YANG MASIH TERPASANG (JIKA ADA)
             if (inventory.equippedWeapon != null) {
@@ -1293,6 +1315,9 @@ public class GamePanel extends JPanel implements Runnable {
             if (inventory.equippedArmor != null) {
                 inventory.equippedArmor.use(player);
             }
+            if (inventory.equippedLantern != null) {
+                inventory.equippedLantern.use(player);
+            }
 
             System.out.println("Status Sekarang -> ATK: " + player.attackDamage + " | DEF: " + player.defense + "%");
 
@@ -1300,6 +1325,5 @@ public class GamePanel extends JPanel implements Runnable {
             System.out.println("Slot " + (slotIndex + 1) + " kosong!");
         }
     }
-
 
 }

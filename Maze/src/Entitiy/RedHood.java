@@ -160,13 +160,13 @@ public class RedHood extends Entity {
     }
 
     /**
-     * Draws the RedHood counter banner at the top left corner of the screen.
+     * Draws the RedHood counter banner at the top right corner of the screen.
      */
     public static void drawCounter(Graphics2D g2, GamePanel gp) {
-        int x = 14;
-        int y = 42; // y = 10 (health bar) + 28 (health bar height) + 4 (spacing) = 42
         int width = 212;
         int height = 28;
+        int x = gp.screenWidth - width - 14; // top-right corner with 14px margin
+        int y = 10; // near the top edge
         int radius = 12;
 
         // Background panel
@@ -182,10 +182,10 @@ public class RedHood extends Entity {
         int innerY = y + 4;
         int innerWidth = width - 8;
         int innerHeight = height - 8;
-        
+
         g2.setColor(new Color(35, 40, 50, 230)); // solid steel-blue-gray background
         g2.fillRoundRect(innerX, innerY, innerWidth, innerHeight, radius, radius);
-        
+
         g2.setColor(new Color(255, 255, 255, 140)); // inner glow border
         g2.drawRoundRect(innerX, innerY, innerWidth, innerHeight, radius, radius);
 
@@ -197,19 +197,19 @@ public class RedHood extends Entity {
 
         FontMetrics metrics = g2.getFontMetrics(gp.customFont);
         int textWidth = metrics.stringWidth(text);
-        
+
         int textY = innerY + innerHeight - 4; // Center text vertically
-        
+
         if (gp.redHoodIcon != null) {
             int iconSize = 20;
             int gap = 6;
             int groupWidth = iconSize + gap + textWidth;
-            
+
             int startX = innerX + (innerWidth - groupWidth) / 2;
             int iconX = startX;
             int iconY = innerY; // Fits perfectly because innerHeight is 20 and iconSize is 20
             int textX = startX + iconSize + gap;
-            
+
             g2.drawImage(gp.redHoodIcon, iconX, iconY, iconSize, iconSize, null);
             g2.drawString(text, textX, textY);
         } else {
