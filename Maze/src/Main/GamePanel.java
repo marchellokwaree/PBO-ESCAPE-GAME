@@ -296,6 +296,7 @@ public class GamePanel extends JPanel implements Runnable {
     private String[][] loadMapFromFileOrDefault() {
         String filePath = resolveMapFilePath(MAP_FILE_PATH);
         String[][] loaded = new MapLoader().loadMapFromFile(filePath);
+        TrapRandomizer.randomize(loaded, 0.04, 0.04);
         return loaded;
     }
 
