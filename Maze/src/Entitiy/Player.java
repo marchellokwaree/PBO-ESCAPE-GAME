@@ -5,15 +5,10 @@ import java.awt.Image;
 import java.awt.Rectangle;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
-import javax.sound.sampled.AudioInputStream;
-import javax.sound.sampled.AudioSystem;
-import javax.sound.sampled.Clip;
-import java.io.InputStream;
-import java.io.BufferedInputStream;
-import java.io.File;
 import Main.Darah;
 import Main.GamePanel;
 import Main.KeyHandler;
+import Main.SoundManager;
 
 public class Player extends Entity {
     GamePanel gp;
@@ -34,6 +29,8 @@ public class Player extends Entity {
     public int normalSpeed = 2;
     public int slowSpeed = 1;
     public int slowEffectCounter = 0; // Counter untuk efek slow
+    public int stunCounter = 0; // Counter untuk efek stun
+    public int stunCooldown = 0; // Cooldown imunitas stun setelah selesai di-stun
     public int screenX;
     public int screenY;
     public final int defaultScreenX;
@@ -50,9 +47,6 @@ public class Player extends Entity {
     public int slashCounter = 0;
     public int slashFrame = 0;
     public String slashDirection = "DOWN";
-
-    // Footstep audio variables
-    private Clip footstepClip;
 
     // Constructor disesuaikan dengan GamePanel kamu (5 parameter)
     public Player(GamePanel gp, KeyHandler keyH, Image playerImg, int x, int y) {
@@ -88,9 +82,6 @@ public class Player extends Entity {
             e.printStackTrace();
         }
 
-        // Load footstep sound
-        loadFootstepSound();
-
         // Sesuaikan hitbox dengan ukuran tile 24x24.
         // Hitbox lebih kecil agar tidak menabrak dinding di bawah/sekitar sprite.
         hitbox = new Rectangle();
@@ -115,6 +106,11 @@ public class Player extends Entity {
 
     public void update() {
         updateEffects();
+        if (stunCounter > 0) {
+            spriteNum = 1; // Kembali ke posisi diam jika stun
+            SoundManager.stop("/Assets/Sound/Footstep.wav");
+            return;
+        }
         int nextX = x;
         int nextY = y;
         // --- KAMERA CLAMPING (Mencegah kamera keluar map) ---
@@ -165,11 +161,7 @@ public class Player extends Entity {
         }
         // LOGIKA ANIMASI: Berganti antara spriteNum 1 dan 2 saat bergerak
         if (moving) {
-            if (footstepClip != null && !footstepClip.isRunning()) {
-                footstepClip.setFramePosition(0);
-                footstepClip.loop(Clip.LOOP_CONTINUOUSLY);
-                footstepClip.start();
-            }
+            SoundManager.loop("/Assets/Sound/Footstep.wav");
 
             spriteCounter++;
             if (spriteCounter > 12) { // Kecepatan ganti kaki
@@ -197,9 +189,7 @@ public class Player extends Entity {
                 currentImage = walkImages[spriteNum - 1]; // Ganti gambar sesuai dengan spriteNum
             }
         } else {
-            if (footstepClip != null && footstepClip.isRunning()) {
-                footstepClip.stop();
-            }
+            SoundManager.stop("/Assets/Sound/Footstep.wav");
             spriteNum = 1; // Kembali ke posisi diam jika berhenti
         }
 
@@ -218,6 +208,14 @@ public class Player extends Entity {
             if (slowEffectCounter == 0) {
                 speed = normalSpeed;
             }
+        }
+        if (stunCounter > 0) {
+            stunCounter--;
+            if (stunCounter == 0) {
+                stunCooldown = 180; // Imunitas stun selama 3 detik (180 frame)
+            }
+        } else if (stunCooldown > 0) {
+            stunCooldown--;
         }
         if (damageCooldown > 0) {
             damageCooldown--;
@@ -248,6 +246,13 @@ public class Player extends Entity {
         speed = slowSpeed;
     }
 
+    public void applyStun(int durationFrames) {
+        if (stunCounter == 0 && stunCooldown == 0) {
+            stunCounter = durationFrames;
+            SoundManager.play("/Assets/Sound/IceEffect.wav");
+        }
+    }
+
     public void draw(Graphics2D g2) {
         int camX = gp.getCameraXInt();
         int camY = gp.getCameraYInt();
@@ -255,10 +260,6 @@ public class Player extends Entity {
         Image walkingImage = null;
 
         // EFEK VISUAL JALAN:
-        // Jika sedang melangkah (spriteNum 2), gambar naik sedikit agar terlihat
-        // seperti melangkah
-        // Jika kamu sudah punya 2 gambar berbeda, kamu bisa mengganti gambarnya di
-        // sini.
         if (spriteNum == 2) {
             drawY -= 4;
             // Ganti ke gambar berjalan
@@ -370,6 +371,9 @@ public class Player extends Entity {
      * SPASI).
      */
     public void attackEnemies(java.util.ArrayList<Entity> monsters) {
+        if (stunCounter > 0) {
+            return; // Hentikan eksekusi, player tidak boleh menyerang jika kena stun
+        }
         // Cek apakah serangan masih dalam masa cooldown
         if (attackCooldown > 0) {
             return; // Hentikan eksekusi, player belum boleh menyerang
@@ -377,6 +381,9 @@ public class Player extends Entity {
 
         // Jika berhasil menyerang, reset cooldown menjadi 60 frame (1 detik)
         attackCooldown = 60;
+
+        // Play sword slash sound
+        SoundManager.play("/Assets/Sound/mixkit-sword-slash-swoosh-1476.wav");
 
         // Trigger slash animation
         isSlashActive = true;
@@ -457,45 +464,11 @@ public class Player extends Entity {
 
         // 4. Kurangi HP pemain
         this.darah.takeDamage(damageAkhir);
+        if (damageAkhir > 0) {
+            SoundManager.play("/Assets/Sound/takeDMG.wav");
+        }
 
         System.out.println("Terkena Hit! Base Damage: " + damageAsli + " | Blocked: " + persenDef + "% | Damage Masuk: "
                 + damageAkhir);
-    }
-
-    private void loadFootstepSound() {
-        try {
-            AudioInputStream audioStream = null;
-            InputStream is = getClass().getResourceAsStream("/Assets/Sound/Footstep.wav");
-            if (is != null) {
-                InputStream bufferedIn = new BufferedInputStream(is);
-                audioStream = AudioSystem.getAudioInputStream(bufferedIn);
-            } else {
-                File soundFile = resolveFile("/Assets/Sound/Footstep.wav");
-                if (soundFile.exists()) {
-                    audioStream = AudioSystem.getAudioInputStream(soundFile);
-                }
-            }
-
-            if (audioStream != null) {
-                footstepClip = AudioSystem.getClip();
-                footstepClip.open(audioStream);
-            } else {
-                System.err.println("Footstep sound file not found.");
-            }
-        } catch (Exception e) {
-            System.err.println("Error loading footstep sound: " + e.getMessage());
-            e.printStackTrace();
-        }
-    }
-
-    private void playFootstepSound() {
-        if (footstepClip != null) {
-            try {
-                footstepClip.setFramePosition(0);
-                footstepClip.start();
-            } catch (Exception e) {
-                System.err.println("Error playing footstep sound: " + e.getMessage());
-            }
-        }
     }
 }

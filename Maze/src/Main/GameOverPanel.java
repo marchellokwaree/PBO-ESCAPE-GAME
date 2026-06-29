@@ -20,7 +20,8 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 /**
- * GameOverPanel menampilkan layar akhir game (WIN/LOSE) dengan style mirip landing page.
+ * GameOverPanel menampilkan layar akhir game (WIN/LOSE) dengan style mirip
+ * landing page.
  * Memiliki background TampilanAwal.png, teks "YOU WIN" atau "YOU LOSE",
  * serta tombol untuk kembali ke Main Menu atau Exit.
  */
@@ -63,6 +64,13 @@ public class GameOverPanel extends JPanel {
         // Footer
         JLabel footerLabel = createFooterLabel();
         add(footerLabel, BorderLayout.SOUTH);
+
+        // Play defeat sound if the player lost
+        if (!isWin) {
+            SoundManager.play("/Assets/Sound/SoundKalah.wav");
+        } else {
+            SoundManager.play("/Assets/Sound/SoundMenang.wav");
+        }
     }
 
     /**
@@ -155,7 +163,8 @@ public class GameOverPanel extends JPanel {
         subLabel.setBorder(BorderFactory.createEmptyBorder(0, 0, 40, 0));
 
         // Tombol MAIN MENU — kembali ke HUDPanel (landing page)
-        RoundedButton mainMenuButton = new RoundedButton("MAIN MENU", new Color(70, 130, 220), new Color(120, 180, 255));
+        RoundedButton mainMenuButton = new RoundedButton("MAIN MENU", new Color(70, 130, 220),
+                new Color(120, 180, 255));
         mainMenuButton.setFont(customFont.deriveFont(22f));
         mainMenuButton.setAlignmentX(CENTER_ALIGNMENT);
         mainMenuButton.setMaximumSize(new Dimension(300, 50));

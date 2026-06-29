@@ -7,6 +7,7 @@ import java.awt.image.BufferedImage;
 import Entitiy.Activity.IAttackable;
 import Main.GamePanel;
 import java.util.Random;
+import Main.SoundManager;
 
 public class Slime2 extends Entity implements IAttackable {
 
@@ -348,6 +349,7 @@ public class Slime2 extends Entity implements IAttackable {
                 this.attackFrame = 0;
                 this.attackCounter = 0;
                 this.hasDealtDamage = false; // Reset penanda pukulan
+                SoundManager.play("/Assets/Sound/SlimeNembak.wav");
             }
         }
 

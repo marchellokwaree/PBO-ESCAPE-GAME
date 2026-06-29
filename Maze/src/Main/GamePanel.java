@@ -7,6 +7,10 @@ import Item.DamageItem;
 import Item.DefenseItem;
 
 import java.awt.Color;
+import javax.sound.sampled.AudioInputStream;
+import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.Clip;
+import java.io.BufferedInputStream;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
@@ -235,7 +239,7 @@ public class GamePanel extends JPanel implements Runnable {
             if (stream != null) {
                 return ImageIO.read(stream);
             }
-            File file = resolveImageFile(path);
+            File file = resolveFile(path);
             return ImageIO.read(file);
         } catch (Exception e) {
             System.err.println("Failed to load buffered image: " + path + " -> " + e.getMessage());
@@ -249,7 +253,7 @@ public class GamePanel extends JPanel implements Runnable {
             if (url != null) {
                 return new ImageIcon(url).getImage();
             }
-            File file = resolveImageFile(path);
+            File file = resolveFile(path);
             return new ImageIcon(file.getAbsolutePath()).getImage();
         } catch (Exception e) {
             System.err.println("Failed to load image: " + path + " -> " + e.getMessage());
@@ -257,7 +261,7 @@ public class GamePanel extends JPanel implements Runnable {
         }
     }
 
-    private File resolveImageFile(String path) {
+    private File resolveFile(String path) {
         String normalizedPath = path.replace("/", File.separator);
         String userDir = System.getProperty("user.dir");
 
@@ -1018,6 +1022,7 @@ public class GamePanel extends JPanel implements Runnable {
      */
     private void stopGame() {
         gameThread = null;
+        SoundManager.stop("/Assets/Sound/Footstep.wav");
     }
 
     protected void checkDamage() {
@@ -1076,7 +1081,7 @@ public class GamePanel extends JPanel implements Runnable {
                 IceTrap iceTrap = (IceTrap) obstacle;
                 Rectangle iceHitbox = new Rectangle(iceTrap.x, iceTrap.y, tileSize, tileSize);
                 if (iceTrap.active && iceHitbox.intersects(player.getHitbox())) {
-                    player.applySlow(5); // Contoh: efek es berlangsung selama 2 detik (120 frame)
+                    player.applyStun(120); // Efek es men-stun player selama 2 detik (120 frame)
                 }
             }
             if (obstacle instanceof HealPotion) {
@@ -1103,6 +1108,9 @@ public class GamePanel extends JPanel implements Runnable {
                             chest.isOpen = true;
                         }
                         chest.showChestUI = !chest.showChestUI;
+                        if (chest.showChestUI) {
+                            SoundManager.play("/Assets/Sound/OpenChest.wav");
+                        }
                         keyH.rightMousePressed = false;
                     }
 
@@ -1128,6 +1136,7 @@ public class GamePanel extends JPanel implements Runnable {
                                     if (masuk) {
                                         System.out.println(chest.chestSlots[i].name + " diambil dari peti!");
                                         chest.chestSlots[i] = null; // Kosongkan slot peti tersebut
+                                        SoundManager.play("/Assets/Sound/PickItem.wav");
                                     }
                                     break; // Cukup ambil 1 item per klik
                                 }
@@ -1451,6 +1460,7 @@ public class GamePanel extends JPanel implements Runnable {
 
                         System.out.println(itemDiTas.name + " ditaruh ke dalam peti!");
                         berhasilDitaruh = true;
+                        SoundManager.play("/Assets/Sound/PickItem.wav");
                         break; // Keluar dari loop agar tidak ter-copy ke kotak lain
                     }
                 }
@@ -1569,5 +1579,4 @@ public class GamePanel extends JPanel implements Runnable {
             g2.drawString(text, textX, textY);
         }
     }
-
 }
