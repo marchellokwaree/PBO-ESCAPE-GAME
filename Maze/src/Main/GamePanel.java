@@ -50,9 +50,7 @@ public class GamePanel extends JPanel implements Runnable {
     public final int maxWorldRow = map1.length;
     public final int worldWidth = tileSize * maxWorldCol;
     public final int worldHeight = tileSize * maxWorldRow;
-    protected int Key;
-    private int totalRedHoods = 0;
-    private Font customFont;
+    public Font customFont;
     public KeyHandler keyH = new KeyHandler();
     public Thread gameThread;
     public Player player;
@@ -84,6 +82,7 @@ public class GamePanel extends JPanel implements Runnable {
     public LarkConsole larkConsole;
 
     public GamePanel() {
+        Entitiy.RedHood.resetCounter();
         try {
             InputStream is = getClass().getResourceAsStream("/Assets/Pixuf.ttf");
             customFont = Font.createFont(Font.TRUETYPE_FONT, is).deriveFont(12f);
@@ -148,8 +147,6 @@ public class GamePanel extends JPanel implements Runnable {
 
                 if ("N".equals(map1[i][j])) {
                     entities.add(new RedHood(j * tileSize, i * tileSize, 0, this));
-                    Key++;
-                    totalRedHoods++;
                 }
 
                 if ("L".equals(map1[i][j])) {
@@ -909,7 +906,7 @@ public class GamePanel extends JPanel implements Runnable {
         if (player != null) {
             player.draw(g2);
             player.darah.draw(g2);
-            drawRedHoodCounter(g2);
+            Entitiy.RedHood.drawCounter(g2, this);
         }
 
         // Draw chest UI if open
@@ -1028,7 +1025,7 @@ public class GamePanel extends JPanel implements Runnable {
             if (obstacle instanceof Finish) {
                 Finish finish = (Finish) obstacle;
                 if (finish.collidesWith(player.x, player.y, tileSize)) {
-                    if (Key == 0) {
+                    if (Entitiy.RedHood.remainingRedHoods == 0) {
                         WinGame();
                     } else {
                         System.out.println("You need to find all Red Hood to unlock the exit!");
@@ -1162,8 +1159,6 @@ public class GamePanel extends JPanel implements Runnable {
                 if (enemyHitbox.intersects(player.getHitbox()) && !redHood.active) {
                     redHood.startDisappear();
                     System.out.println("you got a key ");
-                    Key--;
-
                 }
             }
         }
@@ -1305,60 +1300,5 @@ public class GamePanel extends JPanel implements Runnable {
         }
     }
 
-    private void drawRedHoodCounter(Graphics2D g2) {
-        int x = 14;
-        int y = 42; // y = 10 (health bar) + 28 (health bar height) + 4 (spacing) = 42
-        int width = 212;
-        int height = 28;
-        int radius = 12;
 
-        // Background panel
-        g2.setColor(new Color(0, 0, 0, 200));
-        g2.fillRoundRect(x, y, width, height, radius, radius);
-
-        // Border panel
-        g2.setColor(Color.WHITE);
-        g2.drawRoundRect(x, y, width, height, radius, radius);
-
-        // Inner border & filled panel (matching style of HP bar)
-        int innerX = x + 4;
-        int innerY = y + 4;
-        int innerWidth = width - 8;
-        int innerHeight = height - 8;
-        
-        g2.setColor(new Color(35, 40, 50, 230)); // solid steel-blue-gray background
-        g2.fillRoundRect(innerX, innerY, innerWidth, innerHeight, radius, radius);
-        
-        g2.setColor(new Color(255, 255, 255, 140)); // inner glow border
-        g2.drawRoundRect(innerX, innerY, innerWidth, innerHeight, radius, radius);
-
-        // Calculate Text
-        g2.setFont(customFont);
-        g2.setColor(Color.WHITE);
-        int saved = totalRedHoods - Key;
-        String text = "Saved: " + saved + " / " + totalRedHoods;
-
-        java.awt.FontMetrics metrics = g2.getFontMetrics(customFont);
-        int textWidth = metrics.stringWidth(text);
-        
-        int textY = innerY + innerHeight - 4; // Center text vertically
-        
-        if (redHoodIcon != null) {
-            int iconSize = 20;
-            int gap = 6;
-            int groupWidth = iconSize + gap + textWidth;
-            
-            int startX = innerX + (innerWidth - groupWidth) / 2;
-            int iconX = startX;
-            int iconY = innerY; // Fits perfectly because innerHeight is 20 and iconSize is 20
-            int textX = startX + iconSize + gap;
-            
-            g2.drawImage(redHoodIcon, iconX, iconY, iconSize, iconSize, null);
-            g2.drawString(text, textX, textY);
-        } else {
-            // Fallback: draw centered text without icon
-            int textX = innerX + (innerWidth - textWidth) / 2;
-            g2.drawString(text, textX, textY);
-        }
-    }
 }
