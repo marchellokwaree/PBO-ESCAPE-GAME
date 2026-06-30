@@ -1,11 +1,67 @@
 package Entitiy;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+
+import javax.imageio.ImageIO;
 
 public class Entity {
-    int x, y;
-    int speed;
+    public int x, y;
+    public int speed;
+    public int HP;
+    public int maxHP;
     public Entity(int x, int y, int speed) {
         this.x = x;
         this.y = y;
         this.speed = speed;
+    }
+
+    public Entity(int x, int y, int speed, int HP) {
+        this.x = x;
+        this.y = y;
+        this.speed = speed;
+        this.HP = HP;
+        this.maxHP = HP;
+    }
+
+    protected BufferedImage loadBufferedImage(String path) {
+        try (InputStream stream = getClass().getResourceAsStream(path)) {
+            if (stream != null) {
+                return ImageIO.read(stream);
+            }
+            File file = resolveFile(path);
+            return ImageIO.read(file);
+        } catch (IOException e) {
+            System.err.println("Failed to load player buffered image: " + path + " -> " + e.getMessage());
+            return null;
+        }
+    }
+
+    protected File resolveFile(String path) {
+        String normalizedPath = path.replace('/', File.separatorChar);
+        String userDir = System.getProperty("user.dir");
+
+        File candidate = new File(userDir + File.separator + "src" + normalizedPath);
+        if (candidate.exists()) {
+            return candidate;
+        }
+
+        candidate = new File(userDir + normalizedPath);
+        if (candidate.exists()) {
+            return candidate;
+        }
+
+        candidate = new File(userDir + File.separator + "Maze" + File.separator + "src" + normalizedPath);
+        if (candidate.exists()) {
+            return candidate;
+        }
+        return new File(userDir + File.separator + "src" + normalizedPath);
+    }
+
+    public void update() {
+        // Biarkan kosong.
+        // Ini hanya sebagai "syarat" agar Java tahu method ini ada.
+        // Nanti isinya akan otomatis ditimpa oleh update() yang ada di FireSlime dan Player.
     }
 }
