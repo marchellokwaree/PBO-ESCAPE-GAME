@@ -61,27 +61,27 @@ public class FireSlime extends Entity implements IAttackable {
             int spriteWidth = 64; // Lebar setiap sprite
             int spriteHeight = 64; // Tinggi setiap sprite
             int rowY = 0; // Y untuk baris pertama
-            this.bufferedImage = loadBufferedImage("/Assets/Enemy/PNG/Slime1/With_Shadow/Slime1_Idle_with_shadow.png");
+            this.bufferedImage = SpriteCache.get("/Assets/Enemy/PNG/Slime1/With_Shadow/Slime1_Idle_with_shadow.png", this);
             for (int i = 0; i < animationFrames.length; i++) {
                 int colX = i * spriteWidth; // X untuk setiap kolom
                 animationFrames[i] = bufferedImage.getSubimage(colX, rowY, spriteWidth, spriteHeight);
-                System.out.println("tes slime idle");
             }
             // load disappear animation
 
-            this.bufferedImage = loadBufferedImage("/Assets/Enemy/PNG/Slime1/With_Shadow/Slime1_Death_with_shadow.png");
+            this.bufferedImage = SpriteCache.get("/Assets/Enemy/PNG/Slime1/With_Shadow/Slime1_Death_with_shadow.png", this);
             for (int i = 0; i < disapearAnimation.length; i++) {
                 int colX = i * spriteWidth; // X untuk setiap kolom
                 disapearAnimation[i] = bufferedImage.getSubimage(colX, rowY, spriteWidth, spriteHeight);
             }
 
             // loaad attack animation
-            this.bufferedImage = loadBufferedImage(
-                    "/Assets/Enemy/PNG/Slime1/With_Shadow/Slime1_Attack_with_shadow.png");
+            this.bufferedImage = SpriteCache.get(
+                    "/Assets/Enemy/PNG/Slime1/With_Shadow/Slime1_Attack_with_shadow.png", this);
             for (int i = 0; i < attackAnimation.length; i++) {
                 int colX = i * spriteWidth; // X untuk setiap kolom
                 attackAnimation[i] = bufferedImage.getSubimage(colX, rowY, spriteWidth, spriteHeight);
             }
+            this.bufferedImage = null; // Bebaskan referensi sprite sheet besar
         } catch (Exception e) {
             System.out.println("Error loading animation sheet: " + e.getMessage());
             e.printStackTrace();

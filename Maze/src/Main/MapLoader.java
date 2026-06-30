@@ -11,12 +11,27 @@ public class MapLoader {
     public String[][] loadMapFromFile(String filePath) {
         List<String[]> rowList = new ArrayList<>();
 
-        try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
+        java.io.InputStream is = getClass().getResourceAsStream(filePath);
+        if (is == null && filePath.startsWith("src")) {
+            // Coba potong "src" untuk path resource jika salah path
+            String resourcePath = "/" + filePath.substring(4).replace('\\', '/');
+            is = getClass().getResourceAsStream(resourcePath);
+        }
+
+        try {
+            BufferedReader br;
+            if (is != null) {
+                br = new BufferedReader(new java.io.InputStreamReader(is));
+            } else {
+                br = new BufferedReader(new FileReader(filePath));
+            }
+            
             String line;
             while ((line = br.readLine()) != null) {
                 String[] rowElements = line.trim().split("\\s+");
                 rowList.add(rowElements);
             }
+            br.close();
         } catch (IOException e) {
             e.printStackTrace();
         }

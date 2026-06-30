@@ -81,34 +81,45 @@ public class LoadingPanel extends JPanel {
         new Thread(new Runnable() {
             @Override
             public void run() {
-                // Ganti panel HUD dengan GamePanel.
-                final GamePanel gamePanel = new GamePanel();
-                
-                SwingUtilities.invokeLater(new Runnable() {
-                    @Override
-                    public void run() {
-                        if (timer != null) {
-                            timer.stop();
-                        }
-                        progressBar.setValue(100);
-                        
-                        // Delay kecil saat 100% agar player sempat melihat loading penuh
-                        Timer delayTimer = new Timer(200, new ActionListener() {
-                            @Override
-                            public void actionPerformed(ActionEvent evt) {
-                                ((Timer)evt.getSource()).stop();
-                                parentFrame.setContentPane(gamePanel);
-                                parentFrame.revalidate();
-                                parentFrame.pack();
-                                parentFrame.setLocationRelativeTo(null);
-                                gamePanel.requestFocusInWindow();
-                                gamePanel.startGameThread();
+                try {
+                    // Ganti panel HUD dengan GamePanel.
+                    final GamePanel gamePanel = new GamePanel();
+                    
+                    SwingUtilities.invokeLater(new Runnable() {
+                        @Override
+                        public void run() {
+                            if (timer != null) {
+                                timer.stop();
                             }
-                        });
-                        delayTimer.setRepeats(false);
-                        delayTimer.start();
-                    }
-                });
+                            progressBar.setValue(100);
+                            
+                            // Delay kecil saat 100% agar player sempat melihat loading penuh
+                            Timer delayTimer = new Timer(200, new ActionListener() {
+                                @Override
+                                public void actionPerformed(ActionEvent evt) {
+                                    ((Timer)evt.getSource()).stop();
+                                    parentFrame.setContentPane(gamePanel);
+                                    parentFrame.revalidate();
+                                    parentFrame.pack();
+                                    parentFrame.setLocationRelativeTo(null);
+                                    gamePanel.requestFocusInWindow();
+                                    gamePanel.startGameThread();
+                                }
+                            });
+                            delayTimer.setRepeats(false);
+                            delayTimer.start();
+                        }
+                    });
+                } catch (Throwable t) {
+                    t.printStackTrace();
+                    SwingUtilities.invokeLater(new Runnable() {
+                        @Override
+                        public void run() {
+                            if (timer != null) timer.stop();
+                            javax.swing.JOptionPane.showMessageDialog(parentFrame, "Error loading game: " + t.getMessage() + "\n" + t.toString());
+                        }
+                    });
+                }
             }
         }).start();
     }

@@ -97,6 +97,11 @@ if ($jarExitCode -ne 0) {
 }
 Write-Host "  JAR created." -ForegroundColor Green
 
+# Update root jar as well
+$RootJarPath = Join-Path $ProjectRoot $JarName
+Copy-Item -Force -Path $JarOutput -Destination $RootJarPath
+Write-Host "  Root JAR updated." -ForegroundColor Green
+
 # --- Step 5: Create minimal custom JRE with jlink ---
 Write-Host "[5/6] Creating minimal custom JRE (jlink)..." -ForegroundColor Yellow
 Write-Host "  Only bundling: java.base, java.desktop" -ForegroundColor DarkYellow
@@ -133,8 +138,8 @@ Write-Host "[6/6] Creating native .exe with jpackage..." -ForegroundColor Yellow
     --app-version "1.0.0" `
     --vendor "PBO Escape Game Team" `
     --description "PBO Escape Game - Maze Adventure" `
-    --java-options "-Xms256m" `
-    --java-options "-Xmx512m" `
+    --java-options "-Xms512m" `
+    --java-options "-Xmx2048m" `
     --java-options "-XX:+UseSerialGC" `
     --java-options "-XX:TieredStopAtLevel=1"
 
