@@ -41,6 +41,7 @@ public class Player extends Entity {
 
     public boolean isAttacking = false;
     public int attackCooldown = 0; // Cooldown antar serangan
+    public boolean isGodMode = false; // Kebal trap & damage monster
 
     // Slash effect variables
     BufferedImage[] slashImages = new BufferedImage[5];
@@ -247,11 +248,13 @@ public class Player extends Entity {
     }
 
     public void applySlow(int durationFrames) {
+        if (isGodMode) return;
         slowEffectCounter = durationFrames;
         speed = slowSpeed;
     }
 
     public void applyStun(int durationFrames) {
+        if (isGodMode) return;
         if (stunCounter == 0 && stunCooldown == 0) {
             stunCounter = durationFrames;
             SoundManager.play("/Assets/Sound/IceEffect.wav");
@@ -275,7 +278,8 @@ public class Player extends Entity {
 
         // --- DEBUG: GAMBAR KOTAK PUKULAN ---
         // --- DEBUG: GAMBAR KOTAK PUKULAN (Letakkan di akhir method draw) ---
-        g2.setColor(new java.awt.Color(0, 0, 255, 150)); // INI HITBOX ATTACK PLAYER, HAPUS KALAU SUDAH JADI
+        // g2.setColor(new java.awt.Color(0, 0, 255, 150)); // INI HITBOX ATTACK PLAYER,
+        // HAPUS KALAU SUDAH JADI
 
         int attackDrawX = x - camX;
         int attackDrawY = y - camY;
@@ -297,8 +301,9 @@ public class Player extends Entity {
 
         // SWITCH DAN DEKLARASI VARIABEL JANGAN DIHAPUS
 
-        g2.fillRect(attackDrawX, attackDrawY, gp.getTileSize(), gp.getTileSize()); // INI HITBOX ATTACK PLAYER, HAPUS
-                                                                                   // KALAU SUDAH JADI
+        // g2.fillRect(attackDrawX, attackDrawY, gp.getTileSize(), gp.getTileSize()); //
+        // INI HITBOX ATTACK PLAYER, HAPUS
+        // KALAU SUDAH JADI
 
         AffineTransform originalTransform = g2.getTransform();
 
@@ -470,6 +475,11 @@ public class Player extends Entity {
      * Menggunakan sistem Defense persentase (Damage Reduction %)
      */
     public void terimaDamage(int damageAsli) {
+        if (this.isGodMode) {
+            System.out.println("GOD MODE ACTIVE! Mencegah damage: " + damageAsli);
+            return;
+        }
+
         // 1. Batasi defense maksimal 100% agar damage tidak jadi minus (malah nge-heal)
         int persenDef = Math.min(this.defense, 100);
 

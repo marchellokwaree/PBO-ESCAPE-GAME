@@ -284,6 +284,19 @@ public class LarkConsole {
                             + ", Normal Speed: " + gp.player.normalSpeed);
                 }
                 break;
+            case "tuhan":
+                if (gp.player != null) {
+                    gp.player.isGodMode = !gp.player.isGodMode; // Toggle God Mode
+                    System.out.println("CHEAT ACTIVATED: GOD MODE " + (gp.player.isGodMode ? "ON" : "OFF"));
+                    SwingUtilities.invokeLater(() -> {
+                        JOptionPane.showMessageDialog(
+                                gp,
+                                "God Mode: " + (gp.player.isGodMode ? "ON" : "OFF") + "\nKebal trap & monster!",
+                                "LARK 1A",
+                                JOptionPane.INFORMATION_MESSAGE);
+                    });
+                }
+                break;
             default:
                 System.out.println("Cheat code tidak dikenali: " + code);
                 SwingUtilities.invokeLater(() -> {

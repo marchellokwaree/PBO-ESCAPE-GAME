@@ -243,26 +243,26 @@ public class Slime3 extends Entity implements IAttackable {
 
         // --- TRIK KOTAK MERAH (DEBUG) ---
         // Ini akan menggambar kotak merah terang sebagai pengganti slime
-        g2.setColor(new java.awt.Color(255, 0, 0, 150)); // Merah semi-transparan
-        g2.fillRect(screenX, screenY, width, height);
+        // g2.setColor(new java.awt.Color(255, 0, 0, 150)); // Merah semi-transparan
+        // g2.fillRect(screenX, screenY, width, height);
 
         if (Activitynow == 1) { // GAMBAR HITBOX ATTACK AREA SLIME, HAPUS AJA KALAU GAME SUDAH JADI
-            g2.setColor(new java.awt.Color(255, 165, 0, 150)); // Oranye semi-transparan
+            // g2.setColor(new java.awt.Color(255, 165, 0, 150)); // Oranye semi-transparan
 
             // Ambil langsung dari logika aslinya agar visual 100% cocok dengan serangan
             Rectangle attackArea = getAttackHitboxArea();
 
             // Konversi dari koordinat dunia (World) ke koordinat layar (Screen)
-            int attackDrawX = attackArea.x - camX;
-            int attackDrawY = attackArea.y - camY;
+            // int attackDrawX = attackArea.x - camX;
+            // int attackDrawY = attackArea.y - camY;
 
-            g2.fillRect(attackDrawX, attackDrawY, attackArea.width, attackArea.height);
+            // g2.fillRect(attackDrawX, attackDrawY, attackArea.width, attackArea.height);
         }
 
         // --- DEBUG: GAMBAR RADAR 5x5 SLIME (HIJAU) ---
-        g2.setColor(new java.awt.Color(0, 255, 0, 80)); // Hijau sangat pudar
-        Rectangle radar = getAggroArea();
-        g2.fillRect(radar.x - camX, radar.y - camY, radar.width, radar.height);
+        // g2.setColor(new java.awt.Color(0, 255, 0, 80)); // Hijau sangat pudar
+        // Rectangle radar = getAggroArea();
+        // g2.fillRect(radar.x - camX, radar.y - camY, radar.width, radar.height);
 
         // Hanya gambar jika masuk ke dalam pandangan monitor
         if (x + width > camX &&
@@ -272,15 +272,18 @@ public class Slime3 extends Entity implements IAttackable {
 
             if (Activitynow == 0) {
                 if (animationFrames[currentFrame] != null) {
-                    g2.drawImage(animationFrames[currentFrame], screenX - 16, screenY - 16, 64, 64, null);
+                    g2.drawImage(animationFrames[currentFrame], screenX - 16, screenY - 16, 64,
+                            64, null);
                 }
             } else if (Activitynow == 2) {
                 if (disapearAnimation[disapearFrame] != null) {
-                    g2.drawImage(disapearAnimation[disapearFrame], screenX - 16, screenY - 16, 64, 64, null);
+                    g2.drawImage(disapearAnimation[disapearFrame], screenX - 16, screenY - 16,
+                            64, 64, null);
                 }
             } else if (Activitynow == 1) {
                 if (attackAnimation[attackFrame] != null) {
-                    g2.drawImage(attackAnimation[attackFrame], screenX - 16, screenY - 16, 64, 64, null);
+                    g2.drawImage(attackAnimation[attackFrame], screenX - 16, screenY - 16, 64,
+                            64, null);
                 }
             }
         }

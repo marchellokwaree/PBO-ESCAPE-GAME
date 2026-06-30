@@ -243,23 +243,24 @@ public class FireSlime extends Entity implements IAttackable {
 
         // --- TRIK KOTAK MERAH (DEBUG) ---
         // Ini akan menggambar kotak merah terang sebagai pengganti slime
-        g2.setColor(new java.awt.Color(255, 0, 0, 150)); // Merah semi-transparan
-        g2.fillRect(screenX, screenY, width, height);
+        // g2.setColor(new java.awt.Color(255, 0, 0, 150)); // Merah semi-transparan
+        // g2.fillRect(screenX, screenY, width, height);
 
         if (Activitynow == 1) { // GAMBAR HITBOX ATTACK AREA SLIME, HAPUS AJA KALAU GAME SUDAH JADI
-            g2.setColor(new java.awt.Color(255, 165, 0, 150)); // Oranye semi-transparan
+            // g2.setColor(new java.awt.Color(255, 165, 0, 150)); // Oranye semi-transparan
 
-            // Hitung posisi X dan Y agar area 3x3 ini berada persis di tengah Slime
-            int attackDrawX = screenX - gp.getTileSize();
-            int attackDrawY = screenY - gp.getTileSize();
+            // // Hitung posisi X dan Y agar area 3x3 ini berada persis di tengah Slime
+            // int attackDrawX = screenX - gp.getTileSize();
+            // int attackDrawY = screenY - gp.getTileSize();
 
-            g2.fillRect(attackDrawX, attackDrawY, attackHitbox.width, attackHitbox.height);
+            // g2.fillRect(attackDrawX, attackDrawY, attackHitbox.width,
+            // attackHitbox.height);
         }
 
         // --- DEBUG: GAMBAR RADAR 5x5 SLIME (HIJAU) ---
-        g2.setColor(new java.awt.Color(0, 255, 0, 80)); // Hijau sangat pudar
-        Rectangle radar = getAggroArea();
-        g2.fillRect(radar.x - camX, radar.y - camY, radar.width, radar.height);
+        // g2.setColor(new java.awt.Color(0, 255, 0, 80)); // Hijau sangat pudar
+        // Rectangle radar = getAggroArea();
+        // g2.fillRect(radar.x - camX, radar.y - camY, radar.width, radar.height);
 
         // Hanya gambar jika masuk ke dalam pandangan monitor
         if (x + width > camX &&

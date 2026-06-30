@@ -57,8 +57,8 @@ public class GamePanel extends JPanel implements Runnable {
     boolean lanternSpawned = false;
     boolean lanternCollected = false;
 
-    public final int baseSafeVisionTiles = 2;
-    public final int baseVisionRangeTiles = 3;
+    public final int baseSafeVisionTiles = 100;
+    public final int baseVisionRangeTiles = 100;
     public int safeVisionTiles = baseSafeVisionTiles; // tiles always fully visible around player
     public int visionRangeTiles = baseVisionRangeTiles; // tiles where player can still see, beyond this is black
 
