@@ -8,10 +8,6 @@ import Item.DefenseItem;
 import Item.Lantern;
 
 import java.awt.Color;
-import javax.sound.sampled.AudioInputStream;
-import javax.sound.sampled.AudioSystem;
-import javax.sound.sampled.Clip;
-import java.io.BufferedInputStream;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
@@ -26,13 +22,8 @@ import java.util.Iterator;
 import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
-import javax.swing.JDialog;
-import javax.swing.JLabel;
-import javax.swing.JTextField;
-import javax.swing.JButton;
 import java.awt.Font;
 import java.awt.Rectangle;
 
@@ -386,7 +377,9 @@ public class GamePanel extends JPanel implements Runnable {
         gameThread.start();
         timer.start(); // Mulai timer saat game thread dimulai
         if (spawner != null) {
-            spawner.SpawnMonsters(5);
+            synchronized (monsters) {
+                spawner.SpawnMonsters(5);
+            }
         }
     }
 
@@ -465,44 +458,46 @@ public class GamePanel extends JPanel implements Runnable {
         // Update smooth camera after updating entities
         updateCamera();
 
-        if (spawner != null) {
-            spawner.update();
-        }
+        synchronized (monsters) {
+            if (spawner != null) {
+                spawner.update();
+            }
 
-        // Gunakan Iterator untuk iterasi dan menghapus dengan aman
-        Iterator<Entity> iterator = monsters.iterator();
-        while (iterator.hasNext()) {
-            Entity monster = iterator.next();
+            // Gunakan Iterator untuk iterasi dan menghapus dengan aman
+            Iterator<Entity> iterator = monsters.iterator();
+            while (iterator.hasNext()) {
+                Entity monster = iterator.next();
 
-            if (monster != null) {
-                monster.update();
+                if (monster != null) {
+                    monster.update();
 
-                if (monster instanceof FireSlime) {
-                    FireSlime slime = (FireSlime) monster;
-                    slime.checkPlayerCollision(player);
+                    if (monster instanceof FireSlime) {
+                        FireSlime slime = (FireSlime) monster;
+                        slime.checkPlayerCollision(player);
 
-                    // Jika slime sudah mati dan animasi matinya sudah selesai
-                    if (slime.readyToRemove) {
-                        iterator.remove(); // Menghapus slime dari ArrayList dengan aman
-                        System.out.println("FireSlime berhasil dihapus dari Map!");
+                        // Jika slime sudah mati dan animasi matinya sudah selesai
+                        if (slime.readyToRemove) {
+                            iterator.remove(); // Menghapus slime dari ArrayList dengan aman
+                            System.out.println("FireSlime berhasil dihapus dari Map!");
+                        }
                     }
-                }
-                if (monster instanceof Slime2) {
-                    Slime2 slime = (Slime2) monster;
-                    slime.checkPlayerCollision(player);
+                    if (monster instanceof Slime2) {
+                        Slime2 slime = (Slime2) monster;
+                        slime.checkPlayerCollision(player);
 
-                    if (slime.readyToRemove) {
-                        iterator.remove();
+                        if (slime.readyToRemove) {
+                            iterator.remove();
 
+                        }
                     }
-                }
-                if (monster instanceof Slime3) {
-                    Slime3 slime = (Slime3) monster;
-                    slime.checkPlayerCollision(player);
+                    if (monster instanceof Slime3) {
+                        Slime3 slime = (Slime3) monster;
+                        slime.checkPlayerCollision(player);
 
-                    if (slime.readyToRemove) {
-                        iterator.remove();
+                        if (slime.readyToRemove) {
+                            iterator.remove();
 
+                        }
                     }
                 }
             }
@@ -520,7 +515,9 @@ public class GamePanel extends JPanel implements Runnable {
 
         // 2. Jika klik kiri ditekan, DAN pemain TIDAK sedang membuka peti, baru serang
         if (keyH.leftMousePressed && !sedangBukaPeti) {
-            player.attackEnemies(monsters);
+            synchronized (monsters) {
+                player.attackEnemies(monsters);
+            }
 
             // Reset status klik agar tidak menyerang berkali-kali dalam 1 detik
             keyH.leftMousePressed = false;
@@ -865,15 +862,17 @@ public class GamePanel extends JPanel implements Runnable {
         }
 
         // Draw monsters
-        for (Entity monster : monsters) {
-            if (monster instanceof FireSlime) {
-                ((FireSlime) monster).draw(g2);
-            }
-            if (monster instanceof Slime2) {
-                ((Slime2) monster).draw(g2);
-            }
-            if (monster instanceof Slime3) {
-                ((Slime3) monster).draw(g2);
+        synchronized (monsters) {
+            for (Entity monster : monsters) {
+                if (monster instanceof FireSlime) {
+                    ((FireSlime) monster).draw(g2);
+                }
+                if (monster instanceof Slime2) {
+                    ((Slime2) monster).draw(g2);
+                }
+                if (monster instanceof Slime3) {
+                    ((Slime3) monster).draw(g2);
+                }
             }
         }
 

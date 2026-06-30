@@ -2,88 +2,38 @@ package Item;
 
 import Entitiy.Player;
 import Main.GamePanel;
+import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
 import javax.imageio.ImageIO;
 
 public class Lantern extends Item {
     public int bonusSafeVision;
     public int bonusRange;
-    private BufferedImage[] animationFrames;
+    private BufferedImage[] animationFrames = new BufferedImage[4];
     private int currentFrame = 0;
     private int animationCounter = 0;
     private final int animationDelay = 6;
+    private BufferedImage spriteSheet;
 
     public Lantern(String name, int safeVisionBonus, int rangeBonus) {
         this.name = name;
         this.bonusSafeVision = safeVisionBonus;
         this.bonusRange = rangeBonus;
-        loadIcon();
-    }
-
-    private void loadIcon() {
-        String[] paths = {
-                "/Assets/ASSET/Lantern/Lantern 5- Silver and Orange.png",
-                "Assets/ASSET/Lantern/Lantern 5- Silver and Orange.png"
-        };
-
-        BufferedImage spriteSheet = null;
-        for (String path : paths) {
-            try (InputStream stream = getClass().getResourceAsStream(path)) {
-                if (stream != null) {
-                    spriteSheet = ImageIO.read(stream);
-                    break;
-                }
-            } catch (Exception e) {
-                System.out.println("Error memuat ikon lantern dari resource: " + e.getMessage());
+        try {
+            this.spriteSheet = loadBufferedImage("/Assets/ASSET/Lantern/Lantern.png");
+            int spriteWidth = 43;
+            int spriteHeight = 39;
+            int rowY = 1 * spriteHeight;
+            for (int i = 0; i < animationFrames.length; i++) {
+                int colX = i * spriteWidth;
+                animationFrames[i] = spriteSheet.getSubimage(colX, rowY, spriteWidth, spriteHeight);
             }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-
-        if (spriteSheet == null) {
-            try {
-                String userDir = System.getProperty("user.dir");
-                for (String path : paths) {
-                    File file = new File(userDir, path.replace('/', File.separatorChar));
-                    if (file.exists()) {
-                        spriteSheet = ImageIO.read(file);
-                        break;
-                    }
-                }
-
-                if (spriteSheet == null) {
-                    for (String path : paths) {
-                        File file = new File(userDir + File.separator + "Maze" + File.separator + "src",
-                                path.replace('/', File.separatorChar));
-                        if (file.exists()) {
-                            spriteSheet = ImageIO.read(file);
-                            break;
-                        }
-                    }
-                }
-            } catch (Exception e) {
-                System.out.println("Error memuat ikon lantern dari file system: " + e.getMessage());
-            }
-        }
-
-        if (spriteSheet != null) {
-            int frameWidth = 32;
-            int frameHeight = 32;
-            int frameCount = Math.max(1, spriteSheet.getWidth() / frameWidth);
-            animationFrames = new BufferedImage[frameCount];
-            for (int i = 0; i < frameCount; i++) {
-                int x = i * frameWidth;
-                if (x + frameWidth <= spriteSheet.getWidth() && frameHeight <= spriteSheet.getHeight()) {
-                    animationFrames[i] = spriteSheet.getSubimage(x, 0, frameWidth, frameHeight);
-                }
-            }
-            if (animationFrames.length > 0) {
-                this.image = animationFrames[0];
-            }
-            return;
-        }
-
-        System.out.println("Gambar lantern tidak ditemukan di resource maupun filesystem.");
     }
 
     private void updateAnimation() {
@@ -109,6 +59,15 @@ public class Lantern extends Item {
     }
 
     @Override
+    public void draw(Graphics2D g2, int x, int y, int width, int height) {
+        BufferedImage frame = (animationFrames != null && animationFrames.length > 0) ? animationFrames[currentFrame]
+                : this.image;
+        if (frame != null) {
+            g2.drawImage(frame, x, y, width, height, null);
+        }
+    }
+
+    @Override
     public void use(Player p) {
         GamePanel gp = p.getGamePanel();
         if (gp != null) {
@@ -117,5 +76,39 @@ public class Lantern extends Item {
             System.out.println(
                     this.name + " di-equip! Safe Vision +" + bonusSafeVision + ", Vision Range +" + bonusRange);
         }
+    }
+
+    protected BufferedImage loadBufferedImage(String path) {
+        try (InputStream stream = getClass().getResourceAsStream(path)) {
+            if (stream != null) {
+                return ImageIO.read(stream);
+            }
+            File file = resolveFile(path);
+            return ImageIO.read(file);
+        } catch (IOException e) {
+            System.err.println("Failed to load player buffered image: " + path + " -> " + e.getMessage());
+            return null;
+        }
+    }
+
+    protected File resolveFile(String path) {
+        String normalizedPath = path.replace('/', File.separatorChar);
+        String userDir = System.getProperty("user.dir");
+
+        File candidate = new File(userDir + File.separator + "src" + normalizedPath);
+        if (candidate.exists()) {
+            return candidate;
+        }
+
+        candidate = new File(userDir + normalizedPath);
+        if (candidate.exists()) {
+            return candidate;
+        }
+
+        candidate = new File(userDir + File.separator + "Maze" + File.separator + "src" + normalizedPath);
+        if (candidate.exists()) {
+            return candidate;
+        }
+        return new File(userDir + File.separator + "src" + normalizedPath);
     }
 }

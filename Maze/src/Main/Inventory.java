@@ -10,7 +10,6 @@ import java.io.InputStream;
 import javax.imageio.ImageIO;
 import Item.DamageItem;
 import Item.DefenseItem;
-import Main.GamePanel;
 
 public class Inventory {
     BufferedImage image;
@@ -79,7 +78,7 @@ public class Inventory {
 
         // Dedicated lantern slot on the left side of the inventory UI
         int lanternSize = 28;
-        int lanternX = this.x + 18;
+        int lanternX = this.x + 14;
         int lanternY = this.y + 7;
         if (lanternSlot != null) {
             if (lanternSlot == equippedLantern) {

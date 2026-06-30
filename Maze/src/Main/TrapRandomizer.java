@@ -3,15 +3,7 @@ package Main;
 import java.util.Random;
 
 public class TrapRandomizer {
-    /**
-     * Randomizes fire traps ('F') and ice traps ('I') on empty floor tiles ('0').
-     * Keeps a 2-tile radius around the starting point 'S' completely safe to prevent
-     * instant death/stun upon spawning.
-     *
-     * @param map The 2D map array loaded from the file.
-     * @param fireChance Probability of spawning a fire trap on an empty tile (0.0 to 1.0).
-     * @param iceChance Probability of spawning an ice trap on an empty tile (0.0 to 1.0).
-     */
+
     public static void randomize(String[][] map, double fireChance, double iceChance) {
         if (map == null || map.length == 0) {
             return;
